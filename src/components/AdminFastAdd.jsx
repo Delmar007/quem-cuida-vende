@@ -417,6 +417,8 @@ export default function AdminFastAdd({ setActiveTab, initialData, onSuccess }) {
               value={rawText}
               onChange={e => setRawText(e.target.value)}
               placeholder="BMW 320i M Sport 2.0 Turbo Flex&#10;2025&#10;9.000km&#10;Garantia de fábrica&#10;Teto solar&#10;..."
+              style={{ width: '100%', minHeight: '150px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
