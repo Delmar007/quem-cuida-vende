@@ -14,6 +14,7 @@ import LojistaPagamento from './pages/LojistaPagamento';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ContatoRecebido from './pages/ContatoRecebido';
 import ComprarAnuncios from './pages/ComprarAnuncios';
 import PagamentoSucesso from './pages/PagamentoSucesso';
 import ScrollToTop from './components/ScrollToTop';
@@ -39,6 +40,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/privacidade" element={<PrivacyPolicy />} />
+          <Route path="/contato-recebido" element={<ContatoRecebido />} />
           <Route path="/comprar-anuncios" element={<ComprarAnuncios />} />
           <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
         </Routes>
