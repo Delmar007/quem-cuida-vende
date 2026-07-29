@@ -1,9 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import HeaderColmeia from '../components/HeaderColmeia';
 import DynamicBanner from '../components/DynamicBanner';
+import PropertyCard from '../components/PropertyCard';
 
 const initialCars = [];
+
+const BAIRROS_CG = [
+  "Aero Rancho", "Amambaí", "América", "Caiobá", "Carandá Bosque", 
+  "Centro", "Chácara Cachoeira", "Coophavila II", "Coronel Antonino", 
+  "Cruzeiro", "Estrela Dalva", "Guanandi", "Itamaracá", "Jardim Autonomista", 
+  "Jardim dos Estados", "Jardim Paulista", "Jardim TV Morena", 
+  "Margarida", "Maria Aparecida Pedrossian", "Mata do Jacinto", 
+  "Monte Castelo", "Moreninhas", "Nova Campo Grande", "Nova Lima", 
+  "Pioneiros", "Planalto", "Rita Vieira", "Santo Amaro", "São Francisco", 
+  "São Lourenço", "Tiradentes", "Taveirópolis", "União", "Universitário", 
+  "Vilas Boas", "Noroeste", "Seminário", "José Abrão", "Sobrinho", 
+  "Cabocla", "Bandeirantes", "Carlota", "Cachoeira", "Alves Pereira", 
+  "Centenário", "Parati", "Piratininga", "Guaicurus", "Leblon", "Taquarussu",
+  "Nhanhá", "Vila Nasser", "Vila Popular", "Vila Sobrinho", "Vila Margarida"
+].sort((a, b) => a.localeCompare(b));
 
 const getPosStyles = (pos) => {
   switch(pos) {
@@ -47,6 +64,8 @@ export default function Ads() {
   const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'vitrine'); // 'vitrine' | 'marca' | 'pedidos'
   const [showBrands, setShowBrands] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [showBairros, setShowBairros] = useState(false);
+  const [selectedBairro, setSelectedBairro] = useState(null);
   const [fipeData, setFipeData] = useState({ marcas: [] });
   const [showCategorias, setShowCategorias] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState(location.state?.selectedCategoria || null);
@@ -111,6 +130,34 @@ export default function Ads() {
   const itemsPerPage = 8;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  // ESTADOS DO NOVO MOTOR DE BUSCA DE IMÓVEIS
+  const [imvFinalidade, setImvFinalidade] = useState('Venda');
+  const [imvCategoria, setImvCategoria] = useState('Residencial');
+  const [imvTipo, setImvTipo] = useState('');
+  const [imvUF, setImvUF] = useState('MS');
+  const [imvCidade, setImvCidade] = useState('');
+  const [imvBairro, setImvBairro] = useState('');
+  const [imvPalavraChave, setImvPalavraChave] = useState('');
+  const [imvCorretor, setImvCorretor] = useState('');
+
+  const IMV_FINALIDADES = ['Venda', 'Aluguel', 'Temporada'];
+  const IMV_CATEGORIAS = ['Residencial', 'Comercial', 'Rural'];
+  const IMV_TIPOS = {
+    'Residencial': ['Casa', 'Apartamento', 'Sobrado', 'Casa em Condomínio', 'Kitnet', 'Flat', 'Terreno/Lote'],
+    'Comercial': ['Sala Comercial', 'Salão', 'Prédio Comercial', 'Galpão/Barracão', 'Ponto Comercial'],
+    'Rural': ['Chácara', 'Sítio', 'Fazenda']
+  };
+  const CIDADES_MS = ['Campo Grande', 'Dourados', 'Três Lagoas', 'Corumbá', 'Ponta Porã', 'Naviraí', 'Nova Andradina', 'Aquidauana', 'Maracaju', 'Paranaíba', 'Amambai', 'Rio Brilhante', 'Coxim', 'Caarapó', 'Miranda', 'São Gabriel do Oeste', 'Aparecida do Taboado', 'Chapadão do Sul', 'Anastácio', 'Itaporã', 'Ribas do Rio Pardo', 'Bela Vista', 'Ladário', 'Bataguassu', 'Ivinhema', 'Nova Alvorada do Sul', 'Terenos', 'Bonito', 'Cassilândia', 'Itaquiraí'].sort();
+  const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+  const handleBuscarImoveis = () => {
+    // Para simplificar, quando clica em Buscar, ele força a atualização dos anúncios baseados nestes filtros.
+    // Como getFilteredData é reativo aos states, os states já servem de filtro se ligarmos lá.
+    // Aqui podemos apenas rolar para baixo ou mostrar um aviso caso achem necessário.
+    window.scrollTo({ top: document.querySelector('.desktop-filters-grid')?.offsetTop || 500, behavior: 'smooth' });
+  };
+
 
   const normalizeString = (str) => {
     return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
@@ -223,30 +270,60 @@ export default function Ads() {
     }
   };
 
-  const handleMarcaClick = () => {
-    if (activeTab === 'marca' && showBrands) {
+  const handleSelectBairro = (bairro) => {
+    if (bairro === '') {
+      setSelectedBairro(null);
       setActiveTab('vitrine');
-      setShowBrands(false);
-      setSelectedBrand(null);
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
     } else {
-      setActiveTab('marca');
-      setShowBrands(true);
-      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      setSelectedBairro(bairro);
+    }
+    setShowBairros(false);
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+  };
+
+  const handleFirstFilterClick = () => {
+    if (selectedCategoria === 'Imóveis') {
+      if (activeTab === 'bairro' && showBairros) {
+        setActiveTab('vitrine');
+        setShowBairros(false);
+        setSelectedBairro(null);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      } else {
+        setActiveTab('bairro');
+        setShowBairros(true);
+        setShowBrands(false);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      }
+    } else {
+      if (activeTab === 'marca' && showBrands) {
+        setActiveTab('vitrine');
+        setShowBrands(false);
+        setSelectedBrand(null);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      } else {
+        setActiveTab('marca');
+        setShowBrands(true);
+        setShowBairros(false);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+      }
     }
   };
 
   const handlePedidosClick = () => {
     setActiveTab('pedidos');
     setShowBrands(false);
+    setShowBairros(false);
     setSelectedBrand(null);
+    setSelectedBairro(null);
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
   };
 
   const handleEstoqueTotalClick = () => {
     setActiveTab('vitrine');
     setShowBrands(false);
+    setShowBairros(false);
     setSelectedBrand(null);
+    setSelectedBairro(null);
     setSelectedCategoria(null);
     setCars(prev => [...prev].sort(() => Math.random() - 0.5));
     setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
@@ -279,13 +356,49 @@ export default function Ads() {
   };
 
   const getFilteredData = () => {
-    if (activeTab === 'vitrine' || activeTab === 'marca') {
+    if (activeTab === 'vitrine' || activeTab === 'marca' || activeTab === 'bairro') {
       let filtered = cars.filter(car => car.status !== 'pendente');
       if (activeTab === 'marca' && selectedBrand) {
         filtered = filtered.filter(car => car.marca && car.marca.toLowerCase() === selectedBrand.toLowerCase());
       }
-      if (selectedCategoria) {
-        filtered = filtered.filter(car => car.tipoVeiculo === selectedCategoria);
+      if (activeTab === 'bairro' && selectedBairro) {
+        filtered = filtered.filter(car => car.bairro && car.bairro.toLowerCase() === selectedBairro.toLowerCase());
+      }
+      if (selectedCategoria === 'Imóveis') {
+        filtered = filtered.filter(car => car.tipoVeiculo === 'Imóveis' || car.categoria === 'Imóveis');
+        
+        if (imvFinalidade) {
+          filtered = filtered.filter(car => car.finalidade === imvFinalidade || car.imv_finalidade === imvFinalidade);
+        }
+        if (imvCategoria) {
+          filtered = filtered.filter(car => car.imv_categoria === imvCategoria || car.categoria === imvCategoria);
+        }
+        if (imvTipo) {
+          filtered = filtered.filter(car => car.imv_tipo === imvTipo || car.modelo === imvTipo);
+        }
+        if (imvUF && imvUF !== 'Brasil') {
+          filtered = filtered.filter(car => car.estado === imvUF);
+        }
+        if (imvCidade) {
+          filtered = filtered.filter(car => car.cidade === imvCidade);
+        }
+        if (imvBairro) {
+          filtered = filtered.filter(car => car.bairro && car.bairro.toLowerCase() === imvBairro.toLowerCase());
+        }
+        if (imvPalavraChave) {
+          filtered = filtered.filter(car => {
+            const str = (car.descricao || '') + ' ' + (car.titulo || '') + ' ' + (car.modelo || '');
+            return normalizeString(str).includes(normalizeString(imvPalavraChave));
+          });
+        }
+        if (imvCorretor) {
+          filtered = filtered.filter(car => {
+            const str = (car.nome_vendedor || '') + ' ' + (car.creci || '');
+            return normalizeString(str).includes(normalizeString(imvCorretor));
+          });
+        }
+      } else if (selectedCategoria) {
+        filtered = filtered.filter(car => car.tipoVeiculo === selectedCategoria || car.categoria === selectedCategoria);
       }
       if (selectedEstado !== 'Brasil') {
         filtered = filtered.filter(car => car.estado === selectedEstado);
@@ -406,24 +519,60 @@ export default function Ads() {
     }
 
     return (
-      <div style={{ position: 'relative', width: '100%' }} onClick={() => setShowFilters(!showFilters)}>
-        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+      <div style={{ position: 'relative', width: '100%' }}>
+        <div onClick={() => selectedCategoria === 'Imóveis' ? handleFirstFilterClick() : setShowFilters(!showFilters)} style={{ display: 'flex', alignItems: 'center', width: '100%', cursor: 'pointer' }}>
           <div style={{ marginRight: '16px', color: '#fff' }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            {selectedCategoria === 'Imóveis' ? (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            ) : (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            )}
           </div>
           <div style={{ flex: 1 }}>
             <h3 style={{ fontSize: '1.2rem', margin: 0, fontWeight: '700' }}>
-              Filtro do Feed
-              {filterOption && <span style={{ width: '8px', height: '8px', backgroundColor: '#fff', borderRadius: '50%', display: 'inline-block', marginLeft: '8px', transform: 'translateY(-2px)' }}></span>}
+              {selectedCategoria === 'Imóveis' ? 'Escolher por bairro' : 'Filtro do Feed'}
+              {!selectedCategoria || selectedCategoria !== 'Imóveis' ? (filterOption && <span style={{ width: '8px', height: '8px', backgroundColor: '#fff', borderRadius: '50%', display: 'inline-block', marginLeft: '8px', transform: 'translateY(-2px)' }}></span>) : null}
             </h3>
-            <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', fontWeight: '400' }}>{options.find(o => o.id === filterOption)?.label || 'Refine sua busca'}</span>
+            <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', fontWeight: '400' }}>
+              {selectedCategoria === 'Imóveis' ? (selectedBairro ? selectedBairro : 'Veja os bairros disponíveis') : (options.find(o => o.id === filterOption)?.label || 'Refine sua busca')}
+            </span>
           </div>
           <div style={{ color: '#fff' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         </div>
 
-        {showFilters && (
+        {/* Dropdown Bairros - Para Imóveis */}
+        {selectedCategoria === 'Imóveis' && activeTab === 'bairro' && showBairros && (
+          <div style={{ 
+            position: 'absolute', top: '100%', left: 0, right: 0, marginTop: '8px',
+            backgroundColor: '#1a1a1a', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)',
+            boxShadow: '0px 10px 30px rgba(0,0,0,0.8)', zIndex: 9999, maxHeight: '220px', overflowY: 'auto'
+          }}>
+            <div 
+              onClick={(e) => { e.stopPropagation(); handleSelectBairro(''); }}
+              style={{ padding: '12px 16px', color: '#fff', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.9rem', fontWeight: 'bold' }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Todos os Bairros
+            </div>
+            {BAIRROS_CG.map(b => (
+              <div 
+                key={b}
+                onClick={(e) => { e.stopPropagation(); handleSelectBairro(b); }}
+                style={{ padding: '12px 16px', color: '#fff', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '0.9rem' }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                {b}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Filtro do Feed Tradicional - Para Outros */}
+        {selectedCategoria !== 'Imóveis' && showFilters && (
         <div onClick={(e) => e.stopPropagation()} style={{ 
           position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '8px',
           background: 'linear-gradient(to bottom, #E53935 0%, #8B0000 100%)', border: '1px solid #ff5252',
@@ -490,132 +639,233 @@ export default function Ads() {
   const countYellow = activeCars.filter(c => getDiscountTier(c) === 'yellow').length;
   const countGreen = activeCars.filter(c => getDiscountTier(c) === 'green').length;
 
-  return (
-    <div style={{ backgroundColor: 'var(--background)', minHeight: '100vh' }}>
-        {/* TOP BLACK BAR */}
-        <div style={{ width: '100%', backgroundColor: '#000', backgroundImage: 'url("/cabeçalho_colmeia.png.png")', backgroundSize: 'cover', backgroundPosition: 'center', display: 'flex', justifyContent: 'center', borderBottom: '2px solid rgba(255,255,255,0.1)', boxSizing: 'border-box' }}>
-          <div style={{ width: '100%', maxWidth: '940px', display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '4px', paddingLeft: '20px', paddingRight: '20px', boxSizing: 'border-box' }}>
-            
-            {/* Logo */}
-            <Link to="/anuncios" style={{ width: '100%', display: 'flex', justifyContent: 'center', textDecoration: 'none', marginBottom: '8px' }}>
-              <img src="/logo_larga.png" alt="Equipe Personal Car" style={{ width: '100%', height: 'auto', display: 'block', transition: 'transform 0.3s' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'} />
-            </Link>
+  const getCategoryTexts = (cat) => {
+    switch(cat) {
+      case 'Imóveis': return { buyTitle: 'Comprar um imóvel', buySub: 'Cadastrar Encomenda', sellTitle: 'Vender um imóvel', sellSub: 'Anunciar imóvel', shopTitle: 'Lojista Profissional', shopSub: 'corretores e imobiliárias' };
+      case 'Smartphones': return { buyTitle: 'Comprar um smartphone', buySub: 'Cadastrar Encomenda', sellTitle: 'Vender um smartphone', sellSub: 'Anunciar smartphone', shopTitle: 'Lojista Profissional', shopSub: 'lojas' };
+      case 'Vestuário': return { buyTitle: 'Comprar vestuário', buySub: 'Cadastrar Encomenda', sellTitle: 'Vender vestuário', sellSub: 'Anunciar vestuário', shopTitle: 'Lojista Profissional', shopSub: 'lojas e butiques' };
+      case 'Outros': return { buyTitle: 'Comprar', buySub: 'Cadastrar Encomenda', sellTitle: 'Vender', sellSub: 'Anunciar', shopTitle: 'Loja Profissional', shopSub: 'lojas gerais' };
+      case 'Veículos':
+      default:
+        return { buyTitle: 'Comprar um carro', buySub: 'Cadastrar Encomenda', sellTitle: 'Vender um carro', sellSub: 'Anunciar veículo', shopTitle: 'Lojista Profissional', shopSub: 'lojas e concessionárias' };
+    }
+  };
 
-            {/* Contador de Veículos e Círculos de Desconto */}
-            <div className="header-counters-wrapper" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', marginBottom: '16px', minHeight: '40px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <span translate="no" style={{ color: '#ef4444', fontWeight: '600', fontSize: '1.2rem' }}>
-                  {activeCars.length} Veículos
-                </span>
-                <select
-                  value={selectedBrand || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if(val) {
-                      handleSelectBrand(val);
-                    } else {
-                      handleEstoqueTotalClick();
-                    }
-                  }}
-                  style={{
-                    backgroundColor: '#111',
-                    color: '#fff',
-                    border: '1px solid #333',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '0.9rem',
-                    outline: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <option value="">Todas as Marcas</option>
-                  {[...(fipeData?.marcas || [])].sort().map(m => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
-              {/* Círculos de desconto - Posicionados entre o centro e a borda direita */}
-              <div className="discount-circles" style={{ position: 'absolute', right: '25%', transform: 'translateX(50%)', display: 'flex', gap: '10px' }}>
-                {/* Red Circle (<=10%) */}
-                <div className="discount-circle" style={{ backgroundColor: '#ef4444', color: '#fff' }} title="Até 10% de desconto">
-                  {countRed}
-                </div>
-                {/* Yellow Circle (>10% and <=20%) */}
-                <div className="discount-circle" style={{ backgroundColor: '#facc15', color: '#000' }} title="11% a 20% de desconto">
-                  {countYellow}
-                </div>
-                {/* Green Circle (>20%) */}
-                <div className="discount-circle" style={{ backgroundColor: '#22c55e', color: '#fff' }} title="Acima de 20% de desconto">
-                  {countGreen}
-                </div>
-              </div>
+  const renderImoveisSearchBox = () => {
+    return (
+      <div className="imoveis-search-box" style={{
+        width: '100%', maxWidth: '940px', height: 'auto', margin: '0 auto 30px auto',
+        background: 'linear-gradient(to bottom, #E53935 0%, #8B0000 100%)',
+        borderRadius: 'var(--radius-lg)', padding: '20px', boxSizing: 'border-box',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column',
+        justifyContent: 'space-between', gap: '14px'
+      }}>
+        {/* ROW 1: Finalidade, Categoria (Radios), Tipo de Imóvel */}
+        <div className="imoveis-filter-row" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>FINALIDADE</label>
+            <select value={imvFinalidade} onChange={(e) => setImvFinalidade(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem', fontWeight: '500' }}>
+              {IMV_FINALIDADES.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+          
+          <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>TIPO DE IMÓVEL</label>
+            <div style={{ display: 'flex', gap: '15px', padding: '10px 0' }}>
+              {IMV_CATEGORIAS.map(cat => (
+                <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', cursor: 'pointer', fontSize: '0.95rem' }}>
+                  <input type="radio" name="imvCategoria" value={cat} checked={imvCategoria === cat} onChange={() => { setImvCategoria(cat); setImvTipo(''); }} style={{ cursor: 'pointer', accentColor: '#ff5252', width: '16px', height: '16px' }} />
+                  {cat}
+                </label>
+              ))}
             </div>
+          </div>
+
+          <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label className="mobile-hidden-label" style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold', visibility: 'hidden' }}>ESCOLHER TIPO</label>
+            <select value={imvTipo} onChange={(e) => setImvTipo(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem', fontWeight: '500' }}>
+              <option value="">Qualquer {imvCategoria}</option>
+              {IMV_TIPOS[imvCategoria].map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
           </div>
         </div>
 
-        {/* Menu Topo (Extracted for sticky behavior) */}
-        <nav ref={headerRef} className="sticky-mobile-header" style={{ width: '100%', display: 'flex', justifyContent: 'center', backgroundColor: '#000', borderBottom: '1px solid rgba(255,255,255,0.1)', zIndex: 2000, margin: 0 }}>
-          <div className="scroll-menu-mobile" style={{ width: '100%', maxWidth: '940px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: '600', fontSize: '0.95rem', padding: '10px 20px', boxSizing: 'border-box' }}>
-            <button onClick={() => { if (!session) { alert('Complete seu cadastro (faça login com o Google na página inicial) antes de prosseguir.'); return; } navigate('/comprar?fast=true'); }} style={{ color: '#e0e0e0', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', transition: 'color 0.2s', padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>
-              <span>Comprar um carro</span>
-              <span style={{ color: '#ef4444', fontSize: '11px', fontStyle: 'italic', marginTop: '2px', lineHeight: '1' }}>Cadastrar Encomenda</span>
-            </button>
-            <button onClick={() => { if (!session) { alert('Complete seu cadastro (faça login com o Google na página inicial) antes de prosseguir.'); return; } navigate('/vender?fast=true'); }} style={{ color: '#e0e0e0', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', transition: 'color 0.2s', padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>
-              <span>Vender um carro</span>
-              <span style={{ color: '#ef4444', fontSize: '11px', fontStyle: 'italic', marginTop: '2px', lineHeight: '1' }}>Anunciar Gratuitamente</span>
-            </button>
-            <button onClick={() => { navigate('/lojistas'); }} style={{ color: '#e0e0e0', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', fontWeight: '600', transition: 'color 0.2s', padding: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>
-              <span>Lojista Profissional</span>
-              <span style={{ color: '#ef4444', fontSize: '11px', fontStyle: 'italic', marginTop: '2px', lineHeight: '1' }}>lojas e concessionárias</span>
-            </button>
-            <Link to="/institucional/quem-somos" style={{ color: '#e0e0e0', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>Quem somos</Link>
-            <Link to="/institucional/nossa-oficina" style={{ color: '#e0e0e0', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>Nosso escritório</Link>
-            <Link to="/institucional/testemunhos" style={{ color: '#e0e0e0', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#e0e0e0'}>Testemunhos</Link>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <Link to="/perfil" title="Meu Perfil" style={{ display: 'flex', alignItems: 'center' }}>
-                {session && session.user?.user_metadata?.avatar_url ? (
-                  <img src={session.user.user_metadata.avatar_url} alt="Perfil" style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #fff' }} />
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                )}
-              </Link>
-              <a href="https://www.google.com" title="Sair do site" style={{ color: '#fff', transition: 'transform 0.2s', display: 'flex', alignItems: 'center' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
-              </a>
-              <Link to="/admin" title="Cadastrar Veículos Admin" style={{ color: '#fff', transition: 'transform 0.2s', display: 'flex', alignItems: 'center' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-              </Link>
-            </div>
+        {/* ROW 2: UF, Cidade, Bairros */}
+        <div className="imoveis-filter-row" style={{ display: 'flex', gap: '20px' }}>
+          <div style={{ flex: '0 0 100px', display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>UF</label>
+            <select value={imvUF} onChange={(e) => setImvUF(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem', fontWeight: '500' }}>
+              {UFS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+            </select>
           </div>
-        </nav>
 
-      <main style={{ maxWidth: '940px', margin: '32px auto 64px auto', padding: '0 20px' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>CIDADE</label>
+            <select value={imvCidade} onChange={(e) => setImvCidade(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem', fontWeight: '500' }}>
+              <option value="">Qualquer Cidade</option>
+              {imvUF === 'MS' && CIDADES_MS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>BAIRROS</label>
+            <select value={imvBairro} onChange={(e) => setImvBairro(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem', fontWeight: '500' }}>
+              <option value="">Qualquer Bairro</option>
+              {imvUF === 'MS' && (!imvCidade || imvCidade === 'Campo Grande') && BAIRROS_CG.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* ROW 3: Palavra-Chave, Corretor, Buscar Button */}
+        <div className="imoveis-filter-row imoveis-filter-row-bottom" style={{ display: 'flex', gap: '20px', alignItems: 'flex-end' }}>
+          <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>PALAVRA-CHAVE</label>
+            <input type="text" placeholder="Ex: piscina, varanda..." value={imvPalavraChave} onChange={(e) => setImvPalavraChave(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem' }} />
+          </div>
+
+          <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+            <label style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 'bold' }}>IMOBILIÁRIA / CORRETOR</label>
+            <input type="text" placeholder="Nome ou CRECI" value={imvCorretor} onChange={(e) => setImvCorretor(e.target.value)} style={{ padding: '12px', borderRadius: '4px', border: 'none', backgroundColor: '#fff', color: '#333', fontSize: '0.95rem' }} />
+          </div>
+
+          <div style={{ flex: 1, width: '100%' }}>
+            <button onClick={handleBuscarImoveis} style={{ width: '100%', padding: '14px', backgroundColor: '#F7D046', color: '#000', border: 'none', borderRadius: '4px', fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer', transition: 'transform 0.2s, backgroundColor 0.2s' }} onMouseOver={e => { e.currentTarget.style.backgroundColor = '#e5be35'; e.currentTarget.style.transform = 'scale(1.02)'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#F7D046'; e.currentTarget.style.transform = 'scale(1)'; }}>
+              BUSCAR
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCategoryBanner = () => {
+    if (selectedCategoria === 'Veículos' || !selectedCategoria) {
+      return cars.length > 0 ? <DynamicBanner cars={cars} sponsoredBanners={sponsoredBanners} bannerFilterCategory={bannerFilterCategory} onCarClick={setSelectedCar} /> : null;
+    }
+    
+    let placeholderUrl = '';
+    switch(selectedCategoria) {
+      case 'Imóveis': placeholderUrl = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=940&q=80'; break;
+      case 'Smartphones': placeholderUrl = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&auto=format&fit=crop&w=940&q=80'; break;
+      case 'Vestuário': placeholderUrl = 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?ixlib=rb-4.0.3&auto=format&fit=crop&w=940&q=80'; break;
+      case 'Outros': placeholderUrl = 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=940&q=80'; break;
+      default: placeholderUrl = 'https://via.placeholder.com/940x300?text=Banner';
+    }
+
+    return (
+      <div style={{ width: '100%', paddingBottom: '37.234%', borderRadius: 'var(--radius-lg)', marginBottom: '5px', overflow: 'hidden', position: 'relative', backgroundColor: '#000', boxShadow: 'var(--shadow-premium)' }}>
+        <img src={placeholderUrl} alt={`Banner ${selectedCategoria}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{ color: '#fff', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 'bold', textShadow: '2px 2px 8px rgba(0,0,0,0.8)', margin: 0 }}>{selectedCategoria}</h2>
+        </div>
+      </div>
+    );
+  };
+  const uiTexts = getCategoryTexts(selectedCategoria);
+
+  return (
+      <div style={{ backgroundColor: 'var(--background)', minHeight: '100vh' }}>
+        {/* TOP BAR: Logo and Categories */}
+        <HeaderColmeia 
+          selectedCategoria={selectedCategoria}
+          setSelectedCategoria={setSelectedCategoria}
+          session={session}
+          headerRef={headerRef}
+          uiTexts={uiTexts}
+        />
+
+      <main style={{ maxWidth: '940px', margin: '5px auto 64px auto', padding: '0 20px' }}>
         {/* Hero Banner Section */}
-        {cars.length > 0 && (
-          <DynamicBanner cars={cars} sponsoredBanners={sponsoredBanners} bannerFilterCategory={bannerFilterCategory} onCarClick={setSelectedCar} />
-        )}
+        {renderCategoryBanner()}
         
         {/* PREMIUM ACTION CARDS TOGGLE AND CONTENT */}
-        {(() => {
-          const cards = [
-            (
-              <div key={1} onClick={(e) => { handleMarcaClick(); setLastClickedFilter(1); setShowFiltrosMenu(false); }} className="premium-card" style={{ display: 'flex', alignItems: 'center', padding: '0 16px', cursor: 'pointer', background: 'linear-gradient(to bottom, #333 0%, #050505 100%)', color: '#fff', height: '70px', boxSizing: 'border-box', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ marginRight: '16px', color: '#fff' }}>
-                  <svg width="28" height="28" viewBox="0 0 100 100" fill="currentColor">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M 30 15 L 70 15 L 75 30 L 85 30 L 85 35 L 80 40 L 80 50 L 20 50 L 20 40 L 15 35 L 15 30 L 25 30 Z M 29 28 L 71 28 L 68 17 L 32 17 Z" />
-                    <path fillRule="evenodd" clipRule="evenodd" d="M 45 45 L 85 45 L 90 60 L 100 60 L 100 65 L 95 70 L 95 85 L 85 85 L 85 95 L 75 95 L 75 85 L 45 85 L 45 95 L 35 95 L 35 85 L 30 85 L 30 70 L 35 65 L 35 60 L 40 60 Z M 44 58 L 86 58 L 82 48 L 48 48 Z M 42 72 L 54 72 L 54 76 L 42 76 Z M 76 72 L 88 72 L 88 76 L 76 76 Z" />
-                    <path fillRule="evenodd" clipRule="evenodd" d="M 15 45 L 55 45 L 60 60 L 70 60 L 70 65 L 65 70 L 65 85 L 55 85 L 55 95 L 45 95 L 45 85 L 15 85 L 15 95 L 5 95 L 5 85 L 0 85 L 0 70 L 5 65 L 5 60 L 10 60 Z M 14 58 L 56 58 L 52 48 L 18 48 Z M 12 72 L 24 72 L 24 76 L 12 76 Z M 46 72 L 58 72 L 58 76 L 46 76 Z" />
-                  </svg>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: '1rem', margin: 0, fontWeight: '700' }}>Escolher por marca</h3>
-                  <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: '400' }}>Veja todas as marcas disponíveis</span>
-                </div>
-                <div style={{ color: '#fff' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        {selectedCategoria === 'Imóveis' ? (
+          <>
+            {renderImoveisSearchBox()}
+            
+            <div style={{ marginTop: '40px', paddingBottom: '60px', textAlign: 'left' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Casa Térrea" 
+                  price="R$ 799.999,99" 
+                  location={{ bairro: "Parque Rita Vieira", cidade: "Campo Grande - MS" }} 
+                  propertyType="CASA-TÉRREA" 
+                  transactionType="VENDA" 
+                />
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Sobrado" 
+                  price="R$ 1.250.000,00" 
+                  location={{ bairro: "Carandá Bosque", cidade: "Campo Grande - MS" }} 
+                  propertyType="SOBRADO" 
+                  transactionType="VENDA" 
+                />
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Apartamento" 
+                  price="R$ 450.000,00" 
+                  location={{ bairro: "Centro", cidade: "Campo Grande - MS" }} 
+                  propertyType="APARTAMENTO" 
+                  transactionType="VENDA" 
+                />
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Casa de Vila" 
+                  price="R$ 320.000,00" 
+                  location={{ bairro: "Vila Glória", cidade: "Campo Grande - MS" }} 
+                  propertyType="CASA DE VILA" 
+                  transactionType="VENDA" 
+                />
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1502672260266-1c1de2d9d000?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Apto. Studio" 
+                  price="R$ 280.000,00" 
+                  location={{ bairro: "Jardim dos Estados", cidade: "Campo Grande - MS" }} 
+                  propertyType="APTO. STUDIO" 
+                  transactionType="VENDA" 
+                />
+                <PropertyCard 
+                  image="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  title="Casa Condomínio" 
+                  price="R$ 2.500.000,00" 
+                  location={{ bairro: "Damas", cidade: "Campo Grande - MS" }} 
+                  propertyType="CASA-TÉRREA-CONDOMÍNIO" 
+                  transactionType="VENDA" 
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          (() => {
+            const cards = [];
+            
+            cards.push(
+              <div key={1} style={{ position: 'relative' }}>
+                <div onClick={(e) => { handleFirstFilterClick(); setLastClickedFilter(1); setShowFiltrosMenu(false); }} className="premium-card" style={{ display: 'flex', alignItems: 'center', padding: '0 16px', cursor: 'pointer', background: 'linear-gradient(to bottom, #333 0%, #050505 100%)', color: '#fff', height: '70px', boxSizing: 'border-box', borderRadius: 'var(--radius-lg)' }}>
+                  <div style={{ marginRight: '16px', color: '#fff' }}>
+                    <svg width="28" height="28" viewBox="0 0 100 100" fill="currentColor">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M 30 15 L 70 15 L 75 30 L 85 30 L 85 35 L 80 40 L 80 50 L 20 50 L 20 40 L 15 35 L 15 30 L 25 30 Z M 29 28 L 71 28 L 68 17 L 32 17 Z" />
+                      <path fillRule="evenodd" clipRule="evenodd" d="M 45 45 L 85 45 L 90 60 L 100 60 L 100 65 L 95 70 L 95 85 L 85 85 L 85 95 L 75 95 L 75 85 L 45 85 L 45 95 L 35 95 L 35 85 L 30 85 L 30 70 L 35 65 L 35 60 L 40 60 Z M 44 58 L 86 58 L 82 48 L 48 48 Z M 42 72 L 54 72 L 54 76 L 42 76 Z M 76 72 L 88 72 L 88 76 L 76 76 Z" />
+                      <path fillRule="evenodd" clipRule="evenodd" d="M 15 45 L 55 45 L 60 60 L 70 60 L 70 65 L 65 70 L 65 85 L 55 85 L 55 95 L 45 95 L 45 85 L 15 85 L 15 95 L 5 95 L 5 85 L 0 85 L 0 70 L 5 65 L 5 60 L 10 60 Z M 14 58 L 56 58 L 52 48 L 18 48 Z M 12 72 L 24 72 L 24 76 L 12 76 Z M 46 72 L 58 72 L 58 76 L 46 76 Z" />
+                    </svg>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h3 style={{ fontSize: '1rem', margin: 0, fontWeight: '700' }}>
+                      Escolher por marca
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', color: '#aaa', fontWeight: '400' }}>
+                      Veja todas as marcas disponíveis
+                    </span>
+                  </div>
+                  <div style={{ color: '#fff' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
                 </div>
               </div>
-            ),
+            );
+
+          cards.push(
             (
               <div key={2} onClick={(e) => { handlePedidosClick(); setLastClickedFilter(2); setShowFiltrosMenu(false); }} className="premium-card" style={{ display: 'flex', alignItems: 'center', padding: '0 16px', cursor: 'pointer', background: 'linear-gradient(to bottom, #E53935 0%, #8B0000 100%)', color: '#fff', height: '70px', boxSizing: 'border-box', borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ marginRight: '16px', color: '#fff' }}>
@@ -664,7 +914,7 @@ export default function Ads() {
                  <div style={{ width: '100%' }}>{renderFeedFilter(activeTab === 'pedidos')}</div>
               </div>
             )
-          ];
+          );
 
           return (
             <>
@@ -720,7 +970,8 @@ export default function Ads() {
               </div>
             </>
           );
-        })()}
+        })()
+        )}
 
         {activeTab === 'marca' && showBrands && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px', marginBottom: '40px' }}>
@@ -759,7 +1010,9 @@ export default function Ads() {
           </div>
         )}
 
-        {(activeTab === 'vitrine' || (activeTab === 'marca' && selectedBrand)) && (
+
+
+        {(activeTab === 'vitrine' || (activeTab === 'marca' && selectedBrand) || (activeTab === 'bairro' && selectedBairro)) && (
           <div style={{ marginTop: '0px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px', width: '100%' }}>
               {selectedCategoria && (

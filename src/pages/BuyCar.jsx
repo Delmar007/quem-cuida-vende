@@ -704,22 +704,49 @@ export default function BuyCar({ isAdmin }) {
             <label className="form-label">Tipo de Veículo</label>
             <select name="tipoVeiculo" value={formData.tipoVeiculo} onChange={handleChange} className="form-control">
               <option value="">Selecione...</option>
-              <option value="Antigos">Antigos</option>
-              <option value="3/4">3/4</option>
-              <option value="Caminhão">Caminhão</option>
-              <option value="Cavalo">Cavalo</option>
-              <option value="Conversível">Conversível</option>
-              <option value="Crossover">Crossover</option>
-              <option value="Elétrico">Elétrico</option>
-              <option value="Furgão">Furgão</option>
-              <option value="Hatchback">Hatchback</option>
-              <option value="Híbrido">Híbrido</option>
-              <option value="SW">SW</option>
-              <option value="Pick-UP">Pick-UP</option>
-              <option value="Sedã">Sedã</option>
-              <option value="Sport">Sport</option>
-              <option value="SUV">SUV</option>
-              <option value="Van">Van</option>
+              <optgroup label="Veículos">
+                <option value="Antigos">Antigos</option>
+                <option value="3/4">3/4</option>
+                <option value="Caminhão">Caminhão</option>
+                <option value="Cavalo">Cavalo</option>
+                <option value="Conversível">Conversível</option>
+                <option value="Crossover">Crossover</option>
+                <option value="Elétrico">Elétrico</option>
+                <option value="Furgão">Furgão</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="Híbrido">Híbrido</option>
+                <option value="SW">SW</option>
+                <option value="Pick-UP">Pick-UP</option>
+                <option value="Sedã">Sedã</option>
+                <option value="Sport">Sport</option>
+                <option value="SUV">SUV</option>
+                <option value="Van">Van</option>
+              </optgroup>
+              <optgroup label="Imóveis - Residencial">
+                <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
+                <option value="Apto. Studio">Apto. Studio</option>
+                <option value="Casa de Vila">Casa de Vila</option>
+                <option value="Casa-Térrea">Casa-Térrea</option>
+                <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
+                <option value="Kitnet">Kitnet</option>
+                <option value="Sobrado">Sobrado</option>
+                <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
+                <option value="Terreno">Terreno</option>
+                <option value="Terreno-Condomínio">Terreno-Condomínio</option>
+              </optgroup>
+              <optgroup label="Imóveis - Comercial">
+                <option value="Área">Área</option>
+                <option value="Casa Comercial">Casa Comercial</option>
+                <option value="Galpão / Depósito">Galpão / Depósito</option>
+                <option value="Imóvel Comercial">Imóvel Comercial</option>
+                <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
+                <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
+              </optgroup>
+              <optgroup label="Imóveis - Rural">
+                <option value="Pesqueiro">Pesqueiro</option>
+              </optgroup>
             </select>
           </div>
 

@@ -661,7 +661,7 @@ export default function DynamicBanner({ cars = [], sponsoredBanners = [], previe
         <div style={{ height: '267px', backgroundColor: '#000', display: 'flex', flexDirection: 'column' }}>
            {/* Top bar of bottom section for team name */}
            <div style={{ padding: '10px 40px', borderBottom: '2px solid #222', display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <img src="/logos/logo_equipe_texto.png" alt="Equipe Personal Car" style={{ width: '100%', maxHeight: '40px', objectFit: 'contain' }} />
+              <img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ width: '100%', maxHeight: '40px', objectFit: 'contain' }} />
            </div>
            
            <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 40px' }}>
@@ -683,7 +683,7 @@ export default function DynamicBanner({ cars = [], sponsoredBanners = [], previe
 
              {/* Right Logo */}
              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <img src="/logos/logo_equipe_icone.png" alt="Logo" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+                <img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
              </div>
            </div>
         </div>

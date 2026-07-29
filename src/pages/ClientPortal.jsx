@@ -97,7 +97,7 @@ export default function ClientPortal() {
   return (
     <div>
       <nav style={{ backgroundColor: '#fff', borderBottom: '1px solid var(--border)', padding: '10px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/"><img src="/logos/logo_equipe_texto.png" alt="Equipe Personal Car Logo" style={{ height: '40px' }} /></Link>
+        <Link to="/"><img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ height: '40px' }} /></Link>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <Link to="/anuncios" style={{ color: 'var(--text-primary)', textDecoration: 'none', fontWeight: '500' }}>Vitrine</Link>
           <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'red', fontWeight: '700', cursor: 'pointer', fontSize: '1rem' }}>Sair</button>

@@ -80,7 +80,7 @@ export default function Institutional() {
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         </button>
         <Link to="/anuncios" style={{ width: '100%' }}>
-          <img src="/logo_larga.png" alt="Logo do Site" style={{ width: '100%', maxWidth: '940px', height: 'auto', display: 'block' }} />
+          <img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ width: '100%', maxWidth: '940px', height: 'auto', display: 'block' }} />
         </Link>
       </header>
 

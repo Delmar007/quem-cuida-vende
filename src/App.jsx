@@ -11,6 +11,11 @@ import ClientPortal from './pages/ClientPortal';
 import LojistaPro from './pages/LojistaPro';
 import LojistaCadastro from './pages/LojistaCadastro';
 import LojistaPagamento from './pages/LojistaPagamento';
+import Login from './pages/Login';
+import Cadastro from './pages/Cadastro';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ComprarAnuncios from './pages/ComprarAnuncios';
+import PagamentoSucesso from './pages/PagamentoSucesso';
 import ScrollToTop from './components/ScrollToTop';
 import './index.css';
 
@@ -31,6 +36,11 @@ function App() {
           <Route path="/lojistas/cadastro" element={<LojistaCadastro />} />
           <Route path="/lojistas/pagamento" element={<LojistaPagamento />} />
           <Route path="/institucional/:page" element={<Institutional />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/privacidade" element={<PrivacyPolicy />} />
+          <Route path="/comprar-anuncios" element={<ComprarAnuncios />} />
+          <Route path="/pagamento-sucesso" element={<PagamentoSucesso />} />
         </Routes>
       </div>
     </BrowserRouter>

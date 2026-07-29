@@ -495,7 +495,7 @@ export default function AdminFranqueado() {
     return (
       <div style={{ backgroundColor: '#000', backgroundImage: 'url("/cabeçalho_colmeia.png.png")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ backgroundColor: 'var(--surface)', padding: '40px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-          <img src="/logo_equipepersonalcar.png.png" alt="Logo Equipe Personal Car" style={{ width: '200px', marginBottom: '30px' }} />
+          <img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ width: '200px', marginBottom: '30px' }} />
           <h2 style={{ marginBottom: '20px', fontSize: '1.5rem', fontWeight: '700' }}>Painel do Administrador</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>Digite a senha para acessar o sistema.</p>
           <input 

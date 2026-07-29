@@ -34,7 +34,7 @@ const getPosStyles = (pos) => {
 export default function Admin() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('veiculos');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Senha removida temporariamente
   const [password, setPassword] = useState('');
   
   // -- ESTADO INSTITUCIONAL --
@@ -53,6 +53,7 @@ export default function Admin() {
   const [matchLoading, setMatchLoading] = useState(false);
   const [moderingCar, setModeringCar] = useState(null);
   const [adminBrandFilter, setAdminBrandFilter] = useState('');
+  const [adminCategoryFilter, setAdminCategoryFilter] = useState('Todas');
 
   const tabs = [
     { id: 'anuncio-rapido', label: 'Cadastro Rápido', type: 'crm' },
@@ -505,7 +506,7 @@ export default function Admin() {
     return (
       <div style={{ backgroundColor: '#000', backgroundImage: 'url("/cabeçalho_colmeia.png.png")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ backgroundColor: 'var(--surface)', padding: '40px', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-md)', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-          <img src="/logo_equipepersonalcar.png.png" alt="Logo Equipe Personal Car" style={{ width: '200px', marginBottom: '30px' }} />
+          <img src="/logo-qcv.png" alt="Quem Cuida Vende" style={{ width: '200px', marginBottom: '30px' }} />
           <h2 style={{ marginBottom: '20px', fontSize: '1.5rem', fontWeight: '700' }}>Painel do Administrador</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '20px', fontSize: '0.9rem' }}>Digite a senha para acessar o sistema.</p>
           <input 
@@ -560,10 +561,13 @@ export default function Admin() {
   // -------------------------
   // LOGICA MATCHMAKING
   // -------------------------
+  const filteredCarsForAdmin = adminCategoryFilter === 'Todas' ? cars : cars.filter(c => c.tipoVeiculo === adminCategoryFilter || c.categoria === adminCategoryFilter);
+  const filteredReqsForAdmin = adminCategoryFilter === 'Todas' ? requests : requests.filter(r => r.tipoVeiculo === adminCategoryFilter || r.categoria === adminCategoryFilter);
+
   const calculateMatches = () => {
     const matches = [];
-    requests.forEach(req => {
-      const compatibleCars = cars.filter(car => {
+    filteredReqsForAdmin.forEach(req => {
+      const compatibleCars = filteredCarsForAdmin.filter(car => {
         // Option 1 Check
         const match1 = (() => {
           if (req.tipoVeiculo && car.tipoVeiculo && req.tipoVeiculo !== car.tipoVeiculo) return false;
@@ -609,6 +613,19 @@ export default function Admin() {
       <div className="admin-sidebar">
         <h2 className="admin-title" style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '20px' }}>Painel Admin</h2>
         
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Filtro Global</div>
+          <select 
+            value={adminCategoryFilter}
+            onChange={(e) => setAdminCategoryFilter(e.target.value)}
+            style={{ width: '100%', padding: '8px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--text-primary)', outline: 'none', cursor: 'pointer' }}
+          >
+            {['Todas', 'Veículos', 'Imóveis', 'Smartphones', 'Vestuário', 'Outros'].map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="admin-menu" style={{ flex: 1 }}>
           <div className="admin-menu-section" style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '4px', marginBottom: '4px' }}>CRM - Negócios</div>
           {tabs.filter(t => t.type === 'crm').map(t => (
@@ -965,7 +982,7 @@ export default function Admin() {
                   <h3 className="admin-subtitle">Aprovação de Anuncios NF</h3>
                 </div>
                 
-                {cars.filter(car => car.status === 'pendente').length === 0 ? (
+                {filteredCarsForAdmin.filter(car => car.status === 'pendente').length === 0 ? (
                   <p style={{ color: '#666', textAlign: 'center', marginTop: '40px' }}>Nenhum anúncio pendente de aprovação.</p>
                 ) : (
               <div className="table-responsive">
@@ -979,7 +996,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {cars.filter(car => car.status === 'pendente').map(car => {
+                    {filteredCarsForAdmin.filter(car => car.status === 'pendente').map(car => {
                       let consertos = '';
                       let faleSobre = '';
                       let parceiro = null;
@@ -1090,8 +1107,8 @@ export default function Admin() {
         {/* VIEW: CRM - VEICULOS                    */}
         {/* ======================================= */}
         {activeTab === 'veiculos' && (() => {
-          const uniqueBrands = Array.from(new Set(cars.map(c => c.marca).filter(Boolean))).sort();
-          const filteredCars = adminBrandFilter ? cars.filter(c => c.marca === adminBrandFilter) : cars;
+          const uniqueBrands = Array.from(new Set(filteredCarsForAdmin.map(c => c.marca).filter(Boolean))).sort();
+          const filteredCars = adminBrandFilter ? filteredCarsForAdmin.filter(c => c.marca === adminBrandFilter) : filteredCarsForAdmin;
           return (
           <div style={{ maxWidth: '940px', margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '20px' }}>
@@ -1427,7 +1444,7 @@ export default function Admin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {requests.map(req => {
+                  {filteredReqsForAdmin.map(req => {
                     const isEditing = editingId === req.id;
                     const safeParseJSON = (data, fallback) => {
                       if (typeof data === 'string') {

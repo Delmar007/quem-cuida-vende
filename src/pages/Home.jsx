@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-
 export default function Home() {
   const [session, setSession] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
@@ -39,13 +38,16 @@ export default function Home() {
   };
 
   return (
-    <div className="main-content flex-center" style={{ position: 'relative', backgroundColor: '#000', backgroundImage: 'url("/cabeçalho_colmeia.png.png")', backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh' }}>
+    <div className="main-content flex-center" style={{ position: 'relative', backgroundColor: '#7A1734', backgroundImage: 'linear-gradient(rgba(122, 23, 52, 0.85), rgba(122, 23, 52, 0.85)), url("/cabeçalho_colmeia.png.png")', backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh' }}>
       
-      {/* Logo sozinha no centro superior */}
-      <img src="/logo_grande.png.png" alt="Logo Principal" className="spin-y-animation" style={{ position: 'absolute', top: '40px', left: '50%', height: '180px', zIndex: 10 }} />
-
-      <div className="box-centered" style={{ textAlign: 'center', boxShadow: 'none', border: 'none', maxWidth: '940px', width: '100%', backgroundColor: 'transparent', marginTop: '100px' }}>
-        <img src="/logo_larga.png" alt="Equipe Personal Car" style={{ width: '100%', maxWidth: '940px', marginBottom: '40px' }} />
+      <div className="box-centered" style={{ textAlign: 'center', boxShadow: 'none', border: 'none', maxWidth: '940px', width: '100%', backgroundColor: 'transparent' }}>
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1 style={{ fontFamily: "'Midstar', sans-serif", fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', textShadow: '2px 2px 4px rgba(0,0,0,0.5)', margin: 0, fontWeight: 'normal', letterSpacing: '1px', display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '0.3em' }}>
+            <span style={{ color: '#ffffff', fontSize: '1.1em' }}>Quem</span>
+            <span style={{ color: '#F7D046', fontSize: '1.3em' }}>Cuida</span>
+            <span style={{ color: '#ffffff', fontSize: '1.1em' }}>Vende</span>
+          </h1>
+        </div>
         
         {session ? (
           <div style={{ marginBottom: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -87,38 +89,7 @@ export default function Home() {
           </div>
         )}
 
-        <div className="flex-center" style={{ flexDirection: 'row', gap: '50px' }}>
-          <Link 
-            to="/comprar" 
-            className="btn btn-huge" 
-            style={{ fontFamily: "'911', sans-serif", width: '250px', height: '80px', backgroundColor: '#ff0000', color: '#ffffff', border: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(255,0,0,0.3)'; setShowMessage(true); }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; setShowMessage(false); }}
-            onClick={(e) => {
-              if (!session) {
-                e.preventDefault();
-                alert('Atenção: só acessa o site após fazer o login do Google. Faça o cadastro (login) para poder vender ou fazer pedido.');
-              }
-            }}
-          >
-            Comprar um carro
-          </Link>
-          <Link 
-            to="/vender" 
-            className="btn btn-huge" 
-            style={{ fontFamily: "'911', sans-serif", width: '250px', height: '80px', backgroundColor: '#ff0000', color: '#ffffff', border: 'none', transition: 'transform 0.2s, box-shadow 0.2s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 16px rgba(255,0,0,0.3)'; setShowMessage(true); }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)'; setShowMessage(false); }}
-            onClick={(e) => {
-              if (!session) {
-                e.preventDefault();
-                alert('Atenção: só acessa o site após fazer o login do Google. Faça o cadastro (login) para poder vender ou fazer pedido.');
-              }
-            }}
-          >
-            Vender um carro
-          </Link>
-        </div>
+
 
         <div style={{ marginTop: '40px', display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
           <a 
