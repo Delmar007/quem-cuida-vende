@@ -1,7 +1,7 @@
 -- ==============================================================================
 -- KITTANDA OUTLET — SCRIPT MESTRE DE BANCO DE DADOS SUPABASE
 -- Execute este script completo no SQL Editor do painel Supabase:
--- https://supabase.com/dashboard/project/vooczwqifbbwtspzcdpz/sql
+-- https://supabase.com/dashboard/project/vooczwqifbbwtspzcdpz/sql/new
 -- ==============================================================================
 
 -- 1. EXTENSÕES NECESSÁRIAS
@@ -21,7 +21,7 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS birth_date DATE;
 
 -- 4. TABELA DE LOJAS (stores)
 CREATE TABLE IF NOT EXISTS public.stores (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT (gen_random_uuid())::text,
     owner_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
@@ -56,10 +56,13 @@ CREATE TABLE IF NOT EXISTS public.stores (
     subscription_start_at TIMESTAMPTZ DEFAULT NOW(),
     subscription_renews_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '30 days'),
     followers_count INTEGER DEFAULT 0,
+    categories_initialized BOOLEAN DEFAULT false,
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE public.stores ADD COLUMN IF NOT EXISTS categories_initialized BOOLEAN DEFAULT false;
 
 -- Ativar RLS em stores
 ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
@@ -68,7 +71,7 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Leitura pública de lojas ativas' AND tablename = 'stores') THEN
     CREATE POLICY "Leitura pública de lojas ativas" ON public.stores
-        FOR SELECT USING (is_active = true);
+        FOR SELECT USING (is_active = true OR auth.uid() = owner_id);
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Lojistas podem criar sua loja' AND tablename = 'stores') THEN
@@ -91,17 +94,32 @@ CREATE TRIGGER update_stores_updated_at
 
 -- 5. TABELA DE PRODUTOS (products)
 CREATE TABLE IF NOT EXISTS public.products (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    id TEXT PRIMARY KEY DEFAULT (gen_random_uuid())::text,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
     sku TEXT,
     price NUMERIC NOT NULL,
     promotional_price NUMERIC,
+    cost_price_internal NUMERIC,
+    fipe_price_internal NUMERIC,
     image_url TEXT,
     images JSONB DEFAULT '[]'::jsonb,
+    photo_orientation TEXT DEFAULT 'vertical',
     category TEXT,
     subcategory TEXT,
+    promo_type TEXT,
+    is_vehicle BOOLEAN DEFAULT false,
+    vehicle_category TEXT,
+    vehicle_brand TEXT,
+    vehicle_model TEXT,
+    vehicle_version TEXT,
+    vehicle_year_fab TEXT,
+    vehicle_year_model TEXT,
+    vehicle_km TEXT,
+    vehicle_transmission TEXT,
+    vehicle_traction TEXT,
+    vehicle_plate_internal TEXT,
     is_active BOOLEAN DEFAULT true,
     is_outlet BOOLEAN DEFAULT false,
     is_novidade BOOLEAN DEFAULT false,
@@ -111,9 +129,24 @@ CREATE TABLE IF NOT EXISTS public.products (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Garantir colunas se a tabela já existir
+-- Garantir colunas caso a tabela já exista
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS sku TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS cost_price_internal NUMERIC;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS fipe_price_internal NUMERIC;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS photo_orientation TEXT DEFAULT 'vertical';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS promo_type TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_vehicle BOOLEAN DEFAULT false;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_category TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_brand TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_model TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_version TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_year_fab TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_year_model TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_km TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_transmission TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_traction TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_plate_internal TEXT;
 
 -- Ativar RLS em products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -122,7 +155,13 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Leitura pública de produtos ativos' AND tablename = 'products') THEN
     CREATE POLICY "Leitura pública de produtos ativos" ON public.products
-        FOR SELECT USING (is_active = true);
+        FOR SELECT USING (
+          is_active = true OR EXISTS (
+            SELECT 1 FROM public.stores 
+            WHERE stores.id = products.store_id 
+            AND stores.owner_id = auth.uid()
+          )
+        );
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Lojistas gerenciam produtos da sua loja' AND tablename = 'products') THEN
@@ -175,7 +214,7 @@ ON CONFLICT (id) DO UPDATE SET
 CREATE TABLE IF NOT EXISTS public.user_follows (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(user_id, store_id)
 );
@@ -196,7 +235,7 @@ END $$;
 
 CREATE TABLE IF NOT EXISTS public.promotions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     title TEXT NOT NULL,
     description TEXT,
     discount_percentage NUMERIC,
@@ -230,7 +269,7 @@ END $$;
 -- 8. TABELAS FINANCEIRAS E FATURAS
 CREATE TABLE IF NOT EXISTS public.subscription_invoices (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     amount_cents INTEGER NOT NULL,
     plan VARCHAR NOT NULL,
     due_date DATE NOT NULL,
@@ -247,7 +286,7 @@ ALTER TABLE public.subscription_invoices ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE IF NOT EXISTS public.subscription_audit_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     actor_type VARCHAR NOT NULL,
     actor_id UUID,
     action VARCHAR NOT NULL,
@@ -276,12 +315,12 @@ VALUES (
     'stores',
     'stores',
     true,
-    5242880,
+    20971520,
     ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
 )
 ON CONFLICT (id) DO UPDATE SET 
     public = true,
-    file_size_limit = 5242880,
+    file_size_limit = 20971520,
     allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 
 DO $$
@@ -314,7 +353,7 @@ END $$;
 -- 10. DISPOSITIVO Nº 6 — CATEGORIAS E SUBCATEGORIAS DE PRODUTOS DA LOJA
 CREATE TABLE IF NOT EXISTS public.store_categories (
     id TEXT PRIMARY KEY,
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     slug TEXT NOT NULL,
     description TEXT,
@@ -330,7 +369,13 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Leitura pública de categorias ativas' AND tablename = 'store_categories') THEN
     CREATE POLICY "Leitura pública de categorias ativas" ON public.store_categories
-        FOR SELECT USING (is_active = true);
+        FOR SELECT USING (
+          is_active = true OR EXISTS (
+            SELECT 1 FROM public.stores 
+            WHERE stores.id = store_categories.store_id 
+            AND stores.owner_id = auth.uid()
+          )
+        );
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Lojistas gerenciam categorias da sua loja' AND tablename = 'store_categories') THEN
@@ -348,7 +393,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS public.store_subcategories (
     id TEXT PRIMARY KEY,
     category_id TEXT REFERENCES public.store_categories(id) ON DELETE CASCADE NOT NULL,
-    store_id UUID REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
+    store_id TEXT REFERENCES public.stores(id) ON DELETE CASCADE NOT NULL,
     name TEXT NOT NULL,
     slug TEXT NOT NULL,
     description TEXT,
@@ -364,7 +409,13 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Leitura pública de subcategorias ativas' AND tablename = 'store_subcategories') THEN
     CREATE POLICY "Leitura pública de subcategorias ativas" ON public.store_subcategories
-        FOR SELECT USING (is_active = true);
+        FOR SELECT USING (
+          is_active = true OR EXISTS (
+            SELECT 1 FROM public.stores 
+            WHERE stores.id = store_subcategories.store_id 
+            AND stores.owner_id = auth.uid()
+          )
+        );
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Lojistas gerenciam subcategorias da sua loja' AND tablename = 'store_subcategories') THEN
@@ -378,4 +429,3 @@ BEGIN
         );
   END IF;
 END $$;
-

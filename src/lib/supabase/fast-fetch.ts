@@ -2,8 +2,8 @@
 // IMPORTANTE: Retorna um Response HTTP 401 sintético em vez de dar throw Error, pois o @supabase/auth-js
 // faz 10 retentativas com backoff exponencial (25.7 segundos!) quando o fetch lança exceção de rede.
 let offlineUntil = 0
-const TIMEOUT_MS = 1500
-const COOLDOWN_MS = 10000 // 10 segundos de cache offline para reconectar rápido assim que o projeto Supabase for despausado
+const TIMEOUT_MS = 10000
+const COOLDOWN_MS = 5000 // 5 segundos de cache offline para reconectar rápido
 
 export function isSupabaseCurrentlyOffline(): boolean {
   return Date.now() < offlineUntil

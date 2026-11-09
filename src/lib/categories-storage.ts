@@ -37,10 +37,12 @@ interface CategoriesDataStore {
   initializedStores?: string[]
 }
 
+const IS_SERVERLESS = Boolean(process.env.VERCEL)
 const DATA_DIR = path.join(process.cwd(), 'data')
 const CATEGORIES_FILE = path.join(DATA_DIR, 'categories.json')
 
 function ensureDataFile() {
+  if (IS_SERVERLESS) return
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true })
@@ -55,6 +57,7 @@ function ensureDataFile() {
 }
 
 export function getLocalCategoriesData(): CategoriesDataStore {
+  if (IS_SERVERLESS) return { categories: [], subcategories: [], initializedStores: [] }
   ensureDataFile()
   try {
     if (fs.existsSync(CATEGORIES_FILE)) {
@@ -73,6 +76,7 @@ export function getLocalCategoriesData(): CategoriesDataStore {
 }
 
 export function saveLocalCategoriesData(data: CategoriesDataStore) {
+  if (IS_SERVERLESS) return
   ensureDataFile()
   try {
     fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(data, null, 2), 'utf-8')

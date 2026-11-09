@@ -105,6 +105,32 @@ export interface StoreSubscriptionDetails {
 // In-memory fallback storage for invites
 let memoryInvites: StoreInvite[] = []
 
+async function resolveStore(storeId: string) {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.from('stores').select('*').eq('id', storeId).single()
+    if (data) return data
+  } catch {
+    // fallback
+  }
+  return getLocalStoreById(storeId)
+}
+
+async function resolveStoreProducts(storeId: string) {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .eq('store_id', storeId)
+      .order('created_at', { ascending: false })
+    if (data && data.length > 0) return data
+  } catch {
+    // fallback
+  }
+  return getLocalProducts(storeId)
+}
+
 /**
  * 1. Obter ou gerar convites da loja
  */
@@ -116,7 +142,7 @@ export async function getStoreInvitesAction(storeId: string): Promise<{
   maxInvites: number
   remainingInvites: number
 }> {
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
   const storeSlug = store?.slug || storeId
   const inviteCode = `VIP-${storeSlug.toUpperCase().slice(0, 8)}-${storeId.slice(0, 4).toUpperCase()}`
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3020'
@@ -180,7 +206,7 @@ export async function createStoreInviteAction(
     return { success: false, error: 'Informe o nome do lojista convidado.' }
   }
 
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
   const storeSlug = store?.slug || storeId
   const code = `VIP-${storeSlug.toUpperCase().slice(0, 6)}-${Math.floor(1000 + Math.random() * 9000)}`
 
@@ -207,9 +233,9 @@ export async function getStoreMetricsAction(storeId: string): Promise<{
   success: boolean
   metrics: StoreMetrics
 }> {
-  const products = getLocalProducts(storeId)
+  const products = await resolveStoreProducts(storeId)
   const totalProds = products.length
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
 
   // Estatísticas calculadas de forma realista
   const baseViews = 340 + totalProds * 45
@@ -258,7 +284,7 @@ export async function getStoreFavoritesAction(storeId: string): Promise<{
   success: boolean
   favorites: FavoriteProductItem[]
 }> {
-  const products = getLocalProducts(storeId)
+  const products = await resolveStoreProducts(storeId)
 
   const favorites: FavoriteProductItem[] = products.map((p, index) => {
     // Cálculo determinístico para popularidade
@@ -289,7 +315,7 @@ export async function getStoreBirthdayFollowersAction(storeId: string): Promise<
   followers: BirthdayFollower[]
   planAllowsBirthdayList: boolean
 }> {
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
   const planKey = (store?.effective_plan || store?.plan || 'bronze') as PlanId
   const planConfig = getPlan(planKey)
 
@@ -371,7 +397,7 @@ export async function getStoreSubscriptionDetailsAction(storeId: string): Promis
   subscription?: StoreSubscriptionDetails
   error?: string
 }> {
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
   if (!store) {
     return { success: false, error: 'Loja não encontrada.' }
   }
@@ -381,7 +407,7 @@ export async function getStoreSubscriptionDetailsAction(storeId: string): Promis
   const effectivePlanKey = (store.effective_plan || store.plan || 'bronze') as PlanId
   const contractedPlanConfig = getPlan(contractedPlanKey)
 
-  const products = getLocalProducts(storeId)
+  const products = await resolveStoreProducts(storeId)
   const activeProducts = products.filter((p) => p.is_active)
   const suspendedCount = products.filter((p) => (p as any).suspended_by_downgrade).length
 
@@ -443,7 +469,7 @@ export async function simulatePaymentReactivationAction(storeId: string): Promis
   success: boolean
   message: string
 }> {
-  const store = getLocalStoreById(storeId)
+  const store = await resolveStore(storeId)
   if (!store) {
     return { success: false, message: 'Loja não encontrada.' }
   }
@@ -453,7 +479,7 @@ export async function simulatePaymentReactivationAction(storeId: string): Promis
   const planConfig = getPlan(restoredPlan as PlanId)
   const maxActive = planConfig.maxActiveProducts
 
-  const products = getLocalProducts(storeId)
+  const products = await resolveStoreProducts(storeId)
   
   // Reativar produtos até o limite do plano
   let reactivatedCount = 0
@@ -464,8 +490,34 @@ export async function simulatePaymentReactivationAction(storeId: string): Promis
         is_active: true,
         suspended_by_downgrade: false,
       })
+      try {
+        const supabase = await createClient()
+        await supabase
+          .from('products')
+          .update({ is_active: true, suspended_by_downgrade: false })
+          .eq('id', prod.id)
+      } catch {
+        // ignore
+      }
       reactivatedCount++
     }
+  }
+
+  try {
+    const supabase = await createClient()
+    await supabase
+      .from('stores')
+      .update({
+        effective_plan: restoredPlan,
+        plan: restoredPlan,
+        subscription_status: 'active',
+        payment_status: 'paid',
+        last_payment_date: new Date().toISOString(),
+        downgrade_reason: null,
+      })
+      .eq('id', storeId)
+  } catch {
+    // ignore
   }
 
   // Atualizar loja local

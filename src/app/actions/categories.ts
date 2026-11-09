@@ -9,12 +9,12 @@ import {
   saveLocalSubcategory,
   deleteLocalSubcategory,
   clearLocalStoreCategories,
+  createDefaultStoreCategories,
   StoreCategory,
   StoreSubcategory,
   StoreCategoryWithSubcategories,
 } from '@/lib/categories-storage'
-import { getLocalProducts, saveLocalProduct } from '@/lib/products-storage'
-import { getLocalStoreById } from '@/lib/stores-storage'
+import { getLocalProducts, saveLocalProduct, StoredProduct } from '@/lib/products-storage'
 
 function slugify(text: string): string {
   return text
@@ -26,6 +26,90 @@ function slugify(text: string): string {
     .replace(/\s+/g, '-')
     .replace(/[^\w-]+/g, '')
     .replace(/--+/g, '-')
+}
+
+async function fetchCategoriesAndProducts(storeId: string): Promise<{
+  categoriesWithSubs: StoreCategoryWithSubcategories[]
+  products: StoredProduct[]
+}> {
+  let dbCategories: StoreCategory[] = []
+  let dbSubcategories: StoreSubcategory[] = []
+  let dbProducts: StoredProduct[] = []
+  let supabaseReachable = false
+  let categoriesInitialized = false
+
+  try {
+    const supabase = await createClient()
+    const { data: cats, error: catErr } = await supabase
+      .from('store_categories')
+      .select('*')
+      .eq('store_id', storeId)
+      .order('display_order', { ascending: true })
+
+    if (!catErr && cats) {
+      supabaseReachable = true
+      dbCategories = cats as StoreCategory[]
+      const { data: subs } = await supabase
+        .from('store_subcategories')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('display_order', { ascending: true })
+      if (subs) dbSubcategories = subs as StoreSubcategory[]
+    }
+
+    const { data: prods } = await supabase
+      .from('products')
+      .select('*')
+      .eq('store_id', storeId)
+    if (prods) {
+      dbProducts = prods as StoredProduct[]
+    }
+
+    if (supabaseReachable && dbCategories.length === 0) {
+      const { data: storeRow } = await supabase
+        .from('stores')
+        .select('categories_initialized')
+        .eq('id', storeId)
+        .single()
+      categoriesInitialized = Boolean(storeRow?.categories_initialized)
+
+      if (!categoriesInitialized) {
+        const defaults = createDefaultStoreCategories(storeId)
+        await supabase.from('store_categories').insert(defaults.categories)
+        await supabase.from('store_subcategories').insert(defaults.subcategories)
+        await supabase
+          .from('stores')
+          .update({ categories_initialized: true })
+          .eq('id', storeId)
+        dbCategories = defaults.categories
+        dbSubcategories = defaults.subcategories
+      }
+    }
+  } catch {
+    // Fallback local
+  }
+
+  let categoriesWithSubs: StoreCategoryWithSubcategories[] = []
+  if (dbCategories.length > 0 || (supabaseReachable && categoriesInitialized)) {
+    categoriesWithSubs = dbCategories.map((c) => ({
+      ...c,
+      subcategories: dbSubcategories
+        .filter((s) => s.category_id === c.id)
+        .sort((a, b) => a.display_order - b.display_order),
+    }))
+  } else {
+    categoriesWithSubs = getLocalStoreCategories(storeId)
+  }
+
+  const localProds = getLocalProducts(storeId)
+  const combinedProducts = [...dbProducts]
+  for (const lp of localProds) {
+    if (!combinedProducts.some((p) => p.id === lp.id)) {
+      combinedProducts.push(lp)
+    }
+  }
+
+  return { categoriesWithSubs, products: combinedProducts }
 }
 
 /**
@@ -41,44 +125,7 @@ export async function getStoreCategoriesAction(storeId: string): Promise<{
     return { success: false, categories: [], error: 'Identificador da loja inválido.' }
   }
 
-  // 1. Tentar buscar no Supabase
-  let dbCategories: any[] = []
-  let dbSubcategories: any[] = []
-  try {
-    const supabase = await createClient()
-    const { data: cats, error: catErr } = await supabase
-      .from('store_categories')
-      .select('*')
-      .eq('store_id', storeId)
-      .order('display_order', { ascending: true })
-
-    if (!catErr && cats) {
-      dbCategories = cats
-      const { data: subs } = await supabase
-        .from('store_subcategories')
-        .select('*')
-        .eq('store_id', storeId)
-        .order('display_order', { ascending: true })
-      if (subs) dbSubcategories = subs
-    }
-  } catch (err: any) {
-    // Tabela pode ainda não ter sido criada no Supabase remoto
-  }
-
-  // 2. Fallback para storage local
-  let categoriesWithSubs: StoreCategoryWithSubcategories[] = []
-
-  if (dbCategories.length > 0) {
-    categoriesWithSubs = dbCategories.map((c) => ({
-      ...c,
-      subcategories: dbSubcategories.filter((s) => s.category_id === c.id),
-    }))
-  } else {
-    categoriesWithSubs = getLocalStoreCategories(storeId)
-  }
-
-  // 3. Contabilizar produtos vinculados a cada categoria e subcategoria
-  const products = getLocalProducts(storeId)
+  const { categoriesWithSubs, products } = await fetchCategoriesAndProducts(storeId)
 
   const enriched = categoriesWithSubs.map((cat) => {
     const catNameLower = cat.name.toLowerCase().trim()
@@ -126,8 +173,7 @@ export async function createCategoryAction(params: {
     return { success: false, error: 'O nome da categoria deve ter no mínimo 2 caracteres.' }
   }
 
-  // Verificar duplicidade no mesmo lojista
-  const existing = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existing } = await fetchCategoriesAndProducts(storeId)
   if (
     existing.some(
       (c) => c.name.toLowerCase().trim() === trimmedName.toLowerCase().trim()
@@ -151,7 +197,6 @@ export async function createCategoryAction(params: {
     created_at: now,
   }
 
-  // Tentar persistir no Supabase
   try {
     const supabase = await createClient()
     await supabase.from('store_categories').insert({
@@ -164,7 +209,7 @@ export async function createCategoryAction(params: {
       display_order: newCategory.display_order,
       created_at: now,
     })
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -192,13 +237,12 @@ export async function updateCategoryAction(params: {
     return { success: false, error: 'O nome da categoria deve ter no mínimo 2 caracteres.' }
   }
 
-  const existingList = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existingList, products } = await fetchCategoriesAndProducts(storeId)
   const current = existingList.find((c) => c.id === id)
   if (!current) {
     return { success: false, error: 'Categoria não encontrada.' }
   }
 
-  // Verificar se outro registro já tem esse nome
   if (
     existingList.some(
       (c) => c.id !== id && c.name.toLowerCase().trim() === trimmedName.toLowerCase().trim()
@@ -218,9 +262,7 @@ export async function updateCategoryAction(params: {
     updated_at: new Date().toISOString(),
   }
 
-  // Se o nome mudou, atualizar a referência nos produtos vinculados
   if (oldName !== trimmedName) {
-    const products = getLocalProducts(storeId)
     for (const prod of products) {
       if (prod.category?.toLowerCase().trim() === oldName.toLowerCase().trim()) {
         saveLocalProduct({
@@ -229,9 +271,18 @@ export async function updateCategoryAction(params: {
         })
       }
     }
+    try {
+      const supabase = await createClient()
+      await supabase
+        .from('products')
+        .update({ category: trimmedName.toLowerCase().trim() })
+        .eq('store_id', storeId)
+        .ilike('category', oldName.trim())
+    } catch {
+      // ignore
+    }
   }
 
-  // Tentar no Supabase
   try {
     const supabase = await createClient()
     await supabase
@@ -245,7 +296,7 @@ export async function updateCategoryAction(params: {
       })
       .eq('id', id)
       .eq('store_id', storeId)
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -271,14 +322,12 @@ export async function deleteCategoryAction(params: {
 }> {
   const { id, storeId, force } = params
 
-  const existingList = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existingList, products } = await fetchCategoriesAndProducts(storeId)
   const category = existingList.find((c) => c.id === id)
   if (!category) {
     return { success: false, error: 'Categoria não encontrada.' }
   }
 
-  // Verificar produtos vinculados
-  const products = getLocalProducts(storeId)
   const catNameLower = category.name.toLowerCase().trim()
   const linked = products.filter(
     (p) => p.category?.toLowerCase().trim() === catNameLower
@@ -293,7 +342,6 @@ export async function deleteCategoryAction(params: {
     }
   }
 
-  // Se forçado ou sem produtos, reclassificar produtos para categoria vazia/padrão sem apagá-los
   if (linked.length > 0) {
     for (const prod of linked) {
       saveLocalProduct({
@@ -302,13 +350,22 @@ export async function deleteCategoryAction(params: {
         subcategory: null,
       })
     }
+    try {
+      const supabase = await createClient()
+      await supabase
+        .from('products')
+        .update({ category: 'geral', subcategory: null })
+        .eq('store_id', storeId)
+        .ilike('category', category.name.trim())
+    } catch {
+      // ignore
+    }
   }
 
-  // Supabase
   try {
     const supabase = await createClient()
     await supabase.from('store_categories').delete().eq('id', id).eq('store_id', storeId)
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -336,13 +393,12 @@ export async function createSubcategoryAction(params: {
     return { success: false, error: 'O nome da subcategoria deve ter no mínimo 2 caracteres.' }
   }
 
-  const existingList = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existingList } = await fetchCategoriesAndProducts(storeId)
   const parentCategory = existingList.find((c) => c.id === categoryId)
   if (!parentCategory) {
     return { success: false, error: 'A categoria principal informada não foi encontrada.' }
   }
 
-  // Verificar duplicidade dentro da mesma categoria
   if (
     parentCategory.subcategories.some(
       (s) => s.name.toLowerCase().trim() === trimmedName.toLowerCase().trim()
@@ -370,7 +426,6 @@ export async function createSubcategoryAction(params: {
     created_at: now,
   }
 
-  // Supabase
   try {
     const supabase = await createClient()
     await supabase.from('store_subcategories').insert({
@@ -384,7 +439,7 @@ export async function createSubcategoryAction(params: {
       display_order: newSubcategory.display_order,
       created_at: now,
     })
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -413,7 +468,7 @@ export async function updateSubcategoryAction(params: {
     return { success: false, error: 'O nome da subcategoria deve ter no mínimo 2 caracteres.' }
   }
 
-  const existingList = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existingList, products } = await fetchCategoriesAndProducts(storeId)
   const parentCategory = existingList.find((c) => c.id === categoryId)
   if (!parentCategory) {
     return { success: false, error: 'Categoria principal não encontrada.' }
@@ -424,7 +479,6 @@ export async function updateSubcategoryAction(params: {
     return { success: false, error: 'Subcategoria não encontrada.' }
   }
 
-  // Verificar se outra subcategoria nesta categoria já tem o nome
   if (
     parentCategory.subcategories.some(
       (s) => s.id !== id && s.name.toLowerCase().trim() === trimmedName.toLowerCase().trim()
@@ -447,9 +501,7 @@ export async function updateSubcategoryAction(params: {
     updated_at: new Date().toISOString(),
   }
 
-  // Atualizar produtos vinculados
   if (oldName !== trimmedName) {
-    const products = getLocalProducts(storeId)
     for (const prod of products) {
       if (prod.subcategory?.toLowerCase().trim() === oldName.toLowerCase().trim()) {
         saveLocalProduct({
@@ -458,9 +510,18 @@ export async function updateSubcategoryAction(params: {
         })
       }
     }
+    try {
+      const supabase = await createClient()
+      await supabase
+        .from('products')
+        .update({ subcategory: trimmedName.toLowerCase().trim() })
+        .eq('store_id', storeId)
+        .ilike('subcategory', oldName.trim())
+    } catch {
+      // ignore
+    }
   }
 
-  // Supabase
   try {
     const supabase = await createClient()
     await supabase
@@ -474,7 +535,7 @@ export async function updateSubcategoryAction(params: {
       })
       .eq('id', id)
       .eq('store_id', storeId)
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -501,15 +562,13 @@ export async function deleteSubcategoryAction(params: {
 }> {
   const { id, categoryId, storeId, force } = params
 
-  const existingList = getLocalStoreCategories(storeId)
+  const { categoriesWithSubs: existingList, products } = await fetchCategoriesAndProducts(storeId)
   const parentCategory = existingList.find((c) => c.id === categoryId)
   const subcategory = parentCategory?.subcategories.find((s) => s.id === id)
   if (!subcategory) {
     return { success: false, error: 'Subcategoria não encontrada.' }
   }
 
-  // Checar produtos vinculados
-  const products = getLocalProducts(storeId)
   const subNameLower = subcategory.name.toLowerCase().trim()
   const linked = products.filter(
     (p) => p.subcategory?.toLowerCase().trim() === subNameLower
@@ -524,7 +583,6 @@ export async function deleteSubcategoryAction(params: {
     }
   }
 
-  // Se forçado, desvincular subcategoria sem deletar os produtos
   if (linked.length > 0) {
     for (const prod of linked) {
       saveLocalProduct({
@@ -532,13 +590,22 @@ export async function deleteSubcategoryAction(params: {
         subcategory: null,
       })
     }
+    try {
+      const supabase = await createClient()
+      await supabase
+        .from('products')
+        .update({ subcategory: null })
+        .eq('store_id', storeId)
+        .ilike('subcategory', subcategory.name.trim())
+    } catch {
+      // ignore
+    }
   }
 
-  // Supabase
   try {
     const supabase = await createClient()
     await supabase.from('store_subcategories').delete().eq('id', id).eq('store_id', storeId)
-  } catch (err: any) {
+  } catch {
     // Fallback local
   }
 
@@ -568,15 +635,14 @@ export async function clearStoreCategoriesAction(storeId: string): Promise<{
     return { success: false, error: 'Sessão expirada. Faça login novamente.' }
   }
 
-  // Tentar apagar no Supabase
   try {
     await supabase.from('store_subcategories').delete().eq('store_id', storeId)
     await supabase.from('store_categories').delete().eq('store_id', storeId)
+    await supabase.from('stores').update({ categories_initialized: true }).eq('id', storeId)
   } catch (err: any) {
     console.warn('Erro ao limpar categorias no Supabase:', err.message)
   }
 
-  // Limpar no storage local
   clearLocalStoreCategories(storeId)
 
   revalidatePath('/painel/loja')

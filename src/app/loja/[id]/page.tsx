@@ -6,7 +6,7 @@ import FollowButton from '@/components/FollowButton';
 import { SubscriptionNotice } from '@/components/SubscriptionNotice';
 import { getLocalStoreById } from '@/lib/stores-storage';
 import { getLocalProducts } from '@/lib/products-storage';
-import { getLocalStoreCategories } from '@/lib/categories-storage';
+import { getStoreCategoriesAction } from '@/app/actions/categories';
 import StoreProductsCatalog, { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog';
 import { SEED_STORES } from '@/lib/demo-stores';
 import { connection } from 'next/server';
@@ -94,7 +94,7 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
   }
 
   // Buscar categorias da loja para o menu de navegação e filtros
-  const storeCategories = getLocalStoreCategories(store.id);
+  const { categories: storeCategories } = await getStoreCategoriesAction(store.id);
 
   // Buscar ofertas/promoções da loja
   let promotions: any[] = [];

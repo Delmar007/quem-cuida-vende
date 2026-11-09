@@ -35,10 +35,12 @@ export interface StoredStore {
   updated_at?: string
 }
 
+const IS_SERVERLESS = Boolean(process.env.VERCEL)
 const DATA_DIR = path.join(process.cwd(), 'data')
 const STORES_FILE = path.join(DATA_DIR, 'stores.json')
 
 function ensureDataFile() {
+  if (IS_SERVERLESS) return
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true })
@@ -52,6 +54,7 @@ function ensureDataFile() {
 }
 
 export function getLocalStores(): StoredStore[] {
+  if (IS_SERVERLESS) return []
   ensureDataFile()
   try {
     if (fs.existsSync(STORES_FILE)) {
@@ -65,6 +68,7 @@ export function getLocalStores(): StoredStore[] {
 }
 
 export function saveLocalStore(store: StoredStore): StoredStore {
+  if (IS_SERVERLESS) return store
   ensureDataFile()
   try {
     const list = getLocalStores()

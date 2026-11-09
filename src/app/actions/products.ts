@@ -272,11 +272,28 @@ export async function createProductAction(data: CreateProductInput): Promise<{
         store_id: data.storeId,
         name: newProduct.name,
         description: newProduct.description,
+        sku: newProduct.sku,
         price: newProduct.price,
         promotional_price: newProduct.promotional_price,
+        cost_price_internal: newProduct.cost_price_internal,
+        fipe_price_internal: newProduct.fipe_price_internal,
         image_url: newProduct.image_url,
+        images: newProduct.images || [],
+        photo_orientation: newProduct.photo_orientation,
         category: newProduct.category,
         subcategory: newProduct.subcategory,
+        promo_type: newProduct.promo_type,
+        is_vehicle: newProduct.is_vehicle,
+        vehicle_category: newProduct.vehicle_category,
+        vehicle_brand: newProduct.vehicle_brand,
+        vehicle_model: newProduct.vehicle_model,
+        vehicle_version: newProduct.vehicle_version,
+        vehicle_year_fab: newProduct.vehicle_year_fab,
+        vehicle_year_model: newProduct.vehicle_year_model,
+        vehicle_km: newProduct.vehicle_km,
+        vehicle_transmission: newProduct.vehicle_transmission,
+        vehicle_traction: newProduct.vehicle_traction,
+        vehicle_plate_internal: newProduct.vehicle_plate_internal,
         is_outlet: newProduct.is_outlet,
         is_novidade: newProduct.is_novidade,
         is_active: newProduct.is_active,
@@ -337,8 +354,23 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     return { success: false, error: 'Selecione uma categoria principal para o produto.' }
   }
 
-  const existingProducts = getLocalProducts(data.storeId)
-  const existing = existingProducts.find((p) => p.id === data.id)
+  let existing: StoredProduct | undefined
+  try {
+    const supabase = await createClient()
+    const { data: dbProd } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', data.id)
+      .eq('store_id', data.storeId)
+      .single()
+    if (dbProd) existing = dbProd as StoredProduct
+  } catch {
+    // fallback local
+  }
+  if (!existing) {
+    const existingProducts = getLocalProducts(data.storeId)
+    existing = existingProducts.find((p) => p.id === data.id)
+  }
   if (!existing) {
     return { success: false, error: 'Produto não encontrado.' }
   }
@@ -413,11 +445,28 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
       .update({
         name: updatedProduct.name,
         description: updatedProduct.description,
+        sku: updatedProduct.sku,
         price: updatedProduct.price,
         promotional_price: updatedProduct.promotional_price,
+        cost_price_internal: updatedProduct.cost_price_internal,
+        fipe_price_internal: updatedProduct.fipe_price_internal,
         image_url: updatedProduct.image_url,
+        images: updatedProduct.images || [],
+        photo_orientation: updatedProduct.photo_orientation,
         category: updatedProduct.category,
         subcategory: updatedProduct.subcategory,
+        promo_type: updatedProduct.promo_type,
+        is_vehicle: updatedProduct.is_vehicle,
+        vehicle_category: updatedProduct.vehicle_category,
+        vehicle_brand: updatedProduct.vehicle_brand,
+        vehicle_model: updatedProduct.vehicle_model,
+        vehicle_version: updatedProduct.vehicle_version,
+        vehicle_year_fab: updatedProduct.vehicle_year_fab,
+        vehicle_year_model: updatedProduct.vehicle_year_model,
+        vehicle_km: updatedProduct.vehicle_km,
+        vehicle_transmission: updatedProduct.vehicle_transmission,
+        vehicle_traction: updatedProduct.vehicle_traction,
+        vehicle_plate_internal: updatedProduct.vehicle_plate_internal,
         is_outlet: updatedProduct.is_outlet,
         is_novidade: updatedProduct.is_novidade,
         is_active: updatedProduct.is_active,
@@ -553,17 +602,19 @@ export async function uploadProductImageAction(formData: FormData): Promise<{
     // fallback para gravação local ou base64
   }
 
-  // Fallback 1: Gravar localmente na pasta estática do projeto para economizar payload e memória
-  try {
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products')
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
+  // Fallback 1 (apenas ambiente de desenvolvimento local): Gravar na pasta estática
+  if (!process.env.VERCEL) {
+    try {
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products')
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true })
+      }
+      const fullLocalPath = path.join(uploadDir, fileName)
+      fs.writeFileSync(fullLocalPath, buffer)
+      return { success: true, url: `/uploads/products/${fileName}` }
+    } catch (err: any) {
+      // Fallback 2: data URL base64
     }
-    const fullLocalPath = path.join(uploadDir, fileName)
-    fs.writeFileSync(fullLocalPath, buffer)
-    return { success: true, url: `/uploads/products/${fileName}` }
-  } catch (err: any) {
-    // Fallback 2: data URL base64
   }
 
   const base64 = buffer.toString('base64')

@@ -3,16 +3,12 @@ import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { fastSupabaseFetch, isSupabaseCurrentlyOffline } from './fast-fetch'
 
-const LOCAL_SESSION_COOKIE = 'kittanda_session'
-
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
 
-  // Se o usuário já possui sessão local ativa, liberar imediatamente em 0ms
-  const hasLocalSession = Boolean(request.cookies.get(LOCAL_SESSION_COOKIE)?.value)
-  if (hasLocalSession || isSupabaseCurrentlyOffline()) {
+  if (isSupabaseCurrentlyOffline()) {
     return supabaseResponse
   }
 
@@ -61,13 +57,13 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Proteger rotas autenticadas quando Supabase estiver online e não houver sessão local
-  const isProtectedPath = 
+  // Proteger rotas autenticadas quando Supabase estiver online
+  const isProtectedPath =
     request.nextUrl.pathname.startsWith('/painel') ||
     request.nextUrl.pathname.startsWith('/admin') ||
     request.nextUrl.pathname.startsWith('/perfil')
 
-  if (isProtectedPath && !user && !hasLocalSession) {
+  if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

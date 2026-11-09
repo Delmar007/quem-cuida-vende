@@ -37,10 +37,12 @@ export interface StoredProduct {
   updated_at?: string
 }
 
+const IS_SERVERLESS = Boolean(process.env.VERCEL)
 const DATA_DIR = path.join(process.cwd(), 'data')
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json')
 
 function ensureProductsFile() {
+  if (IS_SERVERLESS) return
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true })
@@ -54,6 +56,7 @@ function ensureProductsFile() {
 }
 
 export function getLocalProducts(storeId?: string): StoredProduct[] {
+  if (IS_SERVERLESS) return []
   ensureProductsFile()
   try {
     if (fs.existsSync(PRODUCTS_FILE)) {
@@ -71,6 +74,7 @@ export function getLocalProducts(storeId?: string): StoredProduct[] {
 }
 
 export function saveLocalProduct(product: StoredProduct): StoredProduct {
+  if (IS_SERVERLESS) return product
   ensureProductsFile()
   try {
     const list = getLocalProducts()
@@ -88,6 +92,7 @@ export function saveLocalProduct(product: StoredProduct): StoredProduct {
 }
 
 export function deleteLocalProduct(productId: string, storeId?: string): boolean {
+  if (IS_SERVERLESS) return true
   ensureProductsFile()
   try {
     const list = getLocalProducts()
