@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { fastSupabaseFetch, isSupabaseCurrentlyOffline } from './fast-fetch'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -12,8 +13,8 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = SUPABASE_URL
+  const supabaseKey = SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
     return supabaseResponse

@@ -115,10 +115,12 @@ async function uploadStoreImage(
   const filePath = `${folder}/${fileNamePrefix}-${Date.now()}.${extension}`
 
   try {
-    const admin = createAdminClient()
+    const storageClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createAdminClient()
+      : await createClient()
     
     // Tentar upload no bucket 'stores'
-    const { error: uploadError } = await admin.storage
+    const { error: uploadError } = await storageClient.storage
       .from('stores')
       .upload(filePath, buffer, {
         contentType: file.type,
@@ -126,7 +128,7 @@ async function uploadStoreImage(
       })
 
     if (!uploadError) {
-      const { data: publicData } = admin.storage.from('stores').getPublicUrl(filePath)
+      const { data: publicData } = storageClient.storage.from('stores').getPublicUrl(filePath)
       if (publicData?.publicUrl) {
         return publicData.publicUrl
       }

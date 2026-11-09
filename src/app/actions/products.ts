@@ -584,8 +584,10 @@ export async function uploadProductImageAction(formData: FormData): Promise<{
   const filePath = `products/${fileName}`
 
   try {
-    const admin = createAdminClient()
-    const { error: uploadError } = await admin.storage
+    const storageClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? createAdminClient()
+      : await createClient()
+    const { error: uploadError } = await storageClient.storage
       .from('stores')
       .upload(filePath, buffer, {
         contentType: file.type,
@@ -593,7 +595,7 @@ export async function uploadProductImageAction(formData: FormData): Promise<{
       })
 
     if (!uploadError) {
-      const { data: publicData } = admin.storage.from('stores').getPublicUrl(filePath)
+      const { data: publicData } = storageClient.storage.from('stores').getPublicUrl(filePath)
       if (publicData?.publicUrl) {
         return { success: true, url: publicData.publicUrl }
       }

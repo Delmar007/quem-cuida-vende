@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { fastSupabaseFetch } from '@/lib/supabase/fast-fetch'
+import { SUPABASE_URL, SUPABASE_ANON_KEY, SITE_URL } from '@/lib/supabase/config'
 import { clearLocalSessionUser } from '@/lib/local-auth'
 
 /**
@@ -14,8 +15,8 @@ async function checkSupabaseOAuthStatus(provider: 'facebook' | 'google'): Promis
   online: boolean
   enabled: boolean
 }> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = SUPABASE_URL
+  const supabaseKey = SUPABASE_ANON_KEY
   if (!supabaseUrl || !supabaseKey) {
     return { online: false, enabled: false }
   }
@@ -66,7 +67,7 @@ export async function authWithSocialAction(provider: 'facebook' | 'google'): Pro
   oauthUrl?: string
   error?: string
 }> {
-  const origin = (await headers()).get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3020'
+  const origin = (await headers()).get('origin') || SITE_URL
   const status = await checkSupabaseOAuthStatus(provider)
 
   if (!status.online) {
