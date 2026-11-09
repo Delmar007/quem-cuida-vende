@@ -5,6 +5,9 @@ import { getStoreProductsAction } from '@/app/actions/products'
 import { getStoreCategoriesAction } from '@/app/actions/categories'
 import { StoreCategoryWithSubcategories } from '@/lib/categories-storage'
 import StoreProductsCatalog, { ProductItem } from '@/components/store/StoreProductsCatalog'
+import PromoThermometerBar from '@/components/PromoThermometerBar'
+import { getStorePromoTimerAction } from '@/app/actions/promo-timer'
+import { PromoTimerConfig } from '@/lib/promo-timer-storage'
 
 export interface StorePreviewData {
   name: string
@@ -70,6 +73,7 @@ export default function StorePreviewModal({
   const [isMobileDevice, setIsMobileDevice] = useState(false)
   const [products, setProducts] = useState<ProductItem[]>([])
   const [categories, setCategories] = useState<StoreCategoryWithSubcategories[]>([])
+  const [promoTimer, setPromoTimer] = useState<PromoTimerConfig | null>(null)
   const [loadingCatalog, setLoadingCatalog] = useState(false)
 
   // Detectar tamanho da tela do dispositivo e ajustar modo inicial
@@ -93,13 +97,17 @@ export default function StorePreviewModal({
       Promise.all([
         getStoreProductsAction(storeId),
         getStoreCategoriesAction(storeId),
+        getStorePromoTimerAction(storeId),
       ])
-        .then(([resProds, resCats]) => {
+        .then(([resProds, resCats, resTimer]) => {
           if (resProds.success && resProds.products) {
             setProducts(resProds.products)
           }
           if (resCats.success && resCats.categories) {
             setCategories(resCats.categories)
+          }
+          if (resTimer.success && resTimer.timer) {
+            setPromoTimer(resTimer.timer)
           }
         })
         .catch(() => {
@@ -235,7 +243,7 @@ export default function StorePreviewModal({
               <>
                 <button
                   type="button"
-                  onClick={() => onNavigateTopic(6)}
+                  onClick={() => onNavigateTopic(5)}
                   className="px-2.5 py-1 bg-neutral-800 hover:bg-neutral-700 text-white text-[10.5px] font-bold rounded-[2px] transition-colors cursor-pointer flex items-center gap-1 shadow-2xs whitespace-nowrap border border-neutral-700"
                   title="Gerenciar Categorias"
                 >
@@ -244,7 +252,7 @@ export default function StorePreviewModal({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onNavigateTopic(7)}
+                  onClick={() => onNavigateTopic(6)}
                   className="px-2.5 py-1 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[10.5px] font-bold rounded-[2px] transition-colors cursor-pointer flex items-center gap-1 shadow-xs whitespace-nowrap"
                   title="Cadastrar / Editar Produtos"
                 >
@@ -319,6 +327,17 @@ export default function StorePreviewModal({
                 </div>
               )}
             </div>
+
+            {/* BARRA DO CRONÔMETRO DE PROMOÇÃO & TERMÔMETRO TEMPORAL ABAIXO DO BANNER */}
+            <PromoThermometerBar
+              storeId={storeId}
+              title={promoTimer?.title}
+              startDate={promoTimer?.startDate}
+              endDate={promoTimer?.endDate}
+              isActive={promoTimer ? promoTimer.isActive : true}
+              variant="banner"
+              showHeart={true}
+            />
 
             {/* 2. VITRINE E MENU VERTICAL DA LOJA (RESPONSIVA PARA DESKTOP E CELULAR) */}
             <div className="p-3 sm:p-6 bg-gray-50/70 border-t border-gray-200 flex-1">

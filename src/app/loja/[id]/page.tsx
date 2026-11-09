@@ -7,6 +7,8 @@ import { SubscriptionNotice } from '@/components/SubscriptionNotice';
 import { getLocalStoreById } from '@/lib/stores-storage';
 import { getLocalProducts } from '@/lib/products-storage';
 import { getStoreCategoriesAction } from '@/app/actions/categories';
+import { getStorePromoTimerServer } from '@/lib/promo-timer-storage';
+import PromoThermometerBar from '@/components/PromoThermometerBar';
 import StoreProductsCatalog, { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog';
 import { SEED_STORES } from '@/lib/demo-stores';
 import { connection } from 'next/server';
@@ -96,6 +98,9 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
   // Buscar categorias da loja para o menu de navegação e filtros
   const { categories: storeCategories } = await getStoreCategoriesAction(store.id);
 
+  // Buscar cronômetro de promoção (termômetro temporal) da loja
+  const promoTimer = await getStorePromoTimerServer(store.id);
+
   // Buscar ofertas/promoções da loja
   let promotions: any[] = [];
   try {
@@ -168,9 +173,21 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
         )}
       </div>
 
+      {/* Termômetro Temporal de Promoção abaixo do Banner */}
+      <PromoThermometerBar
+        title={promoTimer?.title || 'Outlet'}
+        startDate={promoTimer?.startDate}
+        endDate={promoTimer?.endDate}
+        isActive={promoTimer ? promoTimer.isActive : true}
+        variant="banner"
+      />
+
       {/* Menu e Vitrine de Produtos da Loja */}
       <div className="mt-6">
         <StoreProductsCatalog
+          storeId={store.id}
+          storeSlug={store.slug}
+          promoTimer={promoTimer}
           products={products}
           categories={storeCategories}
           storeName={store.name}

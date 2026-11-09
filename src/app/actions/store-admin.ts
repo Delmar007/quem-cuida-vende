@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -35,6 +36,7 @@ export interface StoreAdminData {
 }
 
 import { getLocalStores, getLocalStoresByOwner, getLocalStoreById, saveLocalStore, StoredStore } from '@/lib/stores-storage'
+import { getLocalSessionUser, setLocalSessionUser } from '@/lib/local-auth'
 
 /**
  * Obtém as lojas pertencentes ao usuário atualmente autenticado.
@@ -46,7 +48,7 @@ export async function getMyStoresAction(): Promise<{
   authenticated: boolean
 }> {
   const supabase = await createClient()
-  let user = null
+  let user: any = null
   try {
     const { data } = await supabase.auth.getUser()
     user = data?.user ?? null
@@ -55,10 +57,10 @@ export async function getMyStoresAction(): Promise<{
   }
 
   if (!user) {
-    const fallbackStores = getLocalStores()
-    if (fallbackStores.length > 0) {
-      return { success: true, authenticated: true, stores: fallbackStores }
-    }
+    user = await getLocalSessionUser()
+  }
+
+  if (!user) {
     return { success: false, authenticated: false, error: 'Usuário não autenticado.' }
   }
 
@@ -157,7 +159,16 @@ export async function updateStoreAction(
   }
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user: any = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null
+  } catch {
+    user = null
+  }
+  if (!user) {
+    user = await getLocalSessionUser()
+  }
 
   if (!user) {
     return { success: false, error: 'Sessão expirada. Faça login novamente para salvar as alterações.' }
@@ -328,6 +339,43 @@ export async function updateStoreAction(
   }
 
   saveLocalStore(finalStore as StoredStore)
+
+  // Marcar que este usuário possui loja criada (user_metadata + cookie vinculado ao user.id)
+  try {
+    await supabase.auth.updateUser({
+      data: {
+        has_store: true,
+      },
+    })
+  } catch {
+    // ignore
+  }
+
+  try {
+    const localSession = await getLocalSessionUser()
+    if (localSession && localSession.id === user.id) {
+      await setLocalSessionUser({
+        ...localSession,
+        user_metadata: {
+          ...(localSession.user_metadata || {}),
+          has_store: true,
+        },
+      })
+    }
+  } catch {
+    // ignore
+  }
+
+  try {
+    const cookieStore = await cookies()
+    cookieStore.set(`kittanda_has_store_${user.id}`, 'true', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    })
+  } catch {
+    // ignore
+  }
 
   // Atribuir papel 'lojista' ao usuário via admin
   try {

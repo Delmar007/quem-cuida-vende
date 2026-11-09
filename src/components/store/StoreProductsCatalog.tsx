@@ -3,6 +3,9 @@
 import React, { useState, useMemo } from 'react'
 import { StoreCategoryWithSubcategories } from '@/lib/categories-storage'
 import ProductCardImageCarousel from '@/components/ProductCardImageCarousel'
+import FollowStoreButton from '@/components/FollowStoreButton'
+import FavoriteProductButton from '@/components/FavoriteProductButton'
+import PromoThermometerBar from '@/components/PromoThermometerBar'
 
 export interface ProductItem {
   id: string
@@ -101,6 +104,14 @@ function formatStoreCategorySubcategory(category?: string | null, subcategory?: 
 }
 
 interface StoreProductsCatalogProps {
+  storeId?: string
+  storeSlug?: string
+  promoTimer?: {
+    title?: string
+    startDate?: string
+    endDate?: string
+    isActive?: boolean
+  } | null
   products: ProductItem[]
   categories?: StoreCategoryWithSubcategories[]
   storeName: string
@@ -115,6 +126,9 @@ interface StoreProductsCatalogProps {
 }
 
 export default function StoreProductsCatalog({
+  storeId,
+  storeSlug,
+  promoTimer,
   products = [],
   categories = [],
   storeName,
@@ -643,19 +657,22 @@ export default function StoreProductsCatalog({
                 </div>
               ) : null}
 
-              {/* 6. Botão do WhatsApp */}
-              {phoneDigits && (
-                <a
-                  href={`https://wa.me/55${phoneDigits}?text=${encodeURIComponent(
-                    `Olá! Encontrei sua loja "${storeName}" na Kittanda Outlet e gostaria de mais informações.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 w-full py-2 px-4 bg-black hover:bg-[#FB6600] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-[2px]"
-                >
-                  <span>WhatsApp</span>
-                </a>
-              )}
+              {/* 6. Botões Seguir Loja & WhatsApp */}
+              <div className="mt-3 w-full space-y-2">
+                {storeId && <FollowStoreButton storeId={storeId} storeSlug={storeSlug} />}
+                {phoneDigits && (
+                  <a
+                    href={`https://wa.me/55${phoneDigits}?text=${encodeURIComponent(
+                      `Olá! Encontrei sua loja "${storeName}" na Kittanda Outlet e gostaria de mais informações.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2 px-4 bg-black hover:bg-[#FB6600] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-[2px]"
+                  >
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+              </div>
             </div>
 
             {/* 7. Ver tudo & 8. Categorias */}
@@ -1113,19 +1130,22 @@ export default function StoreProductsCatalog({
               </div>
             ) : null}
 
-            {/* 6. Botão do WhatsApp */}
-            {phoneDigits && (
-              <a
-                href={`https://wa.me/55${phoneDigits}?text=${encodeURIComponent(
-                  `Olá! Encontrei sua loja "${storeName}" na Kittanda Outlet e gostaria de mais informações.`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3.5 w-full py-2.5 px-4 bg-black hover:bg-[#FB6600] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-[2px]"
-              >
-                <span>WhatsApp</span>
-              </a>
-            )}
+            {/* 6. Botões Seguir Loja & WhatsApp */}
+            <div className="mt-3.5 w-full space-y-2">
+              {storeId && <FollowStoreButton storeId={storeId} storeSlug={storeSlug} />}
+              {phoneDigits && (
+                <a
+                  href={`https://wa.me/55${phoneDigits}?text=${encodeURIComponent(
+                    `Olá! Encontrei sua loja "${storeName}" na Kittanda Outlet e gostaria de mais informações.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 bg-black hover:bg-[#FB6600] text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-[2px]"
+                >
+                  <span>WhatsApp</span>
+                </a>
+              )}
+            </div>
           </div>
 
           {/* LISTA DE CATEGORIAS E SUBCATEGORIAS ACCORDION */}
@@ -1439,7 +1459,10 @@ export default function StoreProductsCatalog({
                       </div>
                     </div>
 
-                    <div className="col-start-1 row-start-1 flex flex-col h-full w-full overflow-hidden">
+                    <div className="col-start-1 row-start-1 flex flex-col h-full w-full overflow-hidden relative">
+                      <div className="absolute top-2.5 right-2.5 z-30">
+                        <FavoriteProductButton productId={produto.id} />
+                      </div>
                       {/* Imagem do Produto/Veículo com Setas Laterais + Tags de Modalidade */}
                       <ProductCardImageCarousel
                         images={cardImages}
@@ -1450,6 +1473,15 @@ export default function StoreProductsCatalog({
                         hasDiscount={hasPromo}
                         discountPercent={discountPercent}
                         onImageClick={() => handleOpenDetailModal(produto)}
+                      />
+
+                      {/* Termômetro Temporal na página de produtos */}
+                      <PromoThermometerBar
+                        title={promoTimer?.title || getCardPromoLabel(produto)}
+                        startDate={promoTimer?.startDate}
+                        endDate={promoTimer?.endDate}
+                        isActive={promoTimer ? promoTimer.isActive : true}
+                        variant="card"
                       />
 
                       {/* Conteúdo do Card */}

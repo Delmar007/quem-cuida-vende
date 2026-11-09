@@ -20,6 +20,7 @@ import MerchantMetricsTab from '@/components/merchant/MerchantMetricsTab'
 import MerchantFavoritesTab from '@/components/merchant/MerchantFavoritesTab'
 import MerchantBirthdaysTab from '@/components/merchant/MerchantBirthdaysTab'
 import MerchantSubscriptionTab from '@/components/merchant/MerchantSubscriptionTab'
+import MerchantPromoTimerTab from '@/components/merchant/MerchantPromoTimerTab'
 
 const CATEGORIAS = [
   { id: 'moda', label: 'Moda', icon: '👗' },
@@ -131,86 +132,86 @@ const TOPICOS = [
   {
     id: 1,
     numero: '01',
-    titulo: 'Dados da Loja e Responsável',
-    subtitulo: 'Nome, responsável, WhatsApp, logo e descrição',
+    titulo: 'Dados da loja',
+    subtitulo: 'Nome, responsável, WhatsApp, logo, descrição e endereço comercial',
     icone: '🏬',
   },
   {
     id: 2,
     numero: '02',
-    titulo: 'Endereço Comercial',
-    subtitulo: 'CEP, rua, número, bairro e cidade',
-    icone: '📍',
-  },
-  {
-    id: 3,
-    numero: '03',
     titulo: 'Categorias e Segmentos',
     subtitulo: 'Segmento principal e subcategorias da loja',
     icone: '🏷️',
   },
   {
-    id: 4,
-    numero: '04',
+    id: 3,
+    numero: '03',
     titulo: 'Banner Triplo da Loja (Todos os Planos)',
     subtitulo: 'Topo interno da sua loja (e filtro Lojas no Plano Ouro)',
     icone: '🖼️',
   },
   {
-    id: 5,
-    numero: '05',
+    id: 4,
+    numero: '04',
     titulo: 'Banner do Filtro Lojas (Single / Duplo)',
     subtitulo: 'Single (Bronze) ou Duplo (Bronze Plus e Prata) para o feed Lojas',
     icone: '🪪',
   },
   {
-    id: 6,
-    numero: '06',
+    id: 5,
+    numero: '05',
     titulo: 'Categorias e Subcategorias',
     subtitulo: 'Organizar produtos por tipos e filtros',
     icone: '🗂️',
   },
   {
-    id: 7,
-    numero: '07',
+    id: 6,
+    numero: '06',
     titulo: 'Catálogo de Produtos',
     subtitulo: 'Cadastrar produtos e limites do plano',
     icone: '📦',
   },
   {
-    id: 8,
-    numero: '08',
+    id: 7,
+    numero: '07',
     titulo: 'Sistema de Convites VIP',
     subtitulo: 'Convide lojistas parceiros selecionados',
     icone: '🎟️',
   },
   {
-    id: 9,
-    numero: '09',
+    id: 8,
+    numero: '08',
     titulo: 'Desempenho e Métricas',
     subtitulo: 'Acessos, cliques no WhatsApp e conversão',
     icone: '📊',
   },
   {
-    id: 10,
-    numero: '10',
+    id: 9,
+    numero: '09',
     titulo: 'Lista de Preferidos',
     subtitulo: 'Produtos favoritados pelos clientes',
     icone: '❤️',
   },
   {
-    id: 11,
-    numero: '11',
+    id: 10,
+    numero: '10',
     titulo: 'Aniversariantes Seguidores',
     subtitulo: 'Seguidores que comemoram este mês',
     icone: '🎂',
   },
   {
-    id: 12,
-    numero: '12',
+    id: 11,
+    numero: '11',
     titulo: 'Plano & Cobrança',
     subtitulo: 'Vencimento dia 10, tolerância e faturas',
     icone: '💳',
+  },
+  {
+    id: 12,
+    numero: '13',
+    titulo: 'Cronômetro de Promoção',
+    subtitulo: 'Termômetro temporal de campanha com início e fim',
+    icone: '⏱️',
   },
 ]
 
@@ -218,8 +219,9 @@ function MerchantStoreAdminContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Tópico ativo (1 a 12)
-  const initialTopic = parseInt(searchParams.get('topico') || '1', 10)
+  // Tópico ativo (1 a 12, aceitando 13 para Cronômetro de Promoção)
+  const rawTopic = parseInt(searchParams.get('topico') || '1', 10)
+  const initialTopic = rawTopic === 13 ? 12 : rawTopic
   const [currentTopic, setCurrentTopic] = useState<number>(
     initialTopic >= 1 && initialTopic <= 12 ? initialTopic : 1
   )
@@ -700,6 +702,10 @@ function MerchantStoreAdminContent() {
           prev.map((s) => (s.id === selectedStoreId ? res.store! : s))
         )
         populateStoreForm(res.store)
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('kittanda:store-saved'))
+        }
+        router.refresh()
       } else {
         setFeedback({ type: 'error', message: res.error || 'Erro ao salvar alterações da loja.' })
       }
@@ -712,8 +718,7 @@ function MerchantStoreAdminContent() {
 
   const completedStepsCount = React.useMemo(() => {
     let count = 0
-    if (name?.trim()) count++
-    if (city?.trim() || street?.trim()) count++
+    if (name?.trim() && (city?.trim() || street?.trim())) count++
     if (category) count++
     if (largeBannerPreview || currentLargeBannerUrl) count++
     if (smallBannerPreview || currentSmallBannerUrl) count++
@@ -928,7 +933,7 @@ function MerchantStoreAdminContent() {
             </span>
             <div className="min-w-0">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 block">
-                Etapa {activeTopic.numero} de 12 • Toque para alterar
+                Etapa {activeTopic.numero} de 11 • Toque para alterar
               </span>
               <span className="text-sm font-bold text-neutral-900 truncate block">
                 {activeTopic.titulo}
@@ -964,18 +969,18 @@ function MerchantStoreAdminContent() {
           </div>
         )}
 
-        {/* Lista dos 12 Itens: ao clicar recolhe o restante, mostrando abaixo as caixas */}
+        {/* Lista dos 11 Itens: ao clicar recolhe o restante, mostrando abaixo as caixas */}
         {isMobileMenuOpen && (
           <div className="border-t border-neutral-200/80 bg-neutral-50/40 p-2 space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
             <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center justify-between">
               <span>Etapas de Gestão</span>
-              <span className="font-mono text-neutral-500">{completedStepsCount}/12 concluídas</span>
+              <span className="font-mono text-neutral-500">{completedStepsCount}/11 concluídas</span>
             </div>
 
             <div className="divide-y divide-neutral-100 bg-white rounded-[3px] border border-neutral-200/60 overflow-hidden">
               {TOPICOS.map((topico) => {
                 const isActive = currentTopic === topico.id
-                const isRestrictedTopic = (topico.id === 4 && isBronze) || (topico.id === 5 && !isBronze)
+                const isRestrictedTopic = (topico.id === 3 && isBronze) || (topico.id === 4 && !isBronze)
                 return (
                   <button
                     key={topico.id}
@@ -997,8 +1002,8 @@ function MerchantStoreAdminContent() {
                         {topico.numero}
                       </span>
                       <div className="min-w-0">
-                        <span className={`block truncate ${topico.id === 7 ? 'font-black text-black' : ''}`}>
-                          {topico.id === 7 ? <strong>{topico.titulo}</strong> : topico.titulo} {isRestrictedTopic ? '🔒' : ''}
+                        <span className={`block truncate ${topico.id === 6 ? 'font-black text-black' : ''}`}>
+                          {topico.id === 6 ? <strong>{topico.titulo}</strong> : topico.titulo} {isRestrictedTopic ? '🔒' : ''}
                         </span>
                         <span className="text-[10px] text-neutral-400 block truncate font-normal">
                           {isRestrictedTopic ? 'Restrito — não pertence ao seu pacote' : topico.subtitulo}
@@ -1025,7 +1030,7 @@ function MerchantStoreAdminContent() {
       <div className="flex flex-col lg:flex-row items-start gap-8">
         
         {/* ========================================================================= */}
-        {/* MENU LATERAL ESQUERDO COM AS 12 ETAPAS (DESKTOP)                          */}
+        {/* MENU LATERAL ESQUERDO COM AS 11 ETAPAS (DESKTOP)                          */}
         {/* ========================================================================= */}
         <aside className="hidden lg:block w-[280px] shrink-0 bg-white border border-neutral-200/80 rounded-[4px] overflow-hidden sticky top-20 shadow-xs">
           
@@ -1082,15 +1087,15 @@ function MerchantStoreAdminContent() {
           <div className="px-4 py-2 bg-white border-b border-neutral-100 flex items-center justify-between text-[11px] text-neutral-500">
             <span className="font-medium text-neutral-600">Etapas de Gestão</span>
             <span className="font-mono text-neutral-400">
-              {completedStepsCount}/12 concluídas
+              {completedStepsCount}/11 concluídas
             </span>
           </div>
 
-          {/* Navegação Vertical das 12 Etapas */}
+          {/* Navegação Vertical das 11 Etapas */}
           <nav className="p-2 flex flex-col gap-0.5">
             {TOPICOS.map((topico) => {
               const isActive = currentTopic === topico.id
-              const isRestrictedTopic = (topico.id === 4 && isBronze) || (topico.id === 5 && !isBronze)
+              const isRestrictedTopic = (topico.id === 3 && isBronze) || (topico.id === 4 && !isBronze)
               return (
                 <button
                   key={topico.id}
@@ -1106,13 +1111,13 @@ function MerchantStoreAdminContent() {
                 >
                   <span
                     className={`font-mono text-[11px] shrink-0 ${
-                      isActive || topico.id === 7 ? 'text-neutral-900 font-black' : 'text-neutral-400'
+                      isActive || topico.id === 6 ? 'text-neutral-900 font-black' : 'text-neutral-400'
                     }`}
                   >
                     {topico.numero}
                   </span>
-                  <span className={`truncate flex-1 ${topico.id === 7 ? 'font-black text-neutral-950' : ''}`}>
-                    {topico.id === 7 ? <strong>{topico.titulo}</strong> : topico.titulo}
+                  <span className={`truncate flex-1 ${topico.id === 6 ? 'font-black text-neutral-950' : ''}`}>
+                    {topico.id === 6 ? <strong>{topico.titulo}</strong> : topico.titulo}
                   </span>
                   {isRestrictedTopic && (
                     <span className="text-[10px] shrink-0" title="Restrito ao pacote">
@@ -1129,18 +1134,24 @@ function MerchantStoreAdminContent() {
         {/* ÁREA DE CONTEÚDO DO TÓPICO SELECIONADO                                    */}
         {/* ========================================================================= */}
         <main className="flex-1 min-w-0 w-full space-y-6">
-          <form id="store-profile-form" onSubmit={handleSaveChanges} className={currentTopic <= 5 ? "space-y-6" : "hidden"}>
+          <form id="store-profile-form" onSubmit={handleSaveChanges} className={currentTopic <= 4 ? "space-y-6" : "hidden"}>
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 01: DADOS DA LOJA E RESPONSÁVEL                             */}
+            {/* TÓPICO 01: DADOS DA LOJA (IDENTIFICAÇÃO + ENDEREÇO COMERCIAL)      */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 1 && (
               <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
                 <div className="border-b border-neutral-100 pb-4 mb-6 flex items-center justify-between">
                   <div>
+                    <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
+                      Tópico 01
+                    </span>
                     <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
-                      Dados da Loja e Responsável Legal
+                      Dados da loja
                     </h2>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Identificação da loja, responsável legal e endereço comercial.
+                    </p>
                   </div>
                 </div>
 
@@ -1316,144 +1327,137 @@ function MerchantStoreAdminContent() {
                     </div>
                   </div>
                 </div>
+
+                {/* Divisória e Seção de Endereço Comercial integrada no Tópico 01 */}
+                <div className="border-t border-neutral-200 mt-8 pt-6">
+                  <div className="mb-4">
+                    <h3 className="text-sm font-black uppercase tracking-tight text-neutral-900">
+                      Endereço Comercial & Localização Física
+                    </h3>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      Endereço para os consumidores encontrarem seu estabelecimento e calcularem proximidade.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          CEP {loadingCep && <span className="text-xs text-[#FB6600] animate-pulse">Buscando...</span>}
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={9}
+                          value={cep}
+                          onChange={handleCepChange}
+                          placeholder="79000-000"
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        />
+                        <span className="text-[10px] text-neutral-400 mt-0.5 block">
+                          Auto-preenchimento ViaCEP
+                        </span>
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          Logradouro / Rua / Avenida
+                        </label>
+                        <input
+                          type="text"
+                          value={street}
+                          onChange={(e) => {
+                            setStreet(e.target.value)
+                            setIsDirty(true)
+                          }}
+                          placeholder="Ex.: Rua 14 de Julho"
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          Número
+                        </label>
+                        <input
+                          type="text"
+                          value={number}
+                          onChange={(e) => {
+                            setNumber(e.target.value)
+                            setIsDirty(true)
+                          }}
+                          placeholder="1234 ou S/N"
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          Bairro
+                        </label>
+                        <input
+                          type="text"
+                          value={neighborhood}
+                          onChange={(e) => {
+                            setNeighborhood(e.target.value)
+                            setIsDirty(true)
+                          }}
+                          placeholder="Centro"
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          Cidade / Município
+                        </label>
+                        <input
+                          type="text"
+                          value={city}
+                          onChange={(e) => {
+                            setCity(e.target.value)
+                            setIsDirty(true)
+                          }}
+                          placeholder="Campo Grande"
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
+                          Estado (UF)
+                        </label>
+                        <select
+                          value={state}
+                          onChange={(e) => {
+                            setState(e.target.value)
+                            setIsDirty(true)
+                          }}
+                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px] bg-white font-semibold"
+                        >
+                          <option value="">Selecione o Estado</option>
+                          {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map((uf) => (
+                            <option key={uf} value={uf}>
+                              {uf}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </section>
             )}
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 02: ENDEREÇO COMERCIAL                                      */}
+            {/* TÓPICO 02: CATEGORIAS E SEGMENTOS                                  */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 2 && (
               <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
                 <div className="border-b border-neutral-100 pb-4 mb-6">
                   <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
                     Tópico 02
-                  </span>
-                  <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
-                    Endereço Comercial & Localização Física
-                  </h2>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Endereço para os consumidores encontrarem seu estabelecimento e calcularem proximidade.
-                  </p>
-                </div>
-
-                <div className="space-y-4 max-w-2xl">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                        CEP {loadingCep && <span className="text-xs text-[#FB6600] animate-pulse">Buscando...</span>}
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={9}
-                        value={cep}
-                        onChange={handleCepChange}
-                        placeholder="79000-000"
-                        className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                      />
-                      <span className="text-[10px] text-neutral-400 mt-0.5 block">
-                        Auto-preenchimento ViaCEP
-                      </span>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                        Logradouro / Rua / Avenida
-                      </label>
-                      <input
-                        type="text"
-                        value={street}
-                        onChange={(e) => {
-                          setStreet(e.target.value)
-                          setIsDirty(true)
-                        }}
-                        placeholder="Ex.: Rua 14 de Julho"
-                        className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                        Número
-                      </label>
-                      <input
-                        type="text"
-                        value={number}
-                        onChange={(e) => {
-                          setNumber(e.target.value)
-                          setIsDirty(true)
-                        }}
-                        placeholder="1234 ou S/N"
-                        className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                        Bairro
-                      </label>
-                      <input
-                        type="text"
-                        value={neighborhood}
-                        onChange={(e) => {
-                          setNeighborhood(e.target.value)
-                          setIsDirty(true)
-                        }}
-                        placeholder="Centro"
-                        className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                        Cidade / Município
-                      </label>
-                      <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => {
-                          setCity(e.target.value)
-                          setIsDirty(true)
-                        }}
-                        placeholder="Campo Grande"
-                        className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="w-full sm:w-1/3">
-                    <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                      Estado (UF)
-                    </label>
-                    <select
-                      value={state}
-                      onChange={(e) => {
-                        setState(e.target.value)
-                        setIsDirty(true)
-                      }}
-                      className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px] bg-white font-semibold"
-                    >
-                      <option value="">Selecione o Estado</option>
-                      {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map((uf) => (
-                        <option key={uf} value={uf}>
-                          {uf}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 03: CATEGORIAS E SEGMENTOS                                  */}
-            {/* ------------------------------------------------------------------- */}
-            {currentTopic === 3 && (
-              <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
-                <div className="border-b border-neutral-100 pb-4 mb-6">
-                  <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                    Tópico 03
                   </span>
                   <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
                     Segmento Comercial & Subcategorias
@@ -1546,15 +1550,15 @@ function MerchantStoreAdminContent() {
                             🚗 Cadastro Especial de Veículos (Carro / Usados e Concessionária) Ativado
                           </strong>
                           <p className="text-[11px] text-neutral-600">
-                            No <strong>Tópico 07 (Catálogo de Produtos)</strong>, sua loja possui o formulário exclusivo para veículos (Marca, Modelo, Versão, Ano, KM, Câmbio, Tração, Placa Interna, até 12 fotos, Preço de Custo Interno, Preço de Venda e Preço FIPE Interno).
+                            No <strong>Tópico 06 (Catálogo de Produtos)</strong>, sua loja possui o formulário exclusivo para veículos (Marca, Modelo, Versão, Ano, KM, Câmbio, Tração, Placa Interna, até 12 fotos, Preço de Custo Interno, Preço de Venda e Preço FIPE Interno).
                           </p>
                         </div>
                         <button
                           type="button"
-                          onClick={() => setCurrentTopic(7)}
+                          onClick={() => setCurrentTopic(6)}
                           className="px-3.5 py-2 bg-neutral-900 hover:bg-black text-white text-[11px] font-bold uppercase tracking-wider rounded-[2px] shrink-0 cursor-pointer transition-colors"
                         >
-                          Ir para Catálogo (07) &rarr;
+                          Ir para Catálogo (06) &rarr;
                         </button>
                       </div>
                     )}
@@ -1563,14 +1567,14 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 04: DISPOSITIVO BANNER TRIPLO DA LOJA (TODOS OS PLANOS)      */}
+            {/* TÓPICO 03: DISPOSITIVO BANNER TRIPLO DA LOJA (TODOS OS PLANOS)      */}
             {/* ------------------------------------------------------------------- */}
-            {currentTopic === 4 && (
+            {currentTopic === 3 && (
               <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
                 <div className="border-b border-neutral-100 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Tópico 04 • Banner Triplo da Loja (Liberado em Todos os Planos)
+                      Tópico 03 • Banner Triplo da Loja (Liberado em Todos os Planos)
                     </span>
                     <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
                       Dispositivo Banner Triplo Grande (940 × 370 px)
@@ -1579,8 +1583,8 @@ function MerchantStoreAdminContent() {
                       {currentPlanConfig.feedBannerType === 'triple'
                         ? 'Banner Triplo exibido no topo da página da sua loja e também em 3 colunas no filtro Lojas (Plano Ouro).'
                         : currentPlanConfig.feedBannerType === 'double'
-                        ? `Banner Triplo exibido dentro da página da sua loja. No filtro Lojas aparecerá o seu Banner Duplo (Tópico 05).`
-                        : 'Banner Triplo exibido dentro da página da sua loja (Plano Bronze Gratuito). Não aparece no filtro Lojas (onde aparece o seu Banner Single do Tópico 05).'}
+                        ? `Banner Triplo exibido dentro da página da sua loja. No filtro Lojas aparecerá o seu Banner Duplo (Tópico 04).`
+                        : 'Banner Triplo exibido dentro da página da sua loja (Plano Bronze Gratuito). Não aparece no filtro Lojas (onde aparece o seu Banner Single do Tópico 04).'}
                     </p>
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px] bg-black text-[#FB6600]">
@@ -1673,9 +1677,9 @@ function MerchantStoreAdminContent() {
                     {currentPlanConfig.feedBannerType === 'triple' ? (
                       <span>No topo interno da página da sua loja <strong>e também em destaque de 3 colunas no filtro Lojas</strong> (benefício exclusivo do Plano Ouro).</span>
                     ) : currentPlanConfig.feedBannerType === 'double' ? (
-                      <span>No topo interno da página da sua loja. <strong>No filtro Lojas aparece apenas o seu Banner Duplo</strong> (configure no Tópico 05).</span>
+                      <span>No topo interno da página da sua loja. <strong>No filtro Lojas aparece apenas o seu Banner Duplo</strong> (configure no Tópico 04).</span>
                     ) : (
-                      <span>No topo interno da página da sua loja (inclusive no Plano Bronze Gratuito). <strong>Este banner grande não aparece no filtro Lojas</strong> — no filtro Lojas aparece o seu Banner Single (Tópico 05).</span>
+                      <span>No topo interno da página da sua loja (inclusive no Plano Bronze Gratuito). <strong>Este banner grande não aparece no filtro Lojas</strong> — no filtro Lojas aparece o seu Banner Single (Tópico 04).</span>
                     )}
                   </p>
                   <p>• Formatos aceitos: <strong>JPEG, PNG ou WebP</strong> com peso máximo de até <strong>5 MB</strong>.</p>
@@ -1684,14 +1688,14 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 05: DISPOSITIVO BANNER DO FILTRO LOJAS (SINGLE OU DUPLO)     */}
+            {/* TÓPICO 04: DISPOSITIVO BANNER DO FILTRO LOJAS (SINGLE OU DUPLO)     */}
             {/* ------------------------------------------------------------------- */}
-            {currentTopic === 5 && (
+            {currentTopic === 4 && (
               <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
                 <div className="border-b border-neutral-100 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Tópico 05 • {isBronze ? 'Banner Single no Filtro Lojas (Plano Bronze)' : currentPlanConfig.feedBannerType === 'double' ? `Banner Duplo no Filtro Lojas (Plano ${currentPlanConfig.name})` : 'Plano Ouro (Usa Banner Triplo em Lojas)'}
+                      Tópico 04 • {isBronze ? 'Banner Single no Filtro Lojas (Plano Bronze)' : currentPlanConfig.feedBannerType === 'double' ? `Banner Duplo no Filtro Lojas (Plano ${currentPlanConfig.name})` : 'Plano Ouro (Usa Banner Triplo em Lojas)'}
                     </span>
                     <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
                       {isBronze
@@ -1704,8 +1708,8 @@ function MerchantStoreAdminContent() {
                       {isBronze
                         ? 'Banner Single (1 coluna) exibido no filtro Lojas para o seu Plano Bronze (Gratuito).'
                         : currentPlanConfig.feedBannerType === 'double'
-                        ? `No Plano ${currentPlanConfig.name}, você tem o Banner Triplo dentro da loja (Tópico 04) e este Banner Duplo (2 colunas) que aparece no filtro Lojas.`
-                        : 'No Plano Ouro, o seu Banner Triplo cadastrado no Tópico 04 já aparece diretamente em 3 colunas no filtro Lojas.'}
+                        ? `No Plano ${currentPlanConfig.name}, você tem o Banner Triplo dentro da loja (Tópico 03) e este Banner Duplo (2 colunas) que aparece no filtro Lojas.`
+                        : 'No Plano Ouro, o seu Banner Triplo cadastrado no Tópico 03 já aparece diretamente em 3 colunas no filtro Lojas.'}
                     </p>
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px] bg-black text-[#FB6600]">
@@ -1720,14 +1724,14 @@ function MerchantStoreAdminContent() {
                       Seu Plano Ouro Exibe o Banner Triplo Direto em Lojas
                     </h3>
                     <p className="text-xs text-neutral-600 max-w-lg mx-auto mb-5 leading-relaxed">
-                      Como sua loja está no <strong>Plano Ouro</strong>, o seu <strong>Banner Triplo (3 Colunas)</strong> cadastrado no <strong>Tópico 04</strong> é exibido tanto dentro da sua loja quanto em destaque máximo no filtro <strong>Lojas</strong>.
+                      Como sua loja está no <strong>Plano Ouro</strong>, o seu <strong>Banner Triplo (3 Colunas)</strong> cadastrado no <strong>Tópico 03</strong> é exibido tanto dentro da sua loja quanto em destaque máximo no filtro <strong>Lojas</strong>.
                     </p>
                     <button
                       type="button"
-                      onClick={() => setCurrentTopic(4)}
+                      onClick={() => setCurrentTopic(3)}
                       className="px-5 py-2.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer transition-colors"
                     >
-                      Gerenciar Meu Banner Triplo (Tópico 04)
+                      Gerenciar Meu Banner Triplo (Tópico 03)
                     </button>
                   </div>
                 ) : (
@@ -1819,12 +1823,12 @@ function MerchantStoreAdminContent() {
                         <div className="p-3 bg-neutral-50 rounded-[2px] border border-neutral-200 text-[11px] text-neutral-600 space-y-1">
                           {isBronze ? (
                             <>
-                              <p>• <strong>Regra do Plano Bronze (Gratuito):</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 04) para o topo interno da sua loja e este <strong>Banner Single (1 coluna)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
+                              <p>• <strong>Regra do Plano Bronze (Gratuito):</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 03) para o topo interno da sua loja e este <strong>Banner Single (1 coluna)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
                               <p>• O seu Banner Triplo não aparece no filtro Lojas no Plano Bronze.</p>
                             </>
                           ) : (
                             <>
-                              <p>• <strong>Regra do Plano {currentPlanConfig.name}:</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 04) para o topo interno da sua loja e este <strong>Banner Duplo (2 colunas)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
+                              <p>• <strong>Regra do Plano {currentPlanConfig.name}:</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 03) para o topo interno da sua loja e este <strong>Banner Duplo (2 colunas)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
                               <p>• No filtro Lojas aparece exclusivamente o seu Banner Duplo.</p>
                             </>
                           )}
@@ -1839,9 +1843,9 @@ function MerchantStoreAdminContent() {
           </form>
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 06: CATEGORIAS E SUBCATEGORIAS DE PRODUTOS              */}
+            {/* DISPOSITIVO 05: CATEGORIAS E SUBCATEGORIAS DE PRODUTOS              */}
             {/* =================================================================== */}
-            {currentTopic === 6 && (
+            {currentTopic === 5 && (
               <MerchantCategoriesTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1849,9 +1853,9 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 07: CATÁLOGO DE PRODUTOS                                */}
+            {/* DISPOSITIVO 06: CATÁLOGO DE PRODUTOS                                */}
             {/* =================================================================== */}
-            {currentTopic === 7 && (
+            {currentTopic === 6 && (
               <MerchantProductsTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1864,9 +1868,9 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 08: SISTEMA DE CONVITES VIP                             */}
+            {/* DISPOSITIVO 07: SISTEMA DE CONVITES VIP                             */}
             {/* =================================================================== */}
-            {currentTopic === 8 && (
+            {currentTopic === 7 && (
               <MerchantInvitesTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1874,9 +1878,9 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 09: DESEMPENHO E MÉTRICAS                               */}
+            {/* DISPOSITIVO 08: DESEMPENHO E MÉTRICAS                               */}
             {/* =================================================================== */}
-            {currentTopic === 9 && (
+            {currentTopic === 8 && (
               <MerchantMetricsTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1884,9 +1888,9 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 10: LISTA DE PREFERIDOS                                 */}
+            {/* DISPOSITIVO 09: LISTA DE PREFERIDOS                                 */}
             {/* =================================================================== */}
-            {currentTopic === 10 && (
+            {currentTopic === 9 && (
               <MerchantFavoritesTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1894,9 +1898,9 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 11: ANIVERSARIANTES SEGUIDORES                          */}
+            {/* DISPOSITIVO 10: ANIVERSARIANTES SEGUIDORES                          */}
             {/* =================================================================== */}
-            {currentTopic === 11 && (
+            {currentTopic === 10 && (
               <MerchantBirthdaysTab
                 storeId={selectedStoreId}
                 storeName={name}
@@ -1904,13 +1908,23 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
-            {/* DISPOSITIVO 12: PLANO & COBRANÇA                                    */}
+            {/* DISPOSITIVO 11: PLANO & COBRANÇA                                    */}
             {/* =================================================================== */}
-            {currentTopic === 12 && (
+            {currentTopic === 11 && (
               <MerchantSubscriptionTab
                 storeId={selectedStoreId}
                 storeName={name}
                 onOpenPlansModal={() => setIsPlansModalOpen(true)}
+              />
+            )}
+
+            {/* =================================================================== */}
+            {/* DISPOSITIVO 12: CRONÔMETRO DE PROMOÇÃO (TERMÔMETRO TEMPORAL)        */}
+            {/* =================================================================== */}
+            {currentTopic === 12 && (
+              <MerchantPromoTimerTab
+                storeId={selectedStoreId}
+                storeName={name}
               />
             )}
 
@@ -1950,7 +1964,7 @@ function MerchantStoreAdminContent() {
                   Pré-visualizar Loja
                 </button>
 
-                {currentTopic <= 5 ? (
+                {currentTopic <= 4 ? (
                   <button
                     type="submit"
                     form="store-profile-form"

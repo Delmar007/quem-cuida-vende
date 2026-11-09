@@ -750,6 +750,8 @@ export default async function Home({ searchParams }: HomeProps) {
     semi_novo: "Semi-novo",
     seminovo: "Semi-novo",
     "semi-novo": "Semi-novo",
+    feed_que_sigo: "Feed que sigo",
+    feed_seguindo: "Feed que sigo",
   };
 
   const categoriaAtual = cat ? (nomesCategorias[cat] || cat.toUpperCase()) : "Todas as Categorias";
@@ -760,10 +762,26 @@ export default async function Home({ searchParams }: HomeProps) {
     .map((m) => m.trim().toLowerCase())
     .filter(Boolean);
 
+  const isFeedQueSigoActive =
+    modalidadesSelecionadas.includes("feed_que_sigo") ||
+    modalidadesSelecionadas.includes("feed_seguindo");
+
+  const [followedStoreIds, promoTimers] = await Promise.all([
+    getFollowedStoreIdsFromServer(),
+    getAllPromoTimersServer(),
+  ]);
+
   const matchesPromoType = (prod: ProductItem) => {
     if (modalidadesSelecionadas.length === 0) return true;
     const prodPromo = (prod.promo_type || "").toLowerCase();
     return modalidadesSelecionadas.some((f) => {
+      if (f === "feed_que_sigo" || f === "feed_seguindo") {
+        return followedStoreIds.some(
+          (sid) =>
+            sid === prod.store_id ||
+            sid.toLowerCase() === prod.store_name.toLowerCase()
+        );
+      }
       if (prodPromo === f) return true;
       if (f === "artezanal" && prodPromo === "artesanal") return true;
       if (f === "outlet" && !prodPromo && prod.is_outlet) return true;
@@ -1177,41 +1195,63 @@ export default async function Home({ searchParams }: HomeProps) {
                   ? loja.small_banner_url || "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80"
                   : loja.large_banner_url || loja.small_banner_url || "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=940&q=80";
 
-              const colSpanClass =
+              const colSpanOnly =
                 bannerType === "triple"
-                  ? "md:col-span-3 h-[210px] md:h-[245px]"
+                  ? "md:col-span-3"
                   : bannerType === "double"
-                  ? "md:col-span-2 h-[210px] md:h-[220px]"
-                  : "md:col-span-1 h-[210px] md:h-[220px]";
+                  ? "md:col-span-2"
+                  : "md:col-span-1";
+
+              const heightClass =
+                bannerType === "triple"
+                  ? "h-[210px] md:h-[245px]"
+                  : "h-[210px] md:h-[220px]";
+
+              const storeTimer = promoTimers[loja.id];
 
               return (
-                <Link
+                <div
                   key={renderKey}
-                  href={`/loja/${loja.slug || loja.id}`}
-                  className={`group relative overflow-hidden bg-neutral-100 border border-gray-200 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300 w-full max-w-full flex flex-col justify-between p-4 ${colSpanClass}`}
+                  className={`flex flex-col w-full max-w-full shadow-sm hover:shadow-md transition-all duration-300 rounded-[6px] overflow-hidden ${colSpanOnly}`}
                 >
-                  <img
-                    src={bgImg}
-                    alt={loja.name}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  <Link
+                    href={`/loja/${loja.slug || loja.id}`}
+                    className={`group relative overflow-hidden bg-neutral-100 border-t border-x border-gray-200 rounded-t-[6px] cursor-pointer w-full max-w-full flex flex-col justify-between p-4 ${heightClass}`}
+                  >
+                    <img
+                      src={bgImg}
+                      alt={loja.name}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20 group-hover:from-black/90 transition-colors" />
+
+                    {/* Topo do Card de Loja (Livre) */}
+                    <div className="relative z-10" />
+
+                    {/* Rodapé do Card de Loja */}
+                    <div className="relative z-10">
+                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-black tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1`}>
+                        {loja.name}
+                      </h3>
+                      {loja.description && (
+                        <p className="text-xs text-gray-200 line-clamp-1 drop-shadow-md max-w-2xl">
+                          {loja.description}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+
+                  {/* Barra inferior de Cronômetro de Promoção + Termômetro Temporal + Coração (Exatamente como nas imagens) */}
+                  <PromoThermometerBar
+                    storeId={loja.id}
+                    title={storeTimer?.title}
+                    startDate={storeTimer?.startDate}
+                    endDate={storeTimer?.endDate}
+                    isActive={storeTimer ? storeTimer.isActive : true}
+                    variant="banner"
+                    showHeart={true}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20 group-hover:from-black/90 transition-colors" />
-
-                  {/* Topo do Card de Loja (Livre) */}
-                  <div className="relative z-10" />
-
-                  {/* Rodapé do Card de Loja */}
-                  <div className="relative z-10">
-                    <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-black tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1`}>
-                      {loja.name}
-                    </h3>
-                    {loja.description && (
-                      <p className="text-xs text-gray-200 line-clamp-1 drop-shadow-md max-w-2xl">
-                        {loja.description}
-                      </p>
-                    )}
-                  </div>
-                </Link>
+                </div>
               );
             })}
           </div>
@@ -1250,12 +1290,39 @@ export default async function Home({ searchParams }: HomeProps) {
 
       {produtosFiltrados.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 border border-dashed border-gray-200 p-8 my-6">
-          <p className="text-sm text-gray-600 font-medium mb-1">
-            Nenhum produto encontrado para a combinação selecionada.
-          </p>
-          <p className="text-xs text-gray-400">
-            Filtros ativos: {categoriaAtual} {subcat ? `> ${subcat}` : ""} &bull; Tipo de Promoção: {modalidadeLegenda}
-          </p>
+          {isFeedQueSigoActive && followedStoreIds.length === 0 ? (
+            <>
+              <p className="text-sm text-gray-800 font-bold mb-1.5">
+                Você ainda não está seguindo nenhuma loja no seu Feed que sigo.
+              </p>
+              <p className="text-xs text-gray-500 mb-4 max-w-md mx-auto">
+                Siga suas lojas favoritas clicando no coração (♡) abaixo dos banners das lojas ou gerencie suas lojas seguidas no seu Perfil.
+              </p>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                <Link
+                  href="/?tipo=lojas"
+                  className="px-4 py-2 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] transition-colors"
+                >
+                  Explorar Lojas para Seguir
+                </Link>
+                <Link
+                  href="/perfil?aba=seguindo"
+                  className="px-4 py-2 bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 text-xs font-semibold uppercase tracking-wider rounded-[2px] transition-colors"
+                >
+                  Abrir Meu Perfil (Seguindo)
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-600 font-medium mb-1">
+                Nenhum produto encontrado para a combinação selecionada.
+              </p>
+              <p className="text-xs text-gray-400">
+                Filtros ativos: {categoriaAtual} {subcat ? `> ${subcat}` : ""} &bull; Tipo de Promoção: {modalidadeLegenda}
+              </p>
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 w-full max-w-full">
@@ -1299,10 +1366,12 @@ export default async function Home({ searchParams }: HomeProps) {
                 ? produto.images
                 : [produto.image_url, ...sameCatImages].filter(Boolean).slice(0, 6);
 
+            const prodStoreTimer = promoTimers[produto.store_id];
+
             return (
               <div
                 key={produto.id}
-                className="group border border-gray-200 bg-white hover:shadow-md transition-shadow duration-300 grid grid-cols-1 h-full w-full max-w-full overflow-hidden"
+                className="group border border-gray-200 bg-white hover:shadow-md transition-shadow duration-300 grid grid-cols-1 h-full w-full max-w-full overflow-hidden rounded-[6px]"
               >
                 {/* Sizer estrutural invisível para manter o card de carros exatamente com o mesmo tamanho do card de produtos */}
                 <div
@@ -1310,6 +1379,7 @@ export default async function Home({ searchParams }: HomeProps) {
                   className="col-start-1 row-start-1 pointer-events-none invisible select-none flex flex-col w-full"
                 >
                   <div className="aspect-[4/5] w-full" />
+                  <div className="h-[38px]" />
                   <div className="p-4 flex flex-col justify-between">
                     <div className="h-[78px]" />
                     <div className="mt-3 pt-3 h-[46px]" />
@@ -1327,6 +1397,19 @@ export default async function Home({ searchParams }: HomeProps) {
                     subcategory={produto.subcategory}
                     hasDiscount={hasDiscount}
                     discountPercent={discountPercent}
+                  />
+
+                  {/* Cronômetro de Promoção + Termômetro Temporal + Coração de Favorito */}
+                  <PromoThermometerBar
+                    productId={produto.id}
+                    storeId={produto.store_id}
+                    title={prodStoreTimer?.title || promoBadgeLabel}
+                    startDate={prodStoreTimer?.startDate}
+                    endDate={prodStoreTimer?.endDate}
+                    isActive={prodStoreTimer ? prodStoreTimer.isActive : true}
+                    variant="card"
+                    showHeart={true}
+                    className="!border-x-0 !rounded-none"
                   />
 
                   {/* Conteúdo do Card */}

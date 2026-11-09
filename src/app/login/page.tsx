@@ -25,7 +25,7 @@ export default function LoginPage() {
         return
       }
       if (res.success) {
-        window.location.href = '/painel/loja'
+        window.location.href = '/'
       } else {
         setErrorMessage(res.error || 'Erro ao autenticar.')
       }
@@ -49,7 +49,7 @@ export default function LoginPage() {
           ? await loginWithEmailAction({ email, password })
           : await signupWithEmailAction({ email, password })
       if (res.success) {
-        window.location.href = '/painel/loja'
+        window.location.href = '/'
       } else {
         setErrorMessage(res.error || 'Erro ao entrar.')
       }

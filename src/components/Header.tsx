@@ -26,7 +26,7 @@ export default function Header() {
   const currentFiltro = rawFiltro
   const currentQuery = searchParams.get('q') || ''
 
-  const tiposPromocao = [
+  const tiposPromocao: { id: string; label: string; isOrange?: boolean }[] = [
     { id: 'outlet', label: 'Outlet' },
     { id: 'lancamento', label: 'Lançamento' },
     { id: 'vitrine', label: 'Vitrine' },
@@ -40,6 +40,7 @@ export default function Header() {
     { id: 'artezanal', label: 'Artezanal' },
     { id: 'novo', label: 'Novo' },
     { id: 'usado', label: 'Usado' },
+    { id: 'feed_que_sigo', label: 'Feed que sigo', isOrange: true },
   ]
 
   const activePromoObj = tiposPromocao.find((p) => p.id === currentFiltro.toLowerCase())
@@ -186,20 +187,26 @@ export default function Header() {
   useEffect(() => {
     let mounted = true
 
-    getSessionUserAction().then((sessionUser) => {
-      if (!mounted) return
-      if (sessionUser) {
-        setUser(sessionUser)
-        const photo = sessionUser.user_metadata?.avatar_url || (sessionUser.user_metadata as any)?.picture || null
-        setAvatarUrl(photo)
-      } else {
-        setUser(null)
-        setAvatarUrl(null)
-      }
-    })
+    const fetchSession = () => {
+      getSessionUserAction().then((sessionUser) => {
+        if (!mounted) return
+        if (sessionUser) {
+          setUser(sessionUser)
+          const photo = sessionUser.user_metadata?.avatar_url || (sessionUser.user_metadata as any)?.picture || null
+          setAvatarUrl(photo)
+        } else {
+          setUser(null)
+          setAvatarUrl(null)
+        }
+      })
+    }
+
+    fetchSession()
+    window.addEventListener('kittanda:store-saved', fetchSession)
 
     return () => {
       mounted = false
+      window.removeEventListener('kittanda:store-saved', fetchSession)
     }
   }, [searchParams.toString()])
 
@@ -277,14 +284,10 @@ export default function Header() {
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
-                if (user) {
-                  router.push('/perfil');
-                } else {
-                  openLogin();
-                }
+                router.push('/perfil');
               }}
               className="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
-              title={user ? (user.user_metadata?.full_name || user.email) : 'Fazer login'}
+              title={user ? (user.user_metadata?.full_name || user.email) : 'Meu Perfil'}
             >
               {avatarUrl ? (
                 <img 
@@ -305,17 +308,25 @@ export default function Header() {
 
             {user ? (
               <>
-                <span className="text-black font-medium truncate max-w-[100px] md:max-w-[130px]">
-                  {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
-                </span>
-                <span className="text-gray-300 text-xs font-light">|</span>
                 <Link
-                  href="/painel/loja"
-                  className="hover:text-[#FB6600] text-neutral-800 font-semibold transition-colors cursor-pointer text-xs whitespace-nowrap"
-                  title="Acessar painel da minha loja"
+                  href="/perfil"
+                  className="text-black hover:text-[#FB6600] font-medium truncate max-w-[100px] md:max-w-[130px] transition-colors cursor-pointer"
+                  title="Acessar Meu Perfil (Dados, Foto, WhatsApp, Endereço, Favoritos, Seguindo e Feed que sigo)"
                 >
-                  Minha Loja
+                  {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
                 </Link>
+                {Boolean(user.hasStore) && (
+                  <>
+                    <span className="text-gray-300 text-xs font-light">|</span>
+                    <Link
+                      href="/painel/loja"
+                      className="hover:text-[#FB6600] text-neutral-800 font-semibold transition-colors cursor-pointer text-xs whitespace-nowrap"
+                      title="Acessar painel da minha loja"
+                    >
+                      Minha Loja
+                    </Link>
+                  </>
+                )}
                 <span className="text-gray-300 text-xs font-light">|</span>
                 <button 
                   type="button"
@@ -353,9 +364,10 @@ export default function Header() {
             <span className="text-gray-300 text-xs font-light">|</span>
             <button 
               type="button" 
-              aria-label="Sacola de compras"
-              className="text-gray-400 hover:text-black transition-colors p-0.5 cursor-pointer"
-              onClick={() => router.push('/feed')}
+              aria-label="Feed que sigo"
+              title="Abrir Feed que sigo"
+              className="text-gray-400 hover:text-[#FB6600] transition-colors p-0.5 cursor-pointer"
+              onClick={() => router.push('/perfil?aba=feed')}
             >
               <svg 
                 className="w-5 h-5 stroke-[1.4]" 
@@ -506,22 +518,30 @@ export default function Header() {
                       {tiposPromocao.map((promo) => {
                         const isPromoSelected = currentFiltro.toLowerCase() === promo.id
                         const nextFiltro = isPromoSelected ? '' : promo.id
+                        const targetHref =
+                          promo.id === 'feed_que_sigo' && nextFiltro
+                            ? buildFilterUrl({ tipo: 'produtos', filtro: nextFiltro })
+                            : buildFilterUrl({ filtro: nextFiltro })
                         return (
                           <Link
                             key={promo.id}
-                            href={buildFilterUrl({ filtro: nextFiltro })}
+                            href={targetHref}
                             onClick={() => setIsPromoMenuOpen(false)}
                             className={`flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors ${
                               isPromoSelected
                                 ? 'bg-orange-50/70 text-[#FB6600] font-bold'
+                                : promo.isOrange
+                                ? 'text-[#FB6600] hover:bg-orange-50/60 font-bold'
                                 : 'text-gray-700 hover:bg-gray-50 hover:text-[#FB6600] font-medium'
                             }`}
                           >
-                            <span>{promo.label}</span>
+                            <span className={promo.isOrange ? 'text-[#FB6600] font-bold' : ''}>
+                              {promo.label}
+                            </span>
                             {isPromoSelected ? (
                               <span className="text-[10px] uppercase font-bold text-[#FB6600]">✓</span>
                             ) : (
-                              <span className="text-gray-300 text-xs">&rsaquo;</span>
+                              <span className={`${promo.isOrange ? 'text-[#FB6600]' : 'text-gray-300'} text-xs`}>&rsaquo;</span>
                             )}
                           </Link>
                         )
@@ -684,22 +704,30 @@ export default function Header() {
                   {tiposPromocao.map((promo) => {
                     const isPromoSelected = currentFiltro.toLowerCase() === promo.id
                     const nextFiltro = isPromoSelected ? '' : promo.id
+                    const targetHref =
+                      promo.id === 'feed_que_sigo' && nextFiltro
+                        ? buildFilterUrl({ tipo: 'produtos', filtro: nextFiltro })
+                        : buildFilterUrl({ filtro: nextFiltro })
                     return (
                       <Link
                         key={promo.id}
-                        href={buildFilterUrl({ filtro: nextFiltro })}
+                        href={targetHref}
                         onClick={() => setIsMobileCatOpen(false)}
                         className={`flex items-center justify-between px-3 h-9 text-xs transition-colors ${
                           isPromoSelected
                             ? 'bg-orange-50/70 text-[#FB6600] font-bold'
+                            : promo.isOrange
+                            ? 'text-[#FB6600] hover:bg-orange-50/60 font-bold'
                             : 'text-gray-700 hover:bg-gray-50 font-medium'
                         }`}
                       >
-                        <span>{promo.label}</span>
+                        <span className={promo.isOrange ? 'text-[#FB6600] font-bold' : ''}>
+                          {promo.label}
+                        </span>
                         {isPromoSelected ? (
                           <span className="text-[10px] uppercase font-bold text-[#FB6600]">Ativo</span>
                         ) : (
-                          <span className="text-gray-300 text-xs">&rsaquo;</span>
+                          <span className={`${promo.isOrange ? 'text-[#FB6600]' : 'text-gray-300'} text-xs`}>&rsaquo;</span>
                         )}
                       </Link>
                     )
@@ -815,10 +843,12 @@ export default function Header() {
           setIsPlansOpen(false)
           if (!user) {
             openLogin()
-          } else if (plan === 'bronze') {
-            router.push('/painel/loja?plano=gratuito')
           } else {
-            router.push(`/perfil?action=create_store&plan=${plan}`)
+            if (typeof document !== 'undefined' && user.id) {
+              document.cookie = `kittanda_has_store_${user.id}=true; path=/; max-age=31536000; SameSite=Lax`
+            }
+            setUser((prev: any) => (prev ? { ...prev, hasStore: true } : prev))
+            router.push(`/painel/loja?plano=${plan}`)
           }
         }}
       />

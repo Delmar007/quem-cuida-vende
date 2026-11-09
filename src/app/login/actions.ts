@@ -2,11 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { fastSupabaseFetch } from '@/lib/supabase/fast-fetch'
 import { SUPABASE_URL, SUPABASE_ANON_KEY, SITE_URL } from '@/lib/supabase/config'
-import { clearLocalSessionUser } from '@/lib/local-auth'
+import { clearLocalSessionUser, getLocalSessionUser, setLocalSessionUser } from '@/lib/local-auth'
+import { getLocalStoresByOwner } from '@/lib/stores-storage'
 
 /**
  * Verifica o status do servidor Supabase e se o provedor OAuth (facebook / google) está habilitado.
@@ -44,18 +45,63 @@ async function checkSupabaseOAuthStatus(provider: 'facebook' | 'google'): Promis
 }
 
 export async function getSessionUserAction() {
-  // Limpar qualquer cookie de sessão fictícia anterior para garantir apenas contas reais do Supabase (Google/Facebook/E-mail)
-  await clearLocalSessionUser()
+  let user: any = null
 
   try {
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser()
     if (data?.user) {
-      return data.user
+      user = data.user
     }
   } catch {
     // Ignorar falha de rede do Supabase
   }
+
+  if (!user) {
+    user = await getLocalSessionUser()
+  }
+
+  if (user && user.id) {
+    let hasContractedStoreCookie = false
+    try {
+      const cookieStore = await cookies()
+      hasContractedStoreCookie =
+        cookieStore.get(`kittanda_has_store_${user.id}`)?.value === 'true'
+    } catch {
+      // ignore
+    }
+
+    let hasStore = Boolean(user.user_metadata?.has_store === true || hasContractedStoreCookie)
+
+    if (!hasStore) {
+      try {
+        const supabase = await createClient()
+        const { data: userStores } = await supabase
+          .from('stores')
+          .select('id')
+          .eq('owner_id', user.id)
+          .limit(1)
+        if (userStores && userStores.length > 0) {
+          hasStore = true
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    if (!hasStore) {
+      const localOwned = getLocalStoresByOwner(user.id)
+      if (localOwned.length > 0) {
+        hasStore = true
+      }
+    }
+
+    return {
+      ...user,
+      hasStore,
+    }
+  }
+
   return null
 }
 
@@ -148,8 +194,36 @@ export async function loginWithEmailAction(payload: {
     }
 
     if (data?.user) {
+      const user = data.user
+      let hasStore = Boolean(user.user_metadata?.has_store)
+      if (!hasStore) {
+        try {
+          const cookieStore = await cookies()
+          if (cookieStore.get(`kittanda_has_store_${user.id}`)?.value === 'true') {
+            hasStore = true
+          }
+        } catch {
+          // ignore
+        }
+      }
+      if (!hasStore) {
+        try {
+          const { data: userStores } = await supabase
+            .from('stores')
+            .select('id')
+            .eq('owner_id', user.id)
+            .limit(1)
+          if (userStores && userStores.length > 0) hasStore = true
+        } catch {
+          // ignore
+        }
+      }
+      if (!hasStore && getLocalStoresByOwner(user.id).length > 0) {
+        hasStore = true
+      }
+
       revalidatePath('/', 'layout')
-      return { success: true, user: data.user }
+      return { success: true, user: { ...user, hasStore } }
     }
   } catch (err: any) {
     return { success: false, error: err?.message || 'Erro ao conectar ao servidor de autenticação.' }
@@ -177,12 +251,21 @@ export async function signupWithEmailAction(payload: {
 
   try {
     const supabase = await createClient()
+    // Encerrar qualquer sessão anterior antes de cadastrar o novo e-mail
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // ignore
+    }
+    await clearLocalSessionUser()
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           phone: phone || undefined,
+          has_store: false,
         },
       },
     })
@@ -199,8 +282,27 @@ export async function signupWithEmailAction(payload: {
     }
 
     if (data?.user) {
+      try {
+        const cookieStore = await cookies()
+        cookieStore.delete('kittanda_has_store')
+        cookieStore.delete(`kittanda_has_store_${data.user.id}`)
+      } catch {
+        // ignore
+      }
+
+      // Garantir que a sessão do novo usuário fique ativa imediatamente
+      await setLocalSessionUser({
+        id: data.user.id,
+        email: data.user.email || email,
+        user_metadata: {
+          ...(data.user.user_metadata || {}),
+          phone: phone || undefined,
+          has_store: false,
+        },
+      })
+
       revalidatePath('/', 'layout')
-      return { success: true, user: data.user }
+      return { success: true, user: { ...data.user, hasStore: false } }
     }
   } catch (err: any) {
     return { success: false, error: err?.message || 'Erro ao criar conta.' }
