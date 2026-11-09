@@ -12,6 +12,8 @@ export interface PromoCampaignTimer {
   updatedAt: string
 }
 
+export type PromoTimerConfig = PromoCampaignTimer
+
 const IS_SERVERLESS = Boolean(process.env.VERCEL)
 const DATA_DIR = path.join(process.cwd(), 'data')
 const TIMERS_FILE = path.join(DATA_DIR, 'promo-timers.json')

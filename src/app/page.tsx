@@ -1,9 +1,12 @@
 import Link from "next/link";
 import HomeBanner from "@/components/HomeBanner";
 import ProductCardImageCarousel from "@/components/ProductCardImageCarousel";
+import PromoThermometerBar from "@/components/PromoThermometerBar";
 import { createClient } from "@/lib/supabase/server";
 import { getLocalStores } from "@/lib/stores-storage";
 import { getLocalProducts } from "@/lib/products-storage";
+import { getFollowedStoreIdsFromServer } from "@/app/actions/user-office";
+import { getAllPromoTimersServer } from "@/lib/promo-timer-storage";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -766,10 +769,14 @@ export default async function Home({ searchParams }: HomeProps) {
     modalidadesSelecionadas.includes("feed_que_sigo") ||
     modalidadesSelecionadas.includes("feed_seguindo");
 
-  const [followedStoreIds, promoTimers] = await Promise.all([
+  const [followedStoreIds, promoTimersList] = await Promise.all([
     getFollowedStoreIdsFromServer(),
     getAllPromoTimersServer(),
   ]);
+
+  const promoTimers = Object.fromEntries(
+    promoTimersList.map((t) => [t.storeId, t])
+  );
 
   const matchesPromoType = (prod: ProductItem) => {
     if (modalidadesSelecionadas.length === 0) return true;
@@ -777,7 +784,7 @@ export default async function Home({ searchParams }: HomeProps) {
     return modalidadesSelecionadas.some((f) => {
       if (f === "feed_que_sigo" || f === "feed_seguindo") {
         return followedStoreIds.some(
-          (sid) =>
+          (sid: string) =>
             sid === prod.store_id ||
             sid.toLowerCase() === prod.store_name.toLowerCase()
         );
