@@ -310,6 +310,7 @@ export async function updateStoreAction(
       .upsert({
         id: storeId,
         owner_id: user.id,
+        slug: currentStore.slug,
         ...updatePayload,
       }, { onConflict: 'id' })
       .select()

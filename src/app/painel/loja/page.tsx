@@ -791,8 +791,8 @@ function MerchantStoreAdminContent() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Seletor se o lojista tiver mais de 1 loja */}
-          {stores.length > 1 && (
+          {/* Seletor de lojas do lojista */}
+          {stores.length > 0 && (
             <div className="flex items-center gap-1.5 mr-1">
               <label htmlFor="store-select" className="text-xs text-neutral-500 whitespace-nowrap">
                 Loja:
@@ -805,10 +805,54 @@ function MerchantStoreAdminContent() {
               >
                 {stores.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name || 'Loja sem nome'}
+                    {s.name || 'Nova Loja (sem nome)'}
                   </option>
                 ))}
               </select>
+              <button
+                type="button"
+                onClick={() => {
+                  const newStoreDraft: StoreAdminData = {
+                    id: `store-${Date.now()}`,
+                    name: '',
+                    slug: `loja-${Math.floor(1000 + Math.random() * 9000)}`,
+                    responsible_name: '',
+                    phone: '',
+                    cep: '',
+                    street: '',
+                    number: '',
+                    neighborhood: '',
+                    city: '',
+                    state: '',
+                    category: 'moda',
+                    subcategories: ['Feminina', 'Masculina'],
+                    large_banner_url: null,
+                    small_banner_url: null,
+                    logo_url: null,
+                    description: '',
+                    cnpj_cpf: '',
+                    plan: 'bronze',
+                    contracted_plan: 'bronze',
+                    effective_plan: 'bronze',
+                    subscription_status: 'active',
+                    payment_status: 'paid',
+                    is_active: true,
+                    created_at: new Date().toISOString(),
+                  }
+                  setStores((prev) => [newStoreDraft, ...prev])
+                  setSelectedStoreId(newStoreDraft.id)
+                  populateStoreForm(newStoreDraft)
+                  setCurrentTopic(1)
+                  setFeedback({
+                    type: 'success',
+                    message: 'Preencha os dados da nova loja abaixo e clique em "Salvar Alterações".',
+                  })
+                }}
+                className="px-2.5 py-1.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-semibold rounded-[2px] transition-colors cursor-pointer whitespace-nowrap shadow-xs"
+                title="Cadastrar mais uma loja na sua conta"
+              >
+                + Nova Loja
+              </button>
             </div>
           )}
 
