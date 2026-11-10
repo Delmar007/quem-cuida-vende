@@ -70,11 +70,9 @@ export async function createPlanPaymentPreference(params: CreatePlanPreferencePa
         auto_return: 'approved',
         notification_url: `${siteUrl}/api/subscriptions/webhook`,
         statement_descriptor: 'KITTANDA',
-        payment_methods: {
-          excluded_payment_methods: [],
-          excluded_payment_types: [],
-          installments: 12,
-        },
+        expires: true,
+        expiration_date_from: new Date().toISOString(),
+        expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       },
     })
 
