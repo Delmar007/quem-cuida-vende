@@ -21,21 +21,52 @@ export async function POST(request: NextRequest) {
     const provider = payload.provider || payload.paymentProvider || 'webhook_gateway'
     const eventType = payload.event_type || payload.event || payload.type || 'payment.confirmed'
 
-    // Status do pagamento (aceita 'paid', 'approved', 'CONFIRMED', 'RECEIVED', 'succeeded')
+    // Status inicial do payload
     const rawStatus = (payload.status || payload.payment?.status || payload.data?.status || 'paid').toLowerCase()
+
+    // Suporte específico para notificações de IPN / Webhooks do Mercado Pago
+    let mpPaymentData: any = null
+    if (provider === 'mercadopago' || payload.type === 'payment' || payload.action === 'payment.created' || payload.action === 'payment.updated' || payload.data?.id) {
+      const paymentId = payload.data?.id || (payload.type === 'payment' ? payload.id : null)
+      if (paymentId) {
+        try {
+          const { Payment } = await import('mercadopago')
+          const { getMercadoPagoClient } = await import('@/lib/mercadopago')
+          const mpClient = getMercadoPagoClient()
+          if (mpClient) {
+            const paymentClient = new Payment(mpClient)
+            mpPaymentData = await paymentClient.get({ id: paymentId })
+          }
+        } catch (mpErr) {
+          console.warn('Não foi possível consultar pagamento no Mercado Pago:', mpErr)
+        }
+      }
+    }
+
+    const effectiveStatus = (mpPaymentData?.status || rawStatus).toLowerCase()
     const isPaid =
-      rawStatus === 'paid' ||
-      rawStatus === 'approved' ||
-      rawStatus === 'confirmed' ||
-      rawStatus === 'received' ||
-      rawStatus === 'succeeded' ||
+      effectiveStatus === 'paid' ||
+      effectiveStatus === 'approved' ||
+      effectiveStatus === 'confirmed' ||
+      effectiveStatus === 'received' ||
+      effectiveStatus === 'succeeded' ||
       eventType === 'PAYMENT_CONFIRMED' ||
       eventType === 'PAYMENT_RECEIVED' ||
       eventType === 'invoice.payment_succeeded'
 
-    const storeId = payload.store_id || payload.storeId || payload.metadata?.store_id || payload.payment?.metadata?.store_id
+    const storeId =
+      mpPaymentData?.metadata?.store_id ||
+      payload.store_id ||
+      payload.storeId ||
+      payload.metadata?.store_id ||
+      payload.payment?.metadata?.store_id
+
     const invoiceId = payload.invoice_id || payload.invoiceId || payload.metadata?.invoice_id
-    const amountCents = payload.amount_cents || payload.amountCents || (payload.value ? Math.round(payload.value * 100) : undefined)
+    const amountCents =
+      (mpPaymentData?.transaction_amount ? Math.round(mpPaymentData.transaction_amount * 100) : undefined) ||
+      payload.amount_cents ||
+      payload.amountCents ||
+      (payload.value ? Math.round(payload.value * 100) : undefined)
 
     if (!storeId) {
       return NextResponse.json(

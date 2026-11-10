@@ -11,6 +11,7 @@ import LogoAdjustModal from '@/components/merchant/LogoAdjustModal'
 import BannerAdjustModal from '@/components/merchant/BannerAdjustModal'
 import SmallBannerAdjustModal from '@/components/merchant/SmallBannerAdjustModal'
 import { getPlan } from '@/lib/plans'
+import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 
 // Módulos Expandidos da Área do Lojista
 import MerchantCategoriesTab from '@/components/merchant/MerchantCategoriesTab'
@@ -2044,7 +2045,10 @@ function MerchantStoreAdminContent() {
         onClose={() => setIsPlansModalOpen(false)}
         onSelectPlan={async (plan: PlanType) => {
           setIsPlansModalOpen(false)
-          if (selectedStoreId) {
+          if (!selectedStoreId) return
+
+          // Se for o plano gratuito Bronze, atualiza direto
+          if (plan === 'bronze') {
             setFeedback(null)
             const res = await updateStorePlanAction(selectedStoreId, plan)
             if (res.success && res.store) {
@@ -2053,14 +2057,37 @@ function MerchantStoreAdminContent() {
               )
               setFeedback({
                 type: 'success',
-                message: `Plano alterado para ${getPlan(plan).name} com sucesso! O limite de produtos foi atualizado.`,
+                message: 'Plano Bronze Gratuito ativado com sucesso! Limite de 20 produtos ativos.',
               })
+            }
+            return
+          }
+
+          // Se for plano pago (Bronze Plus, Prata ou Ouro), gera o Checkout Pro do Mercado Pago
+          setFeedback({
+            type: 'success',
+            message: `Gerando pagamento para o Plano ${getPlan(plan).name}... Aguarde um instante.`,
+          })
+
+          try {
+            const checkoutRes = await createPlanCheckoutAction({
+              storeId: selectedStoreId,
+              planId: plan,
+            })
+
+            if (checkoutRes.success && checkoutRes.checkoutUrl) {
+              window.location.href = checkoutRes.checkoutUrl
             } else {
               setFeedback({
                 type: 'error',
-                message: res.error || 'Erro ao atualizar plano.',
+                message: checkoutRes.error || 'Não foi possível abrir o checkout do Mercado Pago.',
               })
             }
+          } catch (err: any) {
+            setFeedback({
+              type: 'error',
+              message: err?.message || 'Erro ao conectar com Mercado Pago.',
+            })
           }
         }}
       />
