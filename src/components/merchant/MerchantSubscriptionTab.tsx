@@ -7,6 +7,7 @@ import {
   StoreSubscriptionDetails,
 } from '@/app/actions/merchant-tools'
 import { manualSubscriptionInterventionAction } from '@/app/actions/subscriptions'
+import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 
 interface MerchantSubscriptionTabProps {
   storeId: string
@@ -48,6 +49,17 @@ export default function MerchantSubscriptionTab({
     setActionLoading(true)
     setFeedback(null)
     try {
+      const checkoutRes = await createPlanCheckoutAction({
+        storeId,
+        planId: details?.contractedPlan || 'bronze_plus',
+      })
+
+      if (checkoutRes.success && checkoutRes.checkoutUrl) {
+        window.location.href = checkoutRes.checkoutUrl
+        return
+      }
+
+      // Fallback para simulação local se não houver link
       const res = await simulatePaymentReactivationAction(storeId)
       if (res.success) {
         setFeedback({ type: 'success', message: res.message })

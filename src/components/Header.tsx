@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import AuthModal from '@/components/AuthModal'
 import PlansModal from '@/components/PlansModal'
+import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 import { logoutAction, getSessionUserAction } from '@/app/login/actions'
 
 export default function Header() {
@@ -839,17 +840,41 @@ export default function Header() {
       <PlansModal
         isOpen={isPlansOpen}
         onClose={() => setIsPlansOpen(false)}
-        onSelectPlan={(plan) => {
+        onSelectPlan={async (plan) => {
           setIsPlansOpen(false)
           if (!user) {
             openLogin()
-          } else {
-            if (typeof document !== 'undefined' && user.id) {
-              document.cookie = `kittanda_has_store_${user.id}=true; path=/; max-age=31536000; SameSite=Lax`
-            }
-            setUser((prev: any) => (prev ? { ...prev, hasStore: true } : prev))
-            router.push(`/painel/loja?plano=${plan}`)
+            return
           }
+
+          if (typeof document !== 'undefined' && user.id) {
+            document.cookie = `kittanda_has_store_${user.id}=true; path=/; max-age=31536000; SameSite=Lax`
+          }
+          setUser((prev: any) => (prev ? { ...prev, hasStore: true } : prev))
+
+          // Se for o plano gratuito Bronze, vai direto para o painel
+          if (plan === 'bronze') {
+            router.push(`/painel/loja?plano=${plan}`)
+            return
+          }
+
+          // Se for plano pago, tenta gerar a tela de pagamento do Mercado Pago
+          try {
+            const checkoutRes = await createPlanCheckoutAction({
+              storeId: user.id,
+              planId: plan,
+            })
+
+            if (checkoutRes.success && checkoutRes.checkoutUrl) {
+              window.location.href = checkoutRes.checkoutUrl
+              return
+            }
+          } catch (err) {
+            console.warn('Fallback para o painel da loja:', err)
+          }
+
+          // Se não gerou link (ex: loja ainda sendo configurada), abre no painel com o plano selecionado
+          router.push(`/painel/loja?plano=${plan}`)
         }}
       />
     </>
