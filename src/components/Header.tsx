@@ -868,9 +868,12 @@ export default function Header() {
             if (checkoutRes.success && checkoutRes.checkoutUrl) {
               window.location.href = checkoutRes.checkoutUrl
               return
+            } else if (checkoutRes.error) {
+              alert(`Aviso Mercado Pago: ${checkoutRes.error}`)
             }
-          } catch (err) {
-            console.warn('Fallback para o painel da loja:', err)
+          } catch (err: any) {
+            console.error('Erro ao gerar checkout do Mercado Pago:', err)
+            alert(`Erro ao conectar com Mercado Pago: ${err?.message || err}`)
           }
 
           // Se não gerou link (ex: loja ainda sendo configurada), abre no painel com o plano selecionado
