@@ -698,27 +698,27 @@ export default function MerchantProductsTab({
       {/* ----------------------------------------------------------------- */}
       {/* CABEÇALHO DO CATÁLOGO DE PRODUTOS                                 */}
       {/* ----------------------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 border border-neutral-200/80 rounded-[4px]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-8 border border-neutral-200 rounded-md shadow-xs">
         <div>
-          <h2 className="text-xl font-bold text-neutral-900 tracking-tight">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
+            Tópico 06
+          </span>
+          <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
             Catálogo de Produtos
           </h2>
-          <p className="text-xs text-neutral-500 mt-1 max-w-xl">
-            Cadastre e gerencie os produtos da sua loja, organize categorias, configure preços e controle a exibição aos clientes.
-          </p>
         </div>
 
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="shrink-0 flex items-center gap-2.5">
           <button
             type="button"
             onClick={handleOpenCreateModal}
             disabled={limitReached}
-            className={`px-4 py-2 text-white text-xs font-semibold rounded-[2px] transition-all flex items-center gap-2 cursor-pointer ${
+            className={`h-10 px-5 text-white text-xs sm:text-sm font-semibold rounded-md transition-all flex items-center gap-2 cursor-pointer ${
               limitReached
                 ? 'bg-neutral-400 opacity-60 cursor-not-allowed'
-                : 'bg-neutral-900 hover:bg-black'
+                : 'bg-neutral-900 hover:bg-black shadow-xs'
             }`}
-            title={limitReached ? `Limite de ${maxProducts} produtos atingido` : 'Cadastrar novo produto'}
+            title={limitReached ? `Limite de ${maxProducts} ${planConfig.itemLabel} atingido` : 'Cadastrar novo item'}
           >
             <span>+ Adicionar Produto</span>
           </button>
@@ -730,20 +730,20 @@ export default function MerchantProductsTab({
       {/* ----------------------------------------------------------------- */}
       {feedback && (
         <div
-          className={`p-4 text-xs rounded-[2px] flex items-center justify-between border animate-in fade-in duration-200 ${
+          className={`p-4 text-sm rounded-md flex items-center justify-between border animate-in fade-in duration-200 ${
             feedback.type === 'success'
               ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
               : 'bg-rose-50 text-rose-900 border-rose-300'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <span>{feedback.type === 'success' ? '✓' : '⚠️'}</span>
-            <span>{feedback.message}</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-base">{feedback.type === 'success' ? '✓' : '⚠️'}</span>
+            <span className="font-medium">{feedback.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-sm font-bold opacity-60 hover:opacity-100 cursor-pointer"
+            className="text-base font-bold opacity-60 hover:opacity-100 ml-4 cursor-pointer"
           >
             &times;
           </button>
@@ -751,140 +751,135 @@ export default function MerchantProductsTab({
       )}
 
       {/* ----------------------------------------------------------------- */}
-      {/* PAINEL DE RESUMO E INDICADORES DO CATÁLOGO (REQUISITO SEÇÃO 3)    */}
+      {/* PAINEL DE RESUMO E INDICADORES DO CATÁLOGO                        */}
       {/* ----------------------------------------------------------------- */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Total Cadastrado */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-neutral-500 block mb-1.5">
             Cadastrados
           </span>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-neutral-900">{totalCount}</span>
-            <span className="text-xs font-semibold text-neutral-400">/ {maxProducts}</span>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-extrabold text-neutral-900">{totalCount}</span>
+            <span className="text-sm font-semibold text-neutral-400">/ {maxProducts}</span>
           </div>
-          <span className="text-[10px] text-neutral-500 block mt-1">Total no catálogo</span>
         </div>
 
-        {/* Vagas Disponíveis */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
-            Vagas Restantes
+        {/* Vagas Restantes */}
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-neutral-500 block mb-1.5">
+            Disponíveis
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className={`text-xl font-black ${availableSlots === 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
+            <span className={`text-2xl font-extrabold ${availableSlots === 0 ? 'text-rose-600' : 'text-emerald-700'}`}>
               {availableSlots}
             </span>
-            <span className="text-[10px] font-semibold text-neutral-400">vagas</span>
+            <span className="text-xs font-semibold text-neutral-400">vagas</span>
           </div>
-          <span className="text-[10px] text-neutral-500 block mt-1">Disponíveis</span>
         </div>
 
         {/* Ocupação do Plano */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-neutral-500 block mb-1.5">
             Ocupação
           </span>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-neutral-900">{occupancyPercentage}%</span>
-          </div>
-          <div className="w-full bg-neutral-100 h-1.5 rounded-full overflow-hidden mt-1.5">
-            <div
-              className={`h-full transition-all duration-500 ${
-                occupancyPercentage >= 100
-                  ? 'bg-rose-500'
-                  : occupancyPercentage >= 80
-                  ? 'bg-amber-500'
-                  : 'bg-emerald-500'
-              }`}
-              style={{ width: `${occupancyPercentage}%` }}
-            />
+          <div>
+            <span className="text-2xl font-extrabold text-neutral-900 block leading-none">{occupancyPercentage}%</span>
+            <div className="w-full bg-neutral-100 h-2 rounded-full overflow-hidden mt-2">
+              <div
+                className={`h-full transition-all duration-500 ${
+                  occupancyPercentage >= 100
+                    ? 'bg-rose-500'
+                    : occupancyPercentage >= 80
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500'
+                }`}
+                style={{ width: `${occupancyPercentage}%` }}
+              />
+            </div>
           </div>
         </div>
 
         {/* Produtos Ativos */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block mb-1">
-            Ativos na Loja
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-emerald-700 block mb-1.5">
+            Ativos
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-emerald-800">{activeCount}</span>
-            <span className="text-[10px] text-neutral-400">visíveis</span>
+            <span className="text-2xl font-extrabold text-emerald-800">{activeCount}</span>
+            <span className="text-xs text-neutral-400">visíveis</span>
           </div>
-          <span className="text-[10px] text-neutral-500 block mt-1">Vitrine pública</span>
         </div>
 
         {/* Produtos Inativos */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">
-            Inativos (Pausa)
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-neutral-500 block mb-1.5">
+            Inativos
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-neutral-700">{inactiveCount}</span>
-            <span className="text-[10px] text-neutral-400">itens</span>
+            <span className="text-2xl font-extrabold text-neutral-700">{inactiveCount}</span>
+            <span className="text-xs text-neutral-400">ocultos</span>
           </div>
-          <span className="text-[10px] text-neutral-500 block mt-1">Ocultos na vitrine</span>
         </div>
 
         {/* Em Promoção */}
-        <div className="bg-white border border-neutral-200 p-4 rounded-[2px] shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#FB6600] block mb-1">
+        <div className="bg-white border border-neutral-200 p-4 rounded-md shadow-2xs flex flex-col justify-between">
+          <span className="text-xs font-bold text-[#FB6600] block mb-1.5">
             Em Promoção
           </span>
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-[#FB6600]">{promoCount}</span>
-            <span className="text-[10px] text-neutral-400">itens</span>
+            <span className="text-2xl font-extrabold text-[#FB6600]">{promoCount}</span>
+            <span className="text-xs text-neutral-400">ofertas</span>
           </div>
-          <span className="text-[10px] text-neutral-500 block mt-1">Com desconto real</span>
         </div>
       </div>
 
       {/* Alerta de Limite Atingido / Upgrade Recomendado */}
       {limitReached && (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-[2px] text-xs text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
-          <div className="flex items-center gap-2.5">
-            <span className="text-lg">⚠️</span>
+        <div className="p-4 sm:p-5 bg-amber-50 border border-amber-300 rounded-md text-sm text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
             <div>
               <strong className="block font-bold">
-                Você atingiu o limite de {maxProducts} produtos do seu plano {planConfig.name}.
+                Limite de {maxProducts} {planConfig.itemLabel} atingido no Plano {planConfig.name}.
               </strong>
-              <p className="text-[11px] text-amber-800">
-                Para cadastrar novos produtos, exclua itens desnecessários ou contrate um plano superior com maior capacidade de catálogo.
+              <p className="text-xs sm:text-sm text-amber-800 mt-0.5">
+                Exclua itens ou faça upgrade de plano para cadastrar mais.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onOpenPlansModal}
-            className="px-4 py-2 bg-neutral-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-[2px] whitespace-nowrap cursor-pointer transition-colors"
+            className="h-10 px-4 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md whitespace-nowrap cursor-pointer transition-colors"
           >
-            Ver Planos Superiores
+            Ver Planos
           </button>
         </div>
       )}
 
       {/* ----------------------------------------------------------------- */}
-      {/* BARRA DE BUSCA E FILTROS DE PRODUTOS                               */}
+      {/* BARRA DE BUSCA E FILTROS DE PRODUTOS                              */}
       {/* ----------------------------------------------------------------- */}
-      <div className="bg-white p-4 border border-neutral-200 rounded-[2px] shadow-xs space-y-3">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2.5 text-xs">
+      <div className="bg-white p-4 sm:p-5 border border-neutral-200 rounded-md shadow-2xs space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Busca por Nome ou SKU */}
-          <div className="col-span-1 sm:col-span-2">
-            <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">
-              Buscar Produto
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-bold text-neutral-700 mb-1.5">
+              Buscar
             </label>
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Digite o nome ou código SKU..."
-              className="w-full px-3 py-2 border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black text-xs"
+              placeholder="Nome ou código SKU..."
+              className="w-full h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 text-sm"
             />
           </div>
 
           {/* Filtro por Categoria Principal */}
           <div>
-            <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">
+            <label className="block text-xs font-bold text-neutral-700 mb-1.5">
               Categoria
             </label>
             <select
@@ -893,9 +888,9 @@ export default function MerchantProductsTab({
                 setFilterCategory(e.target.value)
                 setFilterSubcategory('all')
               }}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black text-xs bg-white"
+              className="w-full h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] text-sm bg-white"
             >
-              <option value="all">Todas as categorias</option>
+              <option value="all">Todas</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.name}>
                   {c.name}
@@ -906,16 +901,16 @@ export default function MerchantProductsTab({
 
           {/* Filtro por Subcategoria */}
           <div>
-            <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">
+            <label className="block text-xs font-bold text-neutral-700 mb-1.5">
               Subcategoria
             </label>
             <select
               value={filterSubcategory}
               disabled={filterCategory === 'all' || filterSubcategories.length === 0}
               onChange={(e) => setFilterSubcategory(e.target.value)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black text-xs bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+              className="w-full h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] text-sm bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
             >
-              <option value="all">Todas as subcategorias</option>
+              <option value="all">Todas</option>
               {filterSubcategories.map((sub) => (
                 <option key={sub.id} value={sub.name}>
                   {sub.name}
@@ -926,23 +921,23 @@ export default function MerchantProductsTab({
 
           {/* Filtro por Status */}
           <div>
-            <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">
+            <label className="block text-xs font-bold text-neutral-700 mb-1.5">
               Status
             </label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black text-xs bg-white"
+              className="w-full h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] text-sm bg-white"
             >
-              <option value="all">Todos os status</option>
-              <option value="active">Apenas Ativos</option>
-              <option value="inactive">Apenas Inativos</option>
+              <option value="all">Todos</option>
+              <option value="active">Ativos</option>
+              <option value="inactive">Inativos</option>
             </select>
           </div>
 
           {/* Filtro por Promoção / Destaque */}
           <div>
-            <label className="block text-[10px] font-bold uppercase text-neutral-500 mb-1">
+            <label className="block text-xs font-bold text-neutral-700 mb-1.5">
               Destaque
             </label>
             <select
@@ -963,20 +958,20 @@ export default function MerchantProductsTab({
                   setFilterHighlight('all')
                 }
               }}
-              className="w-full px-3 py-2 border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black text-xs bg-white"
+              className="w-full h-10 px-3 border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] text-sm bg-white"
             >
-              <option value="all">Todos os destaques</option>
+              <option value="all">Todos</option>
               <option value="promo">Com Preço Promocional</option>
-              <option value="outlet">Destaque Outlet</option>
-              <option value="novidade">Destaque Novidade</option>
+              <option value="outlet">Outlet</option>
+              <option value="novidade">Lançamento</option>
             </select>
           </div>
         </div>
 
         {/* Resumo de Resultados e Reset */}
-        <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-[11px] text-neutral-500">
+        <div className="flex items-center justify-between pt-2.5 border-t border-neutral-100 text-xs sm:text-sm text-neutral-600">
           <span>
-            Exibindo <strong>{filteredProducts.length}</strong> de <strong>{totalCount}</strong> produto(s)
+            Exibindo <strong className="text-neutral-900">{filteredProducts.length}</strong> de <strong className="text-neutral-900">{totalCount}</strong> item(ns)
           </span>
           {(searchTerm || filterCategory !== 'all' || filterSubcategory !== 'all' || filterStatus !== 'all' || filterPromo !== 'all' || filterHighlight !== 'all') && (
             <button
@@ -998,225 +993,206 @@ export default function MerchantProductsTab({
       </div>
 
       {/* ----------------------------------------------------------------- */}
-      {/* LISTAGEM DOS PRODUTOS (TABELA DESKTOP / CARDS MOBILE)             */}
+      {/* LISTAGEM DOS PRODUTOS COM FOTOS GRANDES E TIPOGRAFIA LEGÍVEL      */}
       {/* ----------------------------------------------------------------- */}
       {loading ? (
-        <div className="py-20 text-center text-xs text-neutral-500 bg-white border border-neutral-200 rounded-[2px]">
-          <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+        <div className="py-20 text-center text-sm text-neutral-500 bg-white border border-neutral-200 rounded-md">
+          <div className="w-7 h-7 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           Carregando catálogo de produtos...
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="bg-white border border-dashed border-neutral-300 p-12 text-center rounded-[2px]">
-          <span className="text-3xl block mb-2">📦</span>
-          <h3 className="text-sm font-bold text-neutral-800">Nenhum produto encontrado</h3>
-          <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
+        <div className="bg-white border border-dashed border-neutral-300 p-10 sm:p-12 text-center rounded-md">
+          <span className="text-4xl block mb-3">📦</span>
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900">Nenhum produto encontrado</h3>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
             {products.length === 0
-              ? 'Seu catálogo ainda não possui produtos cadastrados. Clique abaixo para cadastrar o primeiro item!'
-              : 'Nenhum produto corresponde aos filtros selecionados. Tente alterar ou limpar os filtros.'}
+              ? 'Seu catálogo ainda não possui itens cadastrados.'
+              : 'Nenhum item corresponde aos filtros selecionados.'}
           </p>
           {products.length === 0 && !limitReached && (
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="mt-4 px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer"
+              className="mt-5 h-11 px-5 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer"
             >
               + Cadastrar Primeiro Produto
             </button>
           )}
         </div>
       ) : (
-        <div className="bg-white border border-neutral-200 rounded-[2px] shadow-xs overflow-hidden">
-          {/* Tabela Responsiva Desktop */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-neutral-50 border-b border-neutral-200 text-[10px] font-black uppercase tracking-wider text-neutral-500">
-                  <th className="py-3 px-4 w-16">Foto</th>
-                  <th className="py-3 px-4">Produto & SKU</th>
-                  <th className="py-3 px-4">Classificação</th>
-                  <th className="py-3 px-4">Preço Regular</th>
-                  <th className="py-3 px-4">Preço Promocional</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100">
-                {filteredProducts.map((prod) => {
-                  const hasPromo = Boolean(prod.promotional_price && prod.promotional_price < prod.price)
-                  const discountPercent = hasPromo
-                    ? Math.round(((prod.price - prod.promotional_price!) / prod.price) * 100)
-                    : 0
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          {filteredProducts.map((prod) => {
+            const hasPromo = Boolean(prod.promotional_price && prod.promotional_price < prod.price)
+            const discountPercent = hasPromo
+              ? Math.round(((prod.price - prod.promotional_price!) / prod.price) * 100)
+              : 0
 
-                  return (
-                    <tr
-                      key={prod.id}
-                      className={`hover:bg-neutral-50/80 transition-colors ${
-                        !prod.is_active ? 'opacity-60 bg-neutral-50/30' : ''
-                      }`}
-                    >
-                      {/* Foto */}
-                      <td className="py-3 px-4">
-                        <div className="w-12 h-14 bg-neutral-100 border border-neutral-200 rounded-[2px] overflow-hidden relative shrink-0 flex items-center justify-center">
-                          {prod.image_url ? (
-                            <img
-                              src={prod.image_url}
-                              alt={prod.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-base text-neutral-400">🖼️</span>
-                          )}
-                          {prod.images && prod.images.length > 1 && (
-                            <span className="absolute bottom-0.5 right-0.5 bg-black/70 text-white text-[8px] font-bold px-1 rounded">
-                              +{prod.images.length - 1}
-                            </span>
-                          )}
-                        </div>
-                      </td>
+            return (
+              <div
+                key={prod.id}
+                className={`bg-white border border-neutral-200 rounded-md shadow-xs overflow-hidden flex flex-col justify-between transition-all hover:border-neutral-300 ${
+                  !prod.is_active ? 'opacity-70 bg-neutral-50/40' : ''
+                }`}
+              >
+                <div className="p-4 sm:p-5 flex gap-4 sm:gap-5 items-start">
+                  {/* Foto Grande do Produto */}
+                  <button
+                    type="button"
+                    onClick={() => setPreviewProduct(prod)}
+                    className="w-28 h-32 sm:w-32 sm:h-36 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden relative shrink-0 flex items-center justify-center cursor-pointer group"
+                    title="Clique para pré-visualizar"
+                  >
+                    {prod.image_url ? (
+                      <img
+                        src={prod.image_url}
+                        alt={prod.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <span className="text-3xl text-neutral-400">🖼️</span>
+                    )}
+                    {prod.images && prod.images.length > 1 && (
+                      <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                        +{prod.images.length - 1} fotos
+                      </span>
+                    )}
+                  </button>
 
-                      {/* Nome, SKU e Tipo de Promoção */}
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                          <span className="px-1.5 py-0.5 bg-[#FB6600] text-white text-[8.5px] font-black uppercase rounded-[2px]">
-                            {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
+                  {/* Informações e Preços com Fontes Maiores */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                        <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
+                          {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
+                        </span>
+                        {prod.is_vehicle && prod.vehicle_category && (
+                          <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
+                            {prod.vehicle_category}
                           </span>
-                          {prod.is_vehicle && prod.vehicle_category && (
-                            <span className="px-1.5 py-0.5 bg-neutral-900 text-white text-[8.5px] font-bold uppercase rounded-[2px]">
-                              {prod.vehicle_category}
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="font-bold text-neutral-900 leading-snug truncate" title={prod.name}>
-                          {prod.name}
-                        </h4>
-                        {prod.is_vehicle && (
-                          <div className="text-[10px] text-neutral-500 mt-0.5 space-y-0.5">
-                            <span className="block truncate">
-                              {[
-                                prod.vehicle_year_model || prod.vehicle_year_fab,
-                                prod.vehicle_km ? `${prod.vehicle_km} km` : null,
-                                prod.vehicle_transmission,
-                                prod.vehicle_traction,
-                              ]
-                                .filter(Boolean)
-                                .join(' • ')}
-                            </span>
-                            {prod.vehicle_plate_internal && (
-                              <span className="inline-block px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-[9.5px] rounded-[2px]">
-                                🔒 Placa (Interno): {prod.vehicle_plate_internal}
-                              </span>
-                            )}
-                          </div>
+                        )}
+                      </div>
+
+                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
+                        {prod.name}
+                      </h4>
+
+                      <div className="mt-1 text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
+                        <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
+                        {prod.subcategory && (
+                          <>
+                            <span className="text-neutral-300">&bull;</span>
+                            <span>{prod.subcategory}</span>
+                          </>
                         )}
                         {prod.sku && (
-                          <span className="text-[10px] font-mono text-neutral-400 block truncate">
-                            SKU: {prod.sku}
-                          </span>
+                          <>
+                            <span className="text-neutral-300">&bull;</span>
+                            <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
+                          </>
                         )}
-                      </td>
+                      </div>
 
-                      {/* Categoria e Subcategoria */}
-                      <td className="py-3 px-4">
-                        <span className="font-semibold text-neutral-800 block capitalize">
-                          {prod.category}
-                        </span>
-                        {prod.subcategory ? (
-                          <span className="text-[10px] text-neutral-500 block truncate">
-                            ↳ {prod.subcategory}
+                      {prod.is_vehicle && (
+                        <div className="mt-1.5 space-y-1">
+                          <span className="text-xs sm:text-sm text-neutral-600 block">
+                            {[
+                              prod.vehicle_year_model || prod.vehicle_year_fab,
+                              prod.vehicle_km ? `${prod.vehicle_km} km` : null,
+                              prod.vehicle_transmission,
+                              prod.vehicle_traction,
+                            ]
+                              .filter(Boolean)
+                              .join(' • ')}
                           </span>
-                        ) : (
-                          <span className="text-[10px] text-neutral-400 italic">Sem subcategoria</span>
-                        )}
-                      </td>
+                          {prod.vehicle_plate_internal && (
+                            <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-xs rounded">
+                              🔒 Placa: {prod.vehicle_plate_internal}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
-                      {/* Preço Regular / Venda + Dados Internos (Custo / FIPE) */}
-                      <td className="py-3 px-4 font-bold text-neutral-800 whitespace-nowrap">
-                        {hasPromo ? (
-                          <span className="line-through text-neutral-400 text-[11px] block">
+                    {/* Bloco de Preços Legíveis */}
+                    <div className="mt-3 pt-3 border-t border-neutral-100 flex items-baseline gap-2.5 flex-wrap">
+                      {hasPromo ? (
+                        <>
+                          <span className="text-lg sm:text-xl font-extrabold text-[#FB6600]">
+                            R$ {formatCurrencyBRL(prod.promotional_price)}
+                          </span>
+                          <span className="line-through text-neutral-400 text-xs sm:text-sm font-medium">
                             R$ {formatCurrencyBRL(prod.price)}
                           </span>
-                        ) : (
-                          <span className="block">R$ {formatCurrencyBRL(prod.price)}</span>
-                        )}
-                        {prod.cost_price_internal && (
-                          <span className="text-[9.5px] font-semibold text-neutral-500 block mt-0.5">
-                            🔒 Custo: R$ {formatCurrencyBRL(prod.cost_price_internal)}
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            -{discountPercent}%
                           </span>
-                        )}
-                        {prod.fipe_price_internal && (
-                          <span className="text-[9.5px] font-semibold text-amber-800 bg-amber-50 px-1 py-0.2 rounded inline-block mt-0.5">
-                            🔒 FIPE: R$ {formatCurrencyBRL(prod.fipe_price_internal)}
-                          </span>
-                        )}
-                      </td>
+                        </>
+                      ) : (
+                        <span className="text-lg sm:text-xl font-extrabold text-neutral-900">
+                          R$ {formatCurrencyBRL(prod.price)}
+                        </span>
+                      )}
 
-                      {/* Preço Promocional */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        {hasPromo ? (
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-black text-[#FB6600] text-sm">
-                              R$ {formatCurrencyBRL(prod.promotional_price)}
+                      {(prod.cost_price_internal || prod.fipe_price_internal) && (
+                        <div className="w-full flex items-center gap-2 flex-wrap mt-1">
+                          {prod.cost_price_internal && (
+                            <span className="text-xs font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded">
+                              🔒 Custo: R$ {formatCurrencyBRL(prod.cost_price_internal)}
                             </span>
-                            <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 rounded">
-                              -{discountPercent}%
+                          )}
+                          {prod.fipe_price_internal && (
+                            <span className="text-xs font-semibold text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                              🔒 FIPE: R$ {formatCurrencyBRL(prod.fipe_price_internal)}
                             </span>
-                          </div>
-                        ) : (
-                          <span className="text-[10.5px] text-neutral-400">—</span>
-                        )}
-                      </td>
-
-                      {/* Status Toggle */}
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
-                        <button
-                          type="button"
-                          onClick={() => handleToggleActive(prod)}
-                          className={`px-2.5 py-1 text-[9.5px] font-black uppercase rounded-[2px] transition-colors cursor-pointer border ${
-                            prod.is_active
-                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                              : 'bg-neutral-100 text-neutral-600 border-neutral-300 hover:bg-neutral-200'
-                          }`}
-                          title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
-                        >
-                          {prod.is_active ? '✓ Ativo' : '✕ Inativo'}
-                        </button>
-                      </td>
-
-                      {/* Ações */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setPreviewProduct(prod)}
-                            className="p-1.5 text-neutral-500 hover:text-black hover:bg-neutral-100 rounded cursor-pointer"
-                            title="Visualizar card na vitrine"
-                          >
-                            👁️
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditModal(prod)}
-                            className="p-1.5 text-neutral-600 hover:text-black hover:bg-neutral-100 rounded cursor-pointer font-bold"
-                            title="Editar produto"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirmation(prod)}
-                            className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded cursor-pointer font-bold"
-                            title="Excluir produto"
-                          >
-                            🗑️
-                          </button>
+                          )}
                         </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rodapé de Status e Ações */}
+                <div className="px-4 sm:px-5 py-3 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(prod)}
+                    className={`h-8 px-3 text-xs font-bold rounded-md transition-colors cursor-pointer border ${
+                      prod.is_active
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                        : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
+                    }`}
+                    title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
+                  >
+                    {prod.is_active ? '✓ Ativo na Vitrine' : '✕ Inativo'}
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewProduct(prod)}
+                      className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                    >
+                      Prévia
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(prod)}
+                      className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteConfirmation(prod)}
+                      className="h-8 px-3 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -1225,25 +1201,24 @@ export default function MerchantProductsTab({
       {/* ----------------------------------------------------------------- */}
       {isFormModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-3xl rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden my-6">
-            <div className="p-4 bg-neutral-900 text-white flex items-center justify-between gap-3 flex-wrap">
+          <div className="bg-white w-full max-w-3xl rounded-md shadow-2xl border border-neutral-200 overflow-hidden my-6">
+            <div className="p-4 sm:p-5 bg-neutral-900 text-white flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <span className="text-[9.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                  {editingProduct ? 'Editar Cadastro' : 'Novo Produto'} •{' '}
-                  {formIsVehicle ? 'Segmento Carro / Usados e Concessionária' : 'Cadastro no Catálogo'}
+                <span className="text-xs uppercase font-bold tracking-widest text-[#FB6600] block">
+                  {editingProduct ? 'Editar Cadastro' : 'Novo Item'} &bull; {formIsVehicle ? 'Veículos' : 'Catálogo'}
                 </span>
-                <h3 className="text-sm font-black uppercase tracking-tight">
+                <h3 className="text-base sm:text-lg font-extrabold tracking-tight">
                   {editingProduct
                     ? editingProduct.name
                     : formIsVehicle
-                    ? 'Cadastro de Veículo (Carro / Usados e Concessionária)'
-                    : 'Cadastro no Catálogo'}
+                    ? 'Cadastro de Veículo'
+                    : 'Cadastro de Produto'}
                 </h3>
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Seletor de Modo: Produto Padrão vs Veículo (Carro / Usados e Concessionária) */}
-                <div className="flex items-center bg-neutral-800 p-0.5 rounded-[2px] border border-neutral-700">
+                {/* Seletor de Modo: Produto Padrão vs Veículo */}
+                <div className="flex items-center bg-neutral-800 p-1 rounded-md border border-neutral-700">
                   <button
                     type="button"
                     onClick={() => {
@@ -1253,7 +1228,7 @@ export default function MerchantProductsTab({
                       }
                       setFormImages((prev) => prev.slice(0, 6))
                     }}
-                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-[2px] transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
                       !formIsVehicle
                         ? 'bg-white text-black'
                         : 'text-neutral-300 hover:text-white'
@@ -1270,20 +1245,20 @@ export default function MerchantProductsTab({
                         setFormPromoType('semi_novo')
                       }
                     }}
-                    className={`px-2.5 py-1 text-[10px] font-bold uppercase rounded-[2px] transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
                       formIsVehicle
                         ? 'bg-[#FB6600] text-white'
                         : 'text-neutral-300 hover:text-white'
                     }`}
                   >
-                    🚗 Carro / Usados & Concessionária
+                    🚗 Veículo
                   </button>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setIsFormModalOpen(false)}
-                  className="text-neutral-400 hover:text-white font-bold text-lg cursor-pointer ml-1"
+                  className="text-neutral-400 hover:text-white font-bold text-xl cursor-pointer ml-1"
                 >
                   &times;
                 </button>
@@ -1296,26 +1271,21 @@ export default function MerchantProductsTab({
                 e.stopPropagation()
                 handleSaveProduct(e)
               }}
-              className="p-5 sm:p-6 space-y-5 max-h-[82vh] overflow-y-auto"
+              className="p-5 sm:p-6 space-y-6 max-h-[82vh] overflow-y-auto"
             >
-              {/* Seção 1: Informações Básicas (Diferenciada para Carro / Usados e Concessionária) */}
+              {/* Seção 1: Informações Básicas */}
               <div>
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-1 mb-3">
-                  <h4 className="text-[11px] font-black uppercase tracking-wider text-neutral-900">
-                    1. Informações Básicas {formIsVehicle ? '— Dados do Veículo' : ''}
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-4">
+                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
+                    1. Informações Básicas {formIsVehicle ? '— Veículo' : ''}
                   </h4>
-                  {formIsVehicle && (
-                    <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-[2px] bg-neutral-900 text-[#FB6600] uppercase">
-                      Segmento: Carro / Usados e Concessionária
-                    </span>
-                  )}
                 </div>
 
                 {formIsVehicle ? (
                   <div className="space-y-4">
                     {/* Categoria do Veículo */}
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1.5">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                         Categoria *
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -1326,10 +1296,10 @@ export default function MerchantProductsTab({
                               key={vCat.id}
                               type="button"
                               onClick={() => setFormVehicleCategory(vCat.id)}
-                              className={`px-2.5 py-2 text-xs rounded-[2px] border text-left transition-all cursor-pointer flex items-center gap-1.5 ${
+                              className={`h-10 px-3 text-xs sm:text-sm rounded-md border text-left transition-all cursor-pointer flex items-center gap-2 ${
                                 selected
-                                  ? 'bg-[#FB6600] border-[#FB6600] text-white font-black shadow-2xs'
-                                  : 'bg-white border-neutral-200 text-neutral-800 hover:border-black font-semibold'
+                                  ? 'bg-[#FB6600] border-[#FB6600] text-white font-bold shadow-2xs'
+                                  : 'bg-white border-neutral-300 text-neutral-800 hover:border-black font-semibold'
                               }`}
                             >
                               <span>{vCat.icon}</span>
@@ -1343,7 +1313,7 @@ export default function MerchantProductsTab({
                     {/* Marca, Modelo e Versão */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Marca *
                         </label>
                         <input
@@ -1351,13 +1321,13 @@ export default function MerchantProductsTab({
                           required
                           value={formVehicleBrand}
                           onChange={(e) => setFormVehicleBrand(e.target.value)}
-                          placeholder="Ex: Toyota, VW, Honda..."
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: Toyota, VW, Honda..."
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Modelo *
                         </label>
                         <input
@@ -1365,21 +1335,21 @@ export default function MerchantProductsTab({
                           required
                           value={formVehicleModel}
                           onChange={(e) => setFormVehicleModel(e.target.value)}
-                          placeholder="Ex: Corolla, Hilux, Gol..."
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: Corolla, Hilux, Gol..."
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Versão
                         </label>
                         <input
                           type="text"
                           value={formVehicleVersion}
                           onChange={(e) => setFormVehicleVersion(e.target.value)}
-                          placeholder="Ex: 2.0 XEi 16V Flex Aut."
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: 2.0 XEi Flex Aut."
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
                     </div>
@@ -1387,52 +1357,52 @@ export default function MerchantProductsTab({
                     {/* Ano, Ano/Modelo, KM, Câmbio, Tração e Placa (Interno) */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                          Ano (Fabricação)
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Ano (Fab.)
                         </label>
                         <input
                           type="text"
                           value={formVehicleYearFab}
                           onChange={(e) => setFormVehicleYearFab(e.target.value)}
-                          placeholder="Ex: 2023"
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: 2023"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Ano / Modelo
                         </label>
                         <input
                           type="text"
                           value={formVehicleYearModel}
                           onChange={(e) => setFormVehicleYearModel(e.target.value)}
-                          placeholder="Ex: 2023/2024"
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: 2023/2024"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                          KM (Quilometragem)
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          KM
                         </label>
                         <input
                           type="text"
                           value={formVehicleKm}
                           onChange={(e) => setFormVehicleKm(e.target.value)}
-                          placeholder="Ex: 42.000"
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          placeholder="Ex.: 42.000"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Câmbio
                         </label>
                         <select
                           value={formVehicleTransmission}
                           onChange={(e) => setFormVehicleTransmission(e.target.value)}
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold bg-white"
+                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
                         >
                           <option value="Automático">Automático</option>
                           <option value="Manual">Manual</option>
@@ -1443,13 +1413,13 @@ export default function MerchantProductsTab({
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Tração
                         </label>
                         <select
                           value={formVehicleTraction}
                           onChange={(e) => setFormVehicleTraction(e.target.value)}
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold bg-white"
+                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
                         >
                           <option value="4x2">4x2</option>
                           <option value="4x4">4x4</option>
@@ -1460,11 +1430,11 @@ export default function MerchantProductsTab({
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-xs font-bold text-neutral-700 uppercase">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
                             Placa (Interno)
                           </label>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded uppercase">
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
                             🔒 Interno
                           </span>
                         </div>
@@ -1472,8 +1442,8 @@ export default function MerchantProductsTab({
                           type="text"
                           value={formVehiclePlateInternal}
                           onChange={(e) => setFormVehiclePlateInternal(e.target.value.toUpperCase())}
-                          placeholder="Ex: ABC-1D23 (Oculto)"
-                          className="w-full px-3 py-2 text-xs border border-amber-300 bg-amber-50/40 rounded-[2px] focus:outline-none focus:border-black font-mono uppercase"
+                          placeholder="Ex.: ABC-1D23"
+                          className="w-full h-11 px-3.5 text-sm border border-amber-300 bg-amber-50/40 rounded-md focus:outline-none focus:border-[#FB6600] font-mono uppercase"
                         />
                       </div>
                     </div>
@@ -1481,8 +1451,8 @@ export default function MerchantProductsTab({
                     {/* Título Personalizado Opcional + Status */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                          Título no Card (Gerado automaticamente ou personalize)
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Título no Card (Opcional)
                         </label>
                         <input
                           type="text"
@@ -1491,17 +1461,17 @@ export default function MerchantProductsTab({
                           placeholder={
                             [formVehicleBrand, formVehicleModel, formVehicleVersion, formVehicleYearModel || formVehicleYearFab]
                               .filter(Boolean)
-                              .join(' ') || 'Ex: Toyota Corolla 2.0 XEi 2023/2024'
+                              .join(' ') || 'Ex.: Toyota Corolla 2.0 XEi'
                           }
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                          Status de Publicação
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Status
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer h-9 px-3 border border-neutral-300 rounded-[2px] bg-neutral-50 text-xs">
+                        <label className="flex items-center gap-2.5 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-md bg-neutral-50 text-sm">
                           <input
                             type="checkbox"
                             checked={formIsActive}
@@ -1509,7 +1479,7 @@ export default function MerchantProductsTab({
                             className="w-4 h-4 text-[#FB6600] rounded"
                           />
                           <span className="font-semibold text-neutral-800">
-                            {formIsActive ? 'Ativo (Visível na loja)' : 'Inativo (Oculto)'}
+                            {formIsActive ? 'Ativo na vitrine' : 'Inativo (oculto)'}
                           </span>
                         </label>
                       </div>
@@ -1517,22 +1487,22 @@ export default function MerchantProductsTab({
 
                     {/* Descrição Detalhada (Opcional) */}
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                        Descrição Detalhada (Opcional)
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Descrição (Opcional)
                       </label>
                       <textarea
                         rows={3}
                         value={formDescription}
                         onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="Informe opcionais do veículo, estado de conservação, único dono, revisões em concessionária, garantia..."
-                        className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black resize-none"
+                        placeholder="Opcionais do veículo, revisões, garantia..."
+                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] resize-none"
                       />
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                         Nome do Produto *
                       </label>
                       <input
@@ -1540,30 +1510,30 @@ export default function MerchantProductsTab({
                         required
                         value={formName}
                         onChange={(e) => setFormName(e.target.value)}
-                        placeholder="Ex: Camisa Cavada Slim Fit Algodão..."
-                        className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold"
+                        placeholder="Ex.: Camisa Slim Fit Algodão..."
+                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                           Código Interno / SKU (Opcional)
                         </label>
                         <input
                           type="text"
                           value={formSku}
                           onChange={(e) => setFormSku(e.target.value)}
-                          placeholder="Ex: CAM-SLIM-01"
-                          className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-mono"
+                          placeholder="Ex.: CAM-SLIM-01"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-mono"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                          Status de Publicação
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Status
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer h-9 px-3 border border-neutral-300 rounded-[2px] bg-neutral-50 text-xs">
+                        <label className="flex items-center gap-2.5 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-md bg-neutral-50 text-sm">
                           <input
                             type="checkbox"
                             checked={formIsActive}
@@ -1571,41 +1541,41 @@ export default function MerchantProductsTab({
                             className="w-4 h-4 text-[#FB6600] rounded"
                           />
                           <span className="font-semibold text-neutral-800">
-                            {formIsActive ? 'Ativo (Visível na loja)' : 'Inativo (Oculto)'}
+                            {formIsActive ? 'Ativo na vitrine' : 'Inativo (oculto)'}
                           </span>
                         </label>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                        Descrição Detalhada (Opcional)
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Descrição (Opcional)
                       </label>
                       <textarea
                         rows={3}
                         value={formDescription}
                         onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="Detalhes sobre material, modelagem, especificações técnicas..."
-                        className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black resize-none"
+                        placeholder="Material, modelagem, especificações..."
+                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] resize-none"
                       />
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Seção 2: Seleção de Categoria e Subcategoria (Dispositivo nº 6) */}
+              {/* Seção 2: Categorias e Subcategorias */}
               <div>
-                <h4 className="text-[11px] font-black uppercase tracking-wider text-neutral-900 border-b border-neutral-100 pb-1 mb-3">
-                  2. Classificação Oficial (Dispositivo nº 6) — Categorias e Subcategorias
+                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2 mb-4">
+                  2. Categoria e Subcategoria
                 </h4>
                 {categories.length === 0 ? (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-[2px] text-xs text-amber-900 flex items-center justify-between flex-wrap gap-2">
+                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-md text-xs sm:text-sm text-amber-900 flex items-center justify-between flex-wrap gap-2">
                     <span>
-                      Nenhuma categoria personalizada cadastrada ainda no Dispositivo nº 6.
-                      {formIsVehicle && ` Será usada a categoria "${formVehicleCategory}" por padrão.`}
+                      Nenhuma categoria cadastrada no Tópico 05.
+                      {formIsVehicle && ` Será usada "${formVehicleCategory}" por padrão.`}
                     </span>
                     <a
-                      href="?topico=6"
+                      href="?topico=5"
                       className="font-bold underline text-black hover:text-[#FB6600]"
                     >
                       Configurar Categorias &rarr;
@@ -1614,18 +1584,18 @@ export default function MerchantProductsTab({
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                        Categoria Principal (Dispositivo nº 6) *
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Categoria Principal *
                       </label>
                       <select
                         required={!formIsVehicle}
                         value={formCategory}
                         onChange={(e) => handleFormCategoryChange(e.target.value)}
-                        className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-semibold bg-white"
+                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
                       >
                         <option value="">
                           {formIsVehicle
-                            ? `Usar categoria do veículo (${formVehicleCategory})`
+                            ? `Padrão do veículo (${formVehicleCategory})`
                             : 'Selecione uma categoria...'}
                         </option>
                         {categories.map((c) => (
@@ -1637,19 +1607,19 @@ export default function MerchantProductsTab({
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                        Subcategoria Vinculada
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Subcategoria
                       </label>
                       <select
                         value={formSubcategory}
                         onChange={(e) => setFormSubcategory(e.target.value)}
                         disabled={formAvailableSubcategories.length === 0}
-                        className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
                       >
                         <option value="">
                           {formAvailableSubcategories.length === 0
-                            ? 'Sem subcategorias cadastradas'
-                            : 'Nenhuma subcategoria (apenas principal)'}
+                            ? 'Sem subcategorias'
+                            : 'Nenhuma subcategoria'}
                         </option>
                         {formAvailableSubcategories.map((sub) => (
                           <option key={sub.id} value={sub.name}>
@@ -1662,27 +1632,16 @@ export default function MerchantProductsTab({
                 )}
               </div>
 
-              {/* Seção 3: Tipo de Promoção do Produto (Antes das Fotos - Aparece no Canto Superior Esquerdo do Card) */}
+              {/* Seção 3: Tipo de Promoção */}
               <div>
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-1 mb-2">
-                  <h4 className="text-[11px] font-black uppercase tracking-wider text-neutral-900">
-                    3. Tipo de Promoção do Produto *
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3 flex-wrap gap-2">
+                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
+                    3. Tipo de Promoção *
                   </h4>
-                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-[2px] bg-[#FB6600] text-white uppercase">
-                    Canto Superior Esquerdo do Card
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#FB6600] text-white">
+                    Selo no card
                   </span>
                 </div>
-                <p className="text-[11px] text-neutral-500 mb-3">
-                  {formIsVehicle ? (
-                    <>
-                      Selecione a condição do veículo (<strong>Novo</strong>, <strong>Usado</strong> ou <strong>Semi-novo</strong>). Ela aparecerá em destaque no <strong>canto superior esquerdo do card</strong>:
-                    </>
-                  ) : (
-                    <>
-                      Selecione o tipo de promoção deste produto (mesmo filtro do menu horizontal). Ele aparecerá em destaque no <strong>canto superior esquerdo do card</strong>:
-                    </>
-                  )}
-                </p>
 
                 <div
                   className={`grid gap-2 ${
@@ -1696,33 +1655,28 @@ export default function MerchantProductsTab({
                         key={promo.id}
                         type="button"
                         onClick={() => setFormPromoType(promo.id)}
-                        className={`px-3 py-2.5 text-xs rounded-[2px] border text-left transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
+                        className={`h-10 px-3 text-xs sm:text-sm rounded-md border text-left transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
                           isSelected
-                            ? 'bg-[#FB6600] border-[#FB6600] text-white font-black shadow-xs'
-                            : 'bg-white border-neutral-200 text-neutral-700 hover:border-black font-semibold'
+                            ? 'bg-[#FB6600] border-[#FB6600] text-white font-bold shadow-xs'
+                            : 'bg-white border-neutral-300 text-neutral-800 hover:border-black font-semibold'
                         }`}
                       >
                         <span className="truncate">{promo.label}</span>
-                        {isSelected && <span className="text-[10px] shrink-0">✓</span>}
+                        {isSelected && <span className="text-xs shrink-0">✓</span>}
                       </button>
                     )
                   })}
                 </div>
               </div>
 
-              {/* Seção 4: Fotos dos Produtos (Até 12 fotos no modo Veículo / Até 6 fotos no padrão) */}
+              {/* Seção 4: Fotos dos Produtos */}
               <div>
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-1 mb-3">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-[11px] font-black uppercase tracking-wider text-neutral-900">
-                      4. Fotos do Produto ({formImages.length} de {MAX_PHOTOS})
-                    </h4>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-700 uppercase">
-                      Até {MAX_PHOTOS} fotos
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-neutral-400">
-                    A primeira imagem será a foto de capa
+                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3 flex-wrap gap-2">
+                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
+                    4. Fotos ({formImages.length}/{MAX_PHOTOS})
+                  </h4>
+                  <span className="text-xs text-neutral-500">
+                    A 1ª imagem é a foto de capa
                   </span>
                 </div>
 
@@ -1735,11 +1689,11 @@ export default function MerchantProductsTab({
                   className="hidden"
                 />
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5 mb-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-2">
                   {formImages.map((imgUrl, idx) => (
                     <div
                       key={idx}
-                      className="aspect-square bg-neutral-100 border border-neutral-300 rounded-[2px] overflow-hidden relative group shadow-2xs"
+                      className="aspect-square bg-neutral-100 border border-neutral-300 rounded-md overflow-hidden relative group shadow-2xs"
                     >
                       <img
                         src={imgUrl}
@@ -1748,26 +1702,26 @@ export default function MerchantProductsTab({
                       />
                       {idx === 0 ? (
                         <>
-                          <span className="absolute top-1 left-1 bg-[#FB6600] text-white text-[8px] font-black uppercase px-1.5 py-0.5 rounded-[2px] shadow">
+                          <span className="absolute top-1.5 left-1.5 bg-[#FB6600] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow">
                             {getPromoLabel(formPromoType)}
                           </span>
                           {calculatedDiscount && calculatedDiscount > 0 && (
-                            <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-yellow-400 text-black font-black text-[8px] flex items-center justify-center shadow border border-yellow-500/40">
-                              {calculatedDiscount}%
+                            <span className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full bg-yellow-400 text-black font-black text-[10px] flex items-center justify-center shadow border border-yellow-500/40">
+                              -{calculatedDiscount}%
                             </span>
                           )}
                         </>
                       ) : (
-                        <span className="absolute top-1 left-1 bg-neutral-800/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow">
+                        <span className="absolute top-1.5 left-1.5 bg-neutral-900/80 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
                           Foto {idx + 1}
                         </span>
                       )}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
                         {idx !== 0 && (
                           <button
                             type="button"
                             onClick={() => handleSetCoverImage(idx)}
-                            className="p-1 bg-white hover:bg-neutral-200 text-black rounded text-[9px] font-bold cursor-pointer"
+                            className="px-2 py-1 bg-white hover:bg-neutral-200 text-black rounded text-xs font-bold cursor-pointer"
                             title="Tornar foto de capa"
                           >
                             ⭐ Capa
@@ -1776,7 +1730,7 @@ export default function MerchantProductsTab({
                         <button
                           type="button"
                           onClick={() => handleRemoveImage(idx)}
-                          className="p-1 bg-rose-600 hover:bg-rose-700 text-white rounded text-[9px] font-bold cursor-pointer"
+                          className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold cursor-pointer"
                           title="Remover foto"
                         >
                           🗑️
@@ -1795,47 +1749,41 @@ export default function MerchantProductsTab({
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploadingImage}
-                        className={`aspect-square border-2 border-dashed rounded-[2px] flex flex-col items-center justify-center p-2 transition-colors cursor-pointer ${
+                        className={`aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center p-2 transition-colors cursor-pointer ${
                           isNextSlot
-                            ? 'border-neutral-400 hover:border-black text-neutral-700 hover:text-black bg-neutral-50'
-                            : 'border-neutral-200 hover:border-neutral-400 text-neutral-400 hover:text-neutral-700 bg-neutral-50/50'
+                            ? 'border-neutral-400 hover:border-black text-neutral-800 hover:text-black bg-neutral-50'
+                            : 'border-neutral-200 hover:border-neutral-400 text-neutral-500 hover:text-neutral-800 bg-neutral-50/50'
                         }`}
                       >
-                        <span className="text-lg mb-0.5">{uploadingImage && isNextSlot ? '⏳' : '📷'}</span>
-                        <span className="text-[9.5px] font-bold uppercase tracking-wider text-center">
-                          {uploadingImage && isNextSlot ? 'Enviando...' : `+ Foto ${photoNumber}/${MAX_PHOTOS}`}
+                        <span className="text-2xl mb-1">{uploadingImage && isNextSlot ? '⏳' : '📷'}</span>
+                        <span className="text-xs font-bold text-center">
+                          {uploadingImage && isNextSlot ? 'Enviando...' : `Foto ${photoNumber}/${MAX_PHOTOS}`}
                         </span>
                       </button>
                     )
                   })}
                 </div>
-                <p className="text-[10px] text-neutral-400">
-                  * Você pode adicionar até <strong>{MAX_PHOTOS} fotos</strong> por {formIsVehicle ? 'veículo' : 'produto'}. No card da vitrine, o selo <strong>{getPromoLabel(formPromoType)}</strong> aparecerá no canto superior esquerdo.
-                </p>
 
                 {/* Opção de Orientação da Foto no Card */}
-                <div className="pt-3 mt-2 border-t border-neutral-100">
-                  <label className="block text-xs font-bold text-neutral-800 uppercase mb-1">
-                    Enquadramento da Foto no Card da Vitrine
+                <div className="pt-4 mt-3 border-t border-neutral-200">
+                  <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-2">
+                    Enquadramento no Card da Vitrine
                   </label>
-                  <p className="text-[11px] text-neutral-500 mb-2.5">
-                    Escolha o formato ideal para exibir a foto inteira sem cortes indesejados nas laterais:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setFormPhotoOrientation('vertical')}
-                      className={`p-2.5 border rounded-[2px] text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                      className={`p-3 border rounded-md text-left transition-all cursor-pointer flex items-center gap-3 ${
                         formPhotoOrientation === 'vertical'
                           ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
-                          : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
+                          : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
                       }`}
                     >
-                      <span className="text-base">📱</span>
+                      <span className="text-lg">📱</span>
                       <div>
-                        <span className="text-xs font-bold block leading-tight">Foto Vertical (Padrão)</span>
-                        <span className={`text-[10px] block ${formPhotoOrientation === 'vertical' ? 'text-neutral-300' : 'text-neutral-400'}`}>
-                          Ideal para Moda, Vestuário e Pessoas
+                        <span className="text-xs sm:text-sm font-bold block">Foto Vertical (Padrão)</span>
+                        <span className={`text-xs block ${formPhotoOrientation === 'vertical' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                          Moda, vestuário e produtos verticais
                         </span>
                       </div>
                     </button>
@@ -1843,17 +1791,17 @@ export default function MerchantProductsTab({
                     <button
                       type="button"
                       onClick={() => setFormPhotoOrientation('horizontal')}
-                      className={`p-2.5 border rounded-[2px] text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                      className={`p-3 border rounded-md text-left transition-all cursor-pointer flex items-center gap-3 ${
                         formPhotoOrientation === 'horizontal'
                           ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
-                          : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
+                          : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
                       }`}
                     >
-                      <span className="text-base">🖥️</span>
+                      <span className="text-lg">🖥️</span>
                       <div>
-                        <span className="text-xs font-bold block leading-tight">Foto na Horizontal</span>
-                        <span className={`text-[10px] block ${formPhotoOrientation === 'horizontal' ? 'text-orange-100' : 'text-neutral-400'}`}>
-                          Ideal para Carros, Eletro (Mostra a foto inteira)
+                        <span className="text-xs sm:text-sm font-bold block">Foto Horizontal</span>
+                        <span className={`text-xs block ${formPhotoOrientation === 'horizontal' ? 'text-orange-100' : 'text-neutral-500'}`}>
+                          Carros e itens horizontais (mostra inteira)
                         </span>
                       </div>
                     </button>
@@ -1863,123 +1811,108 @@ export default function MerchantProductsTab({
 
               {/* Seção 5: Preços do Produto */}
               <div>
-                <h4 className="text-[11px] font-black uppercase tracking-wider text-neutral-900 border-b border-neutral-100 pb-1 mb-3">
-                  5. Preços {formIsVehicle ? 'do Veículo (Custo Interno, Venda e Tabela FIPE Interna)' : 'do Produto'}
+                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2 mb-4">
+                  5. Preços {formIsVehicle ? 'do Veículo' : 'do Produto'}
                 </h4>
 
                 {formIsVehicle ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {/* Preço de Custo (Interno) */}
-                      <div className="p-3 bg-amber-50/40 border border-amber-200 rounded-[2px]">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-xs font-bold text-neutral-800 uppercase">
-                            Preço de Custo (Interno)
+                      <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-md">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-bold text-neutral-800">
+                            Custo (Interno)
                           </label>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded uppercase">
-                            🔒 Não aparece
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
+                            🔒 Oculto
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-2 text-xs font-bold text-neutral-400">R$</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
                           <input
                             type="text"
                             value={formCostPriceInternal}
                             onChange={(e) => setFormCostPriceInternal(e.target.value)}
                             placeholder="0,00"
-                            className="w-full pl-9 pr-3 py-2 text-xs border border-amber-300 bg-white rounded-[2px] focus:outline-none focus:border-black font-bold text-neutral-800"
+                            className="w-full h-11 pl-9 pr-3 text-sm border border-amber-300 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-neutral-800"
                           />
                         </div>
-                        <span className="text-[10px] text-amber-900/80 block mt-1">
-                          Uso interno — nunca exibido aos clientes.
-                        </span>
                       </div>
 
                       {/* Preço de Venda (Público) */}
-                      <div className="p-3 bg-emerald-50/40 border border-emerald-300 rounded-[2px]">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-xs font-black text-neutral-900 uppercase">
-                            Preço Venda (R$) *
+                      <div className="p-3.5 bg-emerald-50/50 border border-emerald-300 rounded-md">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-bold text-neutral-900">
+                            Preço Venda *
                           </label>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-600 text-white rounded uppercase">
-                            Visível no Card
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-emerald-600 text-white rounded">
+                            Público
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-2 text-xs font-bold text-neutral-500">R$</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-500">R$</span>
                           <input
                             type="text"
                             required
                             value={formPrice}
                             onChange={(e) => setFormPrice(e.target.value)}
-                            placeholder="Ex: 118.900,00"
-                            className="w-full pl-9 pr-3 py-2 text-xs border border-emerald-400 bg-white rounded-[2px] focus:outline-none focus:border-black font-black text-neutral-900"
+                            placeholder="118.900,00"
+                            className="w-full h-11 pl-9 pr-3 text-sm border border-emerald-400 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold text-neutral-900"
                           />
                         </div>
-                        <span className="text-[10px] text-emerald-900/80 block mt-1">
-                          Valor principal anunciado no card da vitrine.
-                        </span>
                       </div>
 
                       {/* Preço FIPE (Interno) */}
-                      <div className="p-3 bg-amber-50/40 border border-amber-200 rounded-[2px]">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-xs font-bold text-neutral-800 uppercase">
-                            Preço FIPE (Interno)
+                      <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-md">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-bold text-neutral-800">
+                            FIPE (Interno)
                           </label>
-                          <span className="text-[9px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded uppercase">
-                            🔒 Não aparece
+                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
+                            🔒 Oculto
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-2 text-xs font-bold text-neutral-400">R$</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
                           <input
                             type="text"
                             value={formFipePriceInternal}
                             onChange={(e) => setFormFipePriceInternal(e.target.value)}
-                            placeholder="Ex: 122.400,00"
-                            className="w-full pl-9 pr-3 py-2 text-xs border border-amber-300 bg-white rounded-[2px] focus:outline-none focus:border-black font-bold text-neutral-800"
+                            placeholder="122.400,00"
+                            className="w-full h-11 pl-9 pr-3 text-sm border border-amber-300 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-neutral-800"
                           />
                         </div>
-                        <span className="text-[10px] text-amber-900/80 block mt-1">
-                          Fica salvo apenas para o lojista saber.
-                        </span>
                       </div>
                     </div>
 
-                    {/* Aviso obrigatório sobre o Preço FIPE e Preço de Custo Internos */}
-                    <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-[2px] text-xs text-amber-950 flex items-start gap-2.5">
+                    <div className="p-3 bg-amber-50 border border-amber-300 rounded-md text-xs text-amber-950 flex items-center gap-2.5">
                       <span className="text-base shrink-0">🔒</span>
-                      <div className="leading-relaxed">
-                        <strong className="font-black uppercase tracking-wider block text-amber-950 mb-0.5">
-                          Aviso Importante ao Lojista — Informações Internas Ocultas no Card:
-                        </strong>
-                        <p className="text-[11px] text-amber-900">
-                          O <strong>Preço FIPE (Interno)</strong>, o <strong>Preço de Custo (Interno)</strong> e a <strong>Placa (Interno)</strong> <strong>não irão aparecer no card</strong> nem na vitrine pública da loja. O <strong>Preço FIPE fica registrado apenas para o lojista saber</strong> e consultar como referência rápida no seu painel administrativo. Para os visitantes e compradores, será exibido exclusivamente o <strong>Preço de Venda</strong>.
-                        </p>
-                      </div>
+                      <span>
+                        <strong>Dados internos (Custo, FIPE e Placa):</strong> ficam visíveis apenas neste painel; visitantes veem somente o Preço de Venda.
+                      </span>
                     </div>
 
-                    {/* Preço Promocional Opcional (caso queira ativar o círculo amarelo de desconto) */}
-                    <div className="pt-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-[11px] font-bold text-neutral-600 uppercase">
-                          Preço Promocional de Oferta (Opcional — ativa o círculo amarelo de % no card)
+                    {/* Preço Promocional Opcional */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-700">
+                          Preço Promocional (Opcional)
                         </label>
                         {calculatedDiscount && (
-                          <span className="text-[10px] font-bold text-black bg-yellow-400 px-2 py-0.5 rounded-full">
-                            Desconto no Card: {calculatedDiscount}%
+                          <span className="text-xs font-bold text-black bg-yellow-400 px-2.5 py-0.5 rounded-full">
+                            Desconto: {calculatedDiscount}%
                           </span>
                         )}
                       </div>
                       <div className="relative max-w-xs">
-                        <span className="absolute left-3 top-2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
                         <input
                           type="text"
                           value={formPromoPrice}
                           onChange={(e) => setFormPromoPrice(e.target.value)}
-                          placeholder="Deixe em branco se não houver desconto"
-                          className="w-full pl-9 pr-3 py-1.5 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-bold text-[#FB6600]"
+                          placeholder="Opcional"
+                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-[#FB6600]"
                         />
                       </div>
                     </div>
@@ -1987,57 +1920,54 @@ export default function MerchantProductsTab({
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                         Preço Regular (R$) *
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
                         <input
                           type="text"
                           required
                           value={formPrice}
                           onChange={(e) => setFormPrice(e.target.value)}
                           placeholder="0,00"
-                          className="w-full pl-9 pr-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-black"
+                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-bold text-neutral-700 uppercase">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
                           Preço Promocional (Opcional)
                         </label>
                         {calculatedDiscount && (
-                          <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">
-                            Economia: {calculatedDiscount}% OFF
+                          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                            {calculatedDiscount}% OFF
                           </span>
                         )}
                       </div>
                       <div className="relative">
-                        <span className="absolute left-3 top-2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
                         <input
                           type="text"
                           value={formPromoPrice}
                           onChange={(e) => setFormPromoPrice(e.target.value)}
-                          placeholder="Ex: 89,90"
-                          className="w-full pl-9 pr-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black font-black text-[#FB6600]"
+                          placeholder="Ex.: 89,90"
+                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold text-[#FB6600]"
                         />
                       </div>
-                      <span className="text-[10px] text-neutral-400 block mt-0.5">
-                        Deve ser menor que o preço regular para ser exibido como oferta.
-                      </span>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Botões do Modal */}
-              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsFormModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold uppercase rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -2049,7 +1979,7 @@ export default function MerchantProductsTab({
                     handleSaveProduct()
                   }}
                   disabled={submitting}
-                  className="px-6 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer disabled:opacity-50"
+                  className="h-10 px-6 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
                 >
                   {submitting
                     ? 'Salvando...'
@@ -2070,24 +2000,24 @@ export default function MerchantProductsTab({
       {/* ----------------------------------------------------------------- */}
       {deleteConfirmation && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden">
-            <div className="p-4 bg-rose-600 text-white flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <div className="bg-white w-full max-w-md rounded-md shadow-2xl border border-neutral-200 overflow-hidden">
+            <div className="p-4 sm:p-5 bg-rose-600 text-white flex items-center justify-between">
+              <h3 className="text-sm sm:text-base font-bold flex items-center gap-2">
                 <span>⚠️</span>
                 <span>Confirmar Exclusão</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setDeleteConfirmation(null)}
-                className="text-white hover:opacity-80 font-bold text-base cursor-pointer"
+                className="text-white hover:opacity-80 font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
             <div className="p-5 space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-neutral-50 border border-neutral-200 rounded-[2px]">
-                <div className="w-12 h-14 bg-neutral-200 rounded-[2px] overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="flex items-center gap-3.5 p-3.5 bg-neutral-50 border border-neutral-200 rounded-md">
+                <div className="w-16 h-20 bg-neutral-200 rounded-md overflow-hidden shrink-0 flex items-center justify-center">
                   {deleteConfirmation.image_url ? (
                     <img
                       src={deleteConfirmation.image_url}
@@ -2095,31 +2025,31 @@ export default function MerchantProductsTab({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span>🖼️</span>
+                    <span className="text-xl">🖼️</span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h4 className="font-bold text-xs text-neutral-900 truncate">
+                  <h4 className="font-bold text-sm text-neutral-900 truncate">
                     {deleteConfirmation.name}
                   </h4>
-                  <span className="text-[10.5px] text-neutral-500 block">
-                    Preço: R$ {formatCurrencyBRL(deleteConfirmation.price)}
+                  <span className="text-xs sm:text-sm font-semibold text-neutral-700 block mt-0.5">
+                    R$ {formatCurrencyBRL(deleteConfirmation.price)}
                   </span>
-                  <span className="text-[10px] text-neutral-400 capitalize">
+                  <span className="text-xs text-neutral-500 capitalize">
                     {deleteConfirmation.category} {deleteConfirmation.subcategory ? `• ${deleteConfirmation.subcategory}` : ''}
                   </span>
                 </div>
               </div>
 
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                Tem certeza que deseja excluir este produto? Ao confirmar, ele será removido permanentemente do catálogo e <strong>1 vaga será liberada imediatamente</strong> no seu plano.
+              <p className="text-sm text-neutral-700 leading-relaxed">
+                Tem certeza que deseja excluir este item permanentemente do catálogo?
               </p>
 
-              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setDeleteConfirmation(null)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold uppercase rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -2127,9 +2057,9 @@ export default function MerchantProductsTab({
                   type="button"
                   onClick={handleConfirmDelete}
                   disabled={submitting}
-                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer disabled:opacity-50"
+                  className="h-10 px-5 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'Excluindo...' : 'Sim, Excluir Produto'}
+                  {submitting ? 'Excluindo...' : 'Excluir'}
                 </button>
               </div>
             </div>
