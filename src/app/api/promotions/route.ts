@@ -10,6 +10,8 @@ const PLAN_LIMITS: Record<string, { maxProducts: number; maxPromotions: number }
   bronze_plus: { maxProducts: PLANS.bronze_plus.maxActiveProducts, maxPromotions: PLANS.bronze_plus.maxPromotions },
   prata: { maxProducts: PLANS.prata.maxActiveProducts, maxPromotions: PLANS.prata.maxPromotions },
   ouro: { maxProducts: PLANS.ouro.maxActiveProducts, maxPromotions: PLANS.ouro.maxPromotions },
+  auto_50: { maxProducts: PLANS.auto_50.maxActiveProducts, maxPromotions: PLANS.auto_50.maxPromotions },
+  auto_100: { maxProducts: PLANS.auto_100.maxActiveProducts, maxPromotions: PLANS.auto_100.maxPromotions },
 };
 
 export async function POST(request: Request) {

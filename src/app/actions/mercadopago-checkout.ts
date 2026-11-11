@@ -53,7 +53,7 @@ export async function createPlanCheckoutAction(params: {
   const result = await createPlanPaymentPreference({
     storeId: params.storeId,
     storeName,
-    planId: plan.id as 'bronze_plus' | 'prata' | 'ouro',
+    planId: plan.id as 'bronze_plus' | 'prata' | 'ouro' | 'auto_50' | 'auto_100',
     planName: plan.name,
     price: plan.price,
     payerEmail,

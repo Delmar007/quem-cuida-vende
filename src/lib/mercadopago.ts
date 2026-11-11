@@ -17,7 +17,7 @@ export function getMercadoPagoClient() {
 export interface CreatePlanPreferenceParams {
   storeId: string
   storeName: string
-  planId: 'bronze_plus' | 'prata' | 'ouro'
+  planId: 'bronze_plus' | 'prata' | 'ouro' | 'auto_50' | 'auto_100'
   planName: string
   price: number
   payerEmail?: string

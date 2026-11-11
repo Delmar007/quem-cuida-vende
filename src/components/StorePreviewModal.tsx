@@ -322,8 +322,17 @@ export default function StorePreviewModal({
               {/* Badge Oficial do Plano */}
               {data.plan && data.plan !== 'bronze' && (
                 <div className="absolute top-3 right-3 bg-black/85 backdrop-blur-[2px] border border-white/20 text-white text-[9.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-[2px] shadow-lg flex items-center gap-1.5">
-                  <span className={data.plan === 'ouro' ? 'text-[#FB6600]' : data.plan === 'bronze_plus' ? 'text-amber-400' : 'text-gray-300'}>★</span>
-                  <span>Loja Oficial {data.plan === 'bronze_plus' ? 'Bronze Plus' : data.plan}</span>
+                  <span className={data.plan === 'ouro' || data.plan === 'auto_100' ? 'text-[#FB6600]' : data.plan === 'bronze_plus' ? 'text-amber-400' : 'text-gray-300'}>★</span>
+                  <span>
+                    Loja Oficial{' '}
+                    {data.plan === 'bronze_plus'
+                      ? 'Bronze Plus'
+                      : data.plan === 'auto_50'
+                      ? 'Loja de Carros'
+                      : data.plan === 'auto_100'
+                      ? 'Concessionária'
+                      : data.plan}
+                  </span>
                 </div>
               )}
             </div>

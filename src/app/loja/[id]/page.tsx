@@ -164,11 +164,20 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
           </div>
         )}
 
-        {/* Badge do Plano (Ouro / Prata / Bronze Plus) */}
+        {/* Badge do Plano */}
         {store.plan && store.plan !== 'bronze' && (
           <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-[2px] border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-[2px] shadow-lg flex items-center gap-1.5">
-            <span className={store.plan === 'ouro' ? 'text-[#FB6600]' : store.plan === 'bronze_plus' ? 'text-amber-400' : 'text-gray-300'}>★</span>
-            <span>Loja Oficial {store.plan === 'bronze_plus' ? 'Bronze Plus' : store.plan}</span>
+            <span className={store.plan === 'ouro' || store.plan === 'auto_100' ? 'text-[#FB6600]' : store.plan === 'bronze_plus' ? 'text-amber-400' : 'text-gray-300'}>★</span>
+            <span>
+              Loja Oficial{' '}
+              {store.plan === 'bronze_plus'
+                ? 'Bronze Plus'
+                : store.plan === 'auto_50'
+                ? 'Loja de Carros'
+                : store.plan === 'auto_100'
+                ? 'Concessionária'
+                : store.plan}
+            </span>
           </div>
         )}
       </div>

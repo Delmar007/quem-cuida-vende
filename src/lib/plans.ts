@@ -1,18 +1,25 @@
 /**
  * Configuração Comercial dos Planos • Kittanda Outlet
  * 
+ * Lojas em Geral:
  * 1. Bronze: Gratuito, até 20 produtos ativos
  * 2. Bronze Plus: R$ 30,00/mês, até 100 produtos ativos (mesmos benefícios do Prata)
  * 3. Prata: R$ 50,00/mês, até 200 produtos ativos
- * 4. Ouro: R$ 100,00/mês, até 400 produtos ativos (benefícios exclusivos e sorteios)
+ * 4. Ouro: R$ 100,00/mês, até 500 produtos ativos (benefícios exclusivos e sorteios)
+ *
+ * Loja de Carros & Concessionárias:
+ * 5. Loja de Carros (auto_50): R$ 50,00/mês, até 50 veículos ativos (Banner Duplo)
+ * 6. Concessionária (auto_100): R$ 150,00/mês, até 100 veículos ativos (Banner Triplo)
  */
 
-export type PlanId = 'bronze' | 'bronze_plus' | 'prata' | 'ouro'
+export type PlanId = 'bronze' | 'bronze_plus' | 'prata' | 'ouro' | 'auto_50' | 'auto_100'
 
 export interface PlanDefinition {
   id: PlanId
   name: string
   label: string
+  segment: 'geral' | 'veiculos'
+  itemLabel: string
   price: number
   priceFormatted: string
   period: string
@@ -39,6 +46,8 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     id: 'bronze',
     name: 'Bronze',
     label: 'Plano Bronze',
+    segment: 'geral',
+    itemLabel: 'produtos ativos',
     price: 0,
     priceFormatted: 'R$ 0,00',
     period: '/mês',
@@ -72,6 +81,8 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     id: 'bronze_plus',
     name: 'Bronze Plus',
     label: 'Plano Bronze Plus',
+    segment: 'geral',
+    itemLabel: 'produtos ativos',
     price: 30,
     priceFormatted: 'R$ 30,00',
     period: '/mês',
@@ -104,6 +115,8 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     id: 'prata',
     name: 'Prata',
     label: 'Plano Prata',
+    segment: 'geral',
+    itemLabel: 'produtos ativos',
     price: 50,
     priceFormatted: 'R$ 50,00',
     period: '/mês',
@@ -136,6 +149,8 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     id: 'ouro',
     name: 'Ouro',
     label: 'Plano Ouro',
+    segment: 'geral',
+    itemLabel: 'produtos ativos',
     price: 100,
     priceFormatted: 'R$ 100,00',
     period: '/mês',
@@ -165,19 +180,102 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     ],
     ctaText: 'Quero ser Ouro',
   },
+  auto_50: {
+    id: 'auto_50',
+    name: 'Loja de Carros',
+    label: 'Plano Loja de Carros',
+    segment: 'veiculos',
+    itemLabel: 'veículos ativos',
+    price: 50,
+    priceFormatted: 'R$ 50,00',
+    period: '/mês',
+    maxActiveProducts: 50,
+    maxPromotions: 25,
+    feedBannerType: 'double',
+    feedBannerLabel: 'No Plano Loja de Carros a loja aparece no feed com Banner Duplo (2 colunas)',
+    badgeText: 'Multimarcas',
+    badgeClass: 'bg-slate-800 text-white border border-slate-700',
+    borderClass: 'border-slate-700',
+    hasSecondaryCategoryBanner: true,
+    hasHighlightNovidades: true,
+    hasMainPageBanner: false,
+    hasBirthdayList: false,
+    hasMonthlyRaffles: false,
+    description: 'Plano dedicado para lojas de seminovos, multimarcas e revendas com até 50 veículos no catálogo.',
+    benefits: [
+      'Banner Triplo dentro da loja + Banner Duplo (2 colunas) no filtro Lojas',
+      'Cadastro de até 50 veículos ativos com até 12 fotos por anúncio',
+      'Ficha técnica exclusiva: Marca, Modelo, Versão, Ano, KM, Câmbio e Tração',
+      'Controle interno privado de Preço FIPE, Custo e Placa no painel',
+      'Destaque na categoria Carro (Usados e Multimarcas)',
+      'Botão direto para negociação imediata via WhatsApp',
+      'Cronômetro de ofertas e termômetro temporal de campanha',
+    ],
+    ctaText: 'Contratar R$ 50/mês',
+  },
+  auto_100: {
+    id: 'auto_100',
+    name: 'Concessionária',
+    label: 'Plano Concessionária',
+    segment: 'veiculos',
+    itemLabel: 'veículos ativos',
+    price: 150,
+    priceFormatted: 'R$ 150,00',
+    period: '/mês',
+    maxActiveProducts: 100,
+    maxPromotions: 50,
+    feedBannerType: 'triple',
+    feedBannerLabel: 'No Plano Concessionária a loja aparece no feed com Banner Triplo (3 colunas - linha inteira)',
+    badgeText: 'Concessionárias',
+    badgeClass: 'bg-orange-50 text-[#FB6600] border border-orange-200',
+    borderClass: 'border-[#FB6600]',
+    highlight: true,
+    hasSecondaryCategoryBanner: true,
+    hasHighlightNovidades: true,
+    hasMainPageBanner: true,
+    hasBirthdayList: true,
+    hasMonthlyRaffles: true,
+    description: 'Exposição máxima para concessionárias e grandes pátios com até 100 veículos e Banner Triplo.',
+    benefits: [
+      'Todos os benefícios do Plano Loja de Carros, mais:',
+      'Banner Triplo (3 colunas) dentro da loja e em linha inteira no filtro Lojas',
+      'Cadastro e vitrine de até 100 veículos ativos com até 12 fotos cada',
+      'Banner de divulgação na página principal e na categoria Carro',
+      'Ficha técnica completa + Tabela FIPE e Custo internos privados no painel',
+      'Acesso à lista de aniversariantes seguidores (LGPD) e favoritos',
+      'Participação em campanhas e feirões mensais da Kittanda',
+    ],
+    ctaText: 'Contratar R$ 150/mês',
+  },
 }
 
-export const ORDERED_PLANS: PlanDefinition[] = [
+export const GENERAL_PLANS: PlanDefinition[] = [
   PLANS.bronze,
   PLANS.bronze_plus,
   PLANS.prata,
   PLANS.ouro,
 ]
 
+export const VEHICLE_PLANS: PlanDefinition[] = [
+  PLANS.auto_50,
+  PLANS.auto_100,
+]
+
+export const ORDERED_PLANS: PlanDefinition[] = [
+  PLANS.bronze,
+  PLANS.bronze_plus,
+  PLANS.prata,
+  PLANS.ouro,
+  PLANS.auto_50,
+  PLANS.auto_100,
+]
+
 export function getPlan(planId?: string): PlanDefinition {
   let clean = (planId || 'bronze').toLowerCase().trim()
   if (clean === 'bronze_luz' || clean === 'bronzeluz') clean = 'bronze_plus'
   if (clean === 'bronze_gratuito' || clean === 'bronzegratuito' || clean === 'gratuito') clean = 'bronze'
+  if (clean === 'carros_50' || clean === 'veiculos_50' || clean === 'loja_carros') clean = 'auto_50'
+  if (clean === 'concessionaria' || clean === 'concessionaria_100' || clean === 'carros_100') clean = 'auto_100'
   return PLANS[clean as PlanId] || PLANS.bronze
 }
 

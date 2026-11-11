@@ -1101,8 +1101,8 @@ export default async function Home({ searchParams }: HomeProps) {
     // - Plano Ouro: Banner Triplo (3 colunas)
     const getStoreBannerType = (storePlan?: string): "single" | "double" | "triple" => {
       const p = (storePlan || "bronze").toLowerCase();
-      if (p === "ouro") return "triple";
-      if (p === "bronze_plus" || p === "prata") return "double";
+      if (p === "ouro" || p === "auto_100") return "triple";
+      if (p === "bronze_plus" || p === "prata" || p === "auto_50") return "double";
       return "single";
     };
 
