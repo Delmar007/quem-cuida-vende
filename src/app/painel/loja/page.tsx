@@ -128,90 +128,90 @@ const SUBCATEGORIAS_POR_CATEGORIA: Record<string, string[]> = {
   ],
 }
 
-// OS 11 TÓPICOS DA ÁREA DO LOJISTA
+// OS 12 TÓPICOS DA ÁREA DO LOJISTA
 const TOPICOS = [
   {
     id: 1,
     numero: '01',
-    titulo: 'Dados da loja',
-    subtitulo: 'Nome, responsável, WhatsApp, logo, descrição e endereço comercial',
+    titulo: 'Dados da Loja',
+    subtitulo: 'Identificação, logotipo e endereço',
     icone: '🏬',
   },
   {
     id: 2,
     numero: '02',
-    titulo: 'Categorias e Segmentos',
-    subtitulo: 'Segmento principal e subcategorias da loja',
+    titulo: 'Categoria e Subcategorias',
+    subtitulo: 'Nicho principal e especialidades',
     icone: '🏷️',
   },
   {
     id: 3,
     numero: '03',
-    titulo: 'Banner Triplo da Loja (Todos os Planos)',
-    subtitulo: 'Topo interno da sua loja (e filtro Lojas no Plano Ouro)',
+    titulo: 'Banner Triplo',
+    subtitulo: 'Capa 940 × 370 px da loja',
     icone: '🖼️',
   },
   {
     id: 4,
     numero: '04',
-    titulo: 'Banner do Filtro Lojas (Single / Duplo)',
-    subtitulo: 'Single (Bronze) ou Duplo (Bronze Plus e Prata) para o feed Lojas',
+    titulo: 'Banner Single / Duplo',
+    subtitulo: 'Destaque no filtro Lojas',
     icone: '🪪',
   },
   {
     id: 5,
     numero: '05',
-    titulo: 'Categorias e Subcategorias',
-    subtitulo: 'Organizar produtos por tipos e filtros',
+    titulo: 'Categorias de Produtos',
+    subtitulo: 'Organização interna do catálogo',
     icone: '🗂️',
   },
   {
     id: 6,
     numero: '06',
     titulo: 'Catálogo de Produtos',
-    subtitulo: 'Cadastrar produtos e limites do plano',
+    subtitulo: 'Cadastro e gestão de itens',
     icone: '📦',
   },
   {
     id: 7,
     numero: '07',
-    titulo: 'Sistema de Convites VIP',
-    subtitulo: 'Convide lojistas parceiros selecionados',
+    titulo: 'Convites VIP',
+    subtitulo: 'Indicação de lojistas parceiros',
     icone: '🎟️',
   },
   {
     id: 8,
     numero: '08',
-    titulo: 'Desempenho e Métricas',
-    subtitulo: 'Acessos, cliques no WhatsApp e conversão',
+    titulo: 'Métricas',
+    subtitulo: 'Acessos e cliques no WhatsApp',
     icone: '📊',
   },
   {
     id: 9,
     numero: '09',
-    titulo: 'Lista de Preferidos',
-    subtitulo: 'Produtos favoritados pelos clientes',
+    titulo: 'Favoritos',
+    subtitulo: 'Produtos mais curtidos',
     icone: '❤️',
   },
   {
     id: 10,
     numero: '10',
-    titulo: 'Aniversariantes Seguidores',
-    subtitulo: 'Seguidores que comemoram este mês',
+    titulo: 'Aniversariantes',
+    subtitulo: 'Seguidores aniversariantes do mês',
     icone: '🎂',
   },
   {
     id: 11,
     numero: '11',
     titulo: 'Plano & Cobrança',
-    subtitulo: 'Vencimento dia 10, tolerância e faturas',
+    subtitulo: 'Assinatura e faturas',
     icone: '💳',
   },
   {
     id: 12,
-    numero: '13',
+    numero: '12',
     titulo: 'Cronômetro de Promoção',
-    subtitulo: 'Termômetro temporal de campanha com início e fim',
+    subtitulo: 'Termômetro de campanha',
     icone: '⏱️',
   },
 ]
@@ -786,28 +786,30 @@ function MerchantStoreAdminContent() {
   return (
     <div className="w-full pb-20">
       {/* Topo Geral da Área do Lojista */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200/80 pb-5 mb-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
-            Painel da loja
-          </h1>
-          <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
-            Gerencie sua loja, catálogo e configurações.
-          </p>
+      <div className="bg-white border border-neutral-200 rounded-md p-4 sm:p-6 mb-6 shadow-2xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block">
+              Área do Lojista
+            </span>
+            <h1 className="font-heading text-2xl sm:text-[26px] font-extrabold tracking-tight text-neutral-900">
+              Painel da Loja
+            </h1>
+          </div>
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* Seletor de lojas do lojista */}
           {stores.length > 0 && (
-            <div className="flex items-center gap-1.5 mr-1">
-              <label htmlFor="store-select" className="text-xs text-neutral-500 whitespace-nowrap">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <label htmlFor="store-select" className="text-xs sm:text-sm font-semibold text-neutral-600 whitespace-nowrap">
                 Loja:
               </label>
               <select
                 id="store-select"
                 value={selectedStoreId}
                 onChange={handleStoreChange}
-                className="px-2.5 py-1.5 text-xs font-medium bg-white border border-neutral-200 rounded-[2px] text-neutral-800 focus:outline-none focus:border-neutral-900 transition-colors"
+                className="flex-1 sm:flex-none sm:min-w-[180px] h-10 px-3 text-sm font-medium bg-white border border-neutral-300 rounded-md text-neutral-900 focus:outline-none focus:border-[#FB6600] transition-colors"
               >
                 {stores.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -851,10 +853,10 @@ function MerchantStoreAdminContent() {
                   setCurrentTopic(1)
                   setFeedback({
                     type: 'success',
-                    message: 'Preencha os dados da nova loja abaixo e clique em "Salvar Alterações".',
+                    message: 'Preencha os dados da nova loja e clique em "Salvar Alterações".',
                   })
                 }}
-                className="px-2.5 py-1.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-semibold rounded-[2px] transition-colors cursor-pointer whitespace-nowrap shadow-xs"
+                className="h-10 px-3.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap shadow-xs shrink-0"
                 title="Cadastrar mais uma loja na sua conta"
               >
                 + Nova Loja
@@ -866,14 +868,14 @@ function MerchantStoreAdminContent() {
           <button
             type="button"
             onClick={() => setIsPreviewOpen(true)}
-            className="px-4 py-2 bg-neutral-900 hover:bg-black text-white text-xs font-semibold rounded-[2px] transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
-            title="Pré-visualizar como o cliente vê no celular ou computador"
+            className="h-10 px-4 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs flex-1 sm:flex-none"
+            title="Pré-visualizar vitrine"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span>Pré-visualizar loja</span>
+            <span>Pré-visualizar</span>
           </button>
 
           {/* Botão Secundário: Ver loja */}
@@ -882,11 +884,11 @@ function MerchantStoreAdminContent() {
               href={`/loja/${activeStore.slug || activeStore.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-700 hover:text-neutral-900 border border-neutral-300 text-xs font-semibold rounded-[2px] transition-colors flex items-center gap-1.5"
-              title="Abrir vitrine da loja em nova aba"
+              className="h-10 px-4 bg-white hover:bg-neutral-50 text-neutral-800 hover:text-black border border-neutral-300 text-xs sm:text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
+              title="Abrir vitrine em nova aba"
             >
               <span>Ver loja</span>
-              <svg className="w-3 h-3 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3.5 h-3.5 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </Link>
@@ -897,7 +899,7 @@ function MerchantStoreAdminContent() {
       {/* Alerta de Feedback (Sucesso / Erro) */}
       {feedback && (
         <div
-          className={`p-4 mb-6 text-xs rounded-[2px] flex items-center justify-between border animate-in fade-in duration-200 ${
+          className={`p-4 mb-6 text-sm rounded-md flex items-center justify-between border animate-in fade-in duration-200 ${
             feedback.type === 'success'
               ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
               : 'bg-rose-50 text-rose-900 border-rose-300'
@@ -910,7 +912,7 @@ function MerchantStoreAdminContent() {
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-sm font-bold opacity-60 hover:opacity-100 ml-4 cursor-pointer"
+            className="text-base font-bold opacity-60 hover:opacity-100 ml-4 cursor-pointer"
           >
             &times;
           </button>
@@ -918,35 +920,34 @@ function MerchantStoreAdminContent() {
       )}
 
       {/* ========================================================================= */}
-      {/* SELETOR RETRÁTIL DE ETAPAS DE GESTÃO NO MOBILE                            */}
+      {/* SELETOR RETRÁTIL DE ETAPAS NO MOBILE                                      */}
       {/* ========================================================================= */}
-      <div className="lg:hidden mb-6 bg-white border border-neutral-200/90 rounded-[4px] shadow-2xs overflow-hidden">
-        {/* Cabeçalho do Seletor: Mostra a Etapa Ativa e Alterna Abertura */}
+      <div className="lg:hidden mb-6 bg-white border border-neutral-200 rounded-md shadow-2xs overflow-hidden">
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          className="w-full p-3.5 flex items-center justify-between text-left bg-white hover:bg-neutral-50/80 transition-colors cursor-pointer"
+          className="w-full p-4 flex items-center justify-between text-left bg-white hover:bg-neutral-50 transition-colors cursor-pointer"
           aria-expanded={isMobileMenuOpen}
         >
           <div className="flex items-center gap-3 min-w-0">
-            <span className="w-7 h-7 rounded-[3px] bg-neutral-900 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">
+            <span className="w-8 h-8 rounded-md bg-neutral-900 text-white font-mono text-sm font-bold flex items-center justify-center shrink-0">
               {activeTopic.numero}
             </span>
             <div className="min-w-0">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 block">
-                Etapa {activeTopic.numero} de 11 • Toque para alterar
+              <span className="text-xs font-semibold text-neutral-500 block">
+                Etapa {activeTopic.numero} de {TOPICOS.length}
               </span>
-              <span className="text-sm font-bold text-neutral-900 truncate block">
+              <span className="text-base font-bold text-neutral-900 truncate block">
                 {activeTopic.titulo}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 ml-2">
-            <span className="text-[11px] font-semibold text-neutral-500 hidden sm:inline">
-              {isMobileMenuOpen ? 'Recolher' : 'Trocar etapa'}
+            <span className="text-xs font-semibold text-neutral-500 hidden sm:inline">
+              {isMobileMenuOpen ? 'Fechar' : 'Alterar'}
             </span>
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-180 bg-neutral-100 text-neutral-900' : 'bg-neutral-50 text-neutral-600'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-180 bg-neutral-100 text-neutral-900' : 'bg-neutral-50 text-neutral-600'}`}>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -954,70 +955,51 @@ function MerchantStoreAdminContent() {
           </div>
         </button>
 
-        {/* Resumo compacto de produtos quando recolhido */}
         {!isMobileMenuOpen && (
-          <div className="px-3.5 py-2 bg-neutral-50/70 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600">
+          <div className="px-4 py-2.5 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-700">
             <span>
-              <strong>Plano {currentPlanConfig.name}:</strong> {productsCount}/{currentPlanConfig.maxActiveProducts} produtos
+              <strong>Plano {currentPlanConfig.name}:</strong> {productsCount}/{currentPlanConfig.maxActiveProducts} {currentPlanConfig.itemLabel}
             </span>
             <button
               type="button"
               onClick={() => setIsPlansModalOpen(true)}
-              className="text-[#FB6600] font-semibold hover:underline cursor-pointer"
+              className="text-[#FB6600] font-bold hover:underline cursor-pointer"
             >
-              Planos
+              Ver Planos
             </button>
           </div>
         )}
 
-        {/* Lista dos 11 Itens: ao clicar recolhe o restante, mostrando abaixo as caixas */}
         {isMobileMenuOpen && (
-          <div className="border-t border-neutral-200/80 bg-neutral-50/40 p-2 space-y-1 animate-in fade-in slide-in-from-top-1 duration-150">
-            <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400 flex items-center justify-between">
-              <span>Etapas de Gestão</span>
-              <span className="font-mono text-neutral-500">{completedStepsCount}/11 concluídas</span>
-            </div>
-
-            <div className="divide-y divide-neutral-100 bg-white rounded-[3px] border border-neutral-200/60 overflow-hidden">
+          <div className="border-t border-neutral-200 bg-neutral-50/50 p-2.5 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="divide-y divide-neutral-100 bg-white rounded-md border border-neutral-200 overflow-hidden">
               {TOPICOS.map((topico) => {
                 const isActive = currentTopic === topico.id
-                const isRestrictedTopic = (topico.id === 3 && isBronze) || (topico.id === 4 && !isBronze)
                 return (
                   <button
                     key={topico.id}
                     type="button"
                     onClick={() => {
                       setCurrentTopic(topico.id)
-                      setIsMobileMenuOpen(false) // Recolhe o restante e mostra as caixas abaixo!
+                      setIsMobileMenuOpen(false)
                     }}
-                    className={`w-full p-3 flex items-center justify-between text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full p-3.5 flex items-center justify-between text-left transition-colors cursor-pointer text-sm ${
                       isActive
-                        ? 'bg-neutral-100/90 text-neutral-900 font-bold border-l-3 border-neutral-900'
-                        : isRestrictedTopic
-                        ? 'text-neutral-400 hover:bg-neutral-50 font-normal'
-                        : 'text-neutral-700 hover:bg-neutral-50 font-medium'
+                        ? 'bg-orange-50/70 text-[#FB6600] font-bold border-l-[3px] border-[#FB6600]'
+                        : 'text-neutral-800 hover:bg-neutral-50 font-medium'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className={`font-mono text-xs shrink-0 ${isActive ? 'text-neutral-900 font-bold' : 'text-neutral-400'}`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={`font-mono text-xs shrink-0 ${isActive ? 'text-[#FB6600] font-bold' : 'text-neutral-400'}`}>
                         {topico.numero}
                       </span>
-                      <div className="min-w-0">
-                        <span className={`block truncate ${topico.id === 6 ? 'font-black text-black' : ''}`}>
-                          {topico.id === 6 ? <strong>{topico.titulo}</strong> : topico.titulo} {isRestrictedTopic ? '🔒' : ''}
-                        </span>
-                        <span className="text-[10px] text-neutral-400 block truncate font-normal">
-                          {isRestrictedTopic ? 'Restrito — não pertence ao seu pacote' : topico.subtitulo}
-                        </span>
-                      </div>
+                      <span className="block truncate">{topico.titulo}</span>
                     </div>
 
                     {isActive ? (
-                      <span className="text-xs text-neutral-900 font-bold shrink-0 ml-2">✓ Ativo</span>
-                    ) : isRestrictedTopic ? (
-                      <span className="text-[10px] text-neutral-400 shrink-0 ml-2">🔒</span>
+                      <span className="text-xs text-[#FB6600] font-bold shrink-0 ml-2">✓</span>
                     ) : (
-                      <span className="text-xs text-neutral-400 shrink-0 ml-2">›</span>
+                      <span className="text-sm text-neutral-400 shrink-0 ml-2">›</span>
                     )}
                   </button>
                 )
@@ -1028,16 +1010,16 @@ function MerchantStoreAdminContent() {
       </div>
 
       {/* Estrutura Principal: Menu Lateral Esquerdo + Área de Conteúdo */}
-      <div className="flex flex-col lg:flex-row items-start gap-8">
+      <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-8">
         
         {/* ========================================================================= */}
-        {/* MENU LATERAL ESQUERDO COM AS 11 ETAPAS (DESKTOP)                          */}
+        {/* MENU LATERAL ESQUERDO COM AS 12 ETAPAS (DESKTOP)                          */}
         {/* ========================================================================= */}
-        <aside className="hidden lg:block w-[280px] shrink-0 bg-white border border-neutral-200/80 rounded-[4px] overflow-hidden sticky top-20 shadow-xs">
+        <aside className="hidden lg:block w-[290px] shrink-0 bg-white border border-neutral-200 rounded-md overflow-hidden sticky top-20 shadow-xs">
           
           {/* Identificação da Loja */}
           <div className="p-4 border-b border-neutral-100 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-neutral-100 text-neutral-800 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden border border-neutral-200">
+            <div className="w-11 h-11 rounded-full bg-neutral-100 text-neutral-800 flex items-center justify-center font-bold text-base shrink-0 overflow-hidden border border-neutral-200">
               {logoPreview || currentLogoUrl ? (
                 <img src={logoPreview || currentLogoUrl!} alt={name} className="w-full h-full object-cover" />
               ) : (
@@ -1045,35 +1027,35 @@ function MerchantStoreAdminContent() {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-xs font-semibold text-neutral-900 truncate">
+              <h3 className="text-sm font-bold text-neutral-900 truncate">
                 {name || 'Minha Loja'}
               </h3>
-              <p className="text-[11px] text-neutral-400 truncate mt-0.5">
+              <p className="text-xs text-neutral-500 truncate mt-0.5">
                 {city ? `${city}${state ? ` • ${state}` : ''}` : 'Kittanda Outlet'}
               </p>
             </div>
           </div>
 
-          {/* Resumo Compacto do Plano e Limite de Produtos (Requisito Seção 4) */}
-          <div className="p-4 bg-neutral-50/60 border-b border-neutral-100">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-neutral-800">
+          {/* Resumo Compacto do Plano e Limite */}
+          <div className="p-4 bg-neutral-50/70 border-b border-neutral-100">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-bold text-neutral-900">
                 Plano {currentPlanConfig.name}
               </span>
               <button
                 type="button"
                 onClick={() => setIsPlansModalOpen(true)}
-                className="text-[11px] text-neutral-500 hover:text-neutral-900 underline cursor-pointer"
+                className="text-xs font-semibold text-[#FB6600] hover:underline cursor-pointer"
               >
                 Planos
               </button>
             </div>
-            <div className="text-[11px] text-neutral-500 mt-1">
-              {productsCount} de {currentPlanConfig.maxActiveProducts} produtos utilizados
+            <div className="text-xs text-neutral-600 mt-1">
+              {productsCount} de {currentPlanConfig.maxActiveProducts} {currentPlanConfig.itemLabel}
             </div>
-            <div className="w-full bg-neutral-200/80 h-1.5 rounded-full overflow-hidden mt-2">
+            <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden mt-2">
               <div
-                className="bg-neutral-800 h-full rounded-full transition-all duration-300"
+                className="bg-[#FB6600] h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${Math.min(
                     100,
@@ -1084,47 +1066,29 @@ function MerchantStoreAdminContent() {
             </div>
           </div>
 
-          {/* Progresso Compacto das Etapas */}
-          <div className="px-4 py-2 bg-white border-b border-neutral-100 flex items-center justify-between text-[11px] text-neutral-500">
-            <span className="font-medium text-neutral-600">Etapas de Gestão</span>
-            <span className="font-mono text-neutral-400">
-              {completedStepsCount}/11 concluídas
-            </span>
-          </div>
-
-          {/* Navegação Vertical das 11 Etapas */}
+          {/* Navegação Vertical das 12 Etapas */}
           <nav className="p-2 flex flex-col gap-0.5">
             {TOPICOS.map((topico) => {
               const isActive = currentTopic === topico.id
-              const isRestrictedTopic = (topico.id === 3 && isBronze) || (topico.id === 4 && !isBronze)
               return (
                 <button
                   key={topico.id}
                   type="button"
                   onClick={() => setCurrentTopic(topico.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[3px] text-left transition-colors cursor-pointer text-xs ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[4px] text-left transition-colors cursor-pointer text-[13.5px] ${
                     isActive
-                      ? 'bg-neutral-100/90 text-neutral-900 font-semibold border-l-2 border-neutral-900'
-                      : isRestrictedTopic
-                      ? 'text-neutral-400 hover:bg-neutral-50 font-normal'
-                      : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 font-normal'
+                      ? 'bg-orange-50/80 text-[#FB6600] font-bold border-l-[3px] border-[#FB6600]'
+                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
                   }`}
                 >
                   <span
-                    className={`font-mono text-[11px] shrink-0 ${
-                      isActive || topico.id === 6 ? 'text-neutral-900 font-black' : 'text-neutral-400'
+                    className={`font-mono text-xs shrink-0 ${
+                      isActive ? 'text-[#FB6600] font-bold' : 'text-neutral-400'
                     }`}
                   >
                     {topico.numero}
                   </span>
-                  <span className={`truncate flex-1 ${topico.id === 6 ? 'font-black text-neutral-950' : ''}`}>
-                    {topico.id === 6 ? <strong>{topico.titulo}</strong> : topico.titulo}
-                  </span>
-                  {isRestrictedTopic && (
-                    <span className="text-[10px] shrink-0" title="Restrito ao pacote">
-                      🔒
-                    </span>
-                  )}
+                  <span className="truncate flex-1">{topico.titulo}</span>
                 </button>
               )
             })}
@@ -1141,29 +1105,24 @@ function MerchantStoreAdminContent() {
             {/* TÓPICO 01: DADOS DA LOJA (IDENTIFICAÇÃO + ENDEREÇO COMERCIAL)      */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 1 && (
-              <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
-                <div className="border-b border-neutral-100 pb-4 mb-6 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Tópico 01
-                    </span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
-                      Dados da loja
-                    </h2>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Identificação da loja, responsável legal e endereço comercial.
-                    </p>
-                  </div>
+              <section className="bg-white border border-neutral-200 p-5 sm:p-8 rounded-md shadow-xs animate-in fade-in duration-200">
+                <div className="border-b border-neutral-200 pb-4 mb-6">
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
+                    Tópico 01
+                  </span>
+                  <h2 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-900">
+                    Dados da Loja
+                  </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                   {/* Logotipo da Loja */}
-                  <div className="flex flex-col items-center sm:items-start text-center sm:text-left border-b md:border-b-0 md:border-r border-neutral-100 pb-6 md:pb-0 md:pr-6">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-neutral-700 mb-2 block">
-                      Logotipo / Imagem de Perfil
+                  <div className="lg:col-span-4 bg-neutral-50/80 border border-neutral-200 rounded-md p-5 flex flex-col items-center text-center">
+                    <label className="text-xs sm:text-[13px] font-bold text-neutral-800 mb-3 block">
+                      Logotipo
                     </label>
 
-                    <div className="relative w-34 h-34 rounded-full overflow-hidden flex items-center justify-center shrink-0 mb-3 bg-neutral-100">
+                    <div className="relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center shrink-0 mb-4 bg-white border border-neutral-200 shadow-2xs">
                       {logoPreview ? (
                         <img
                           src={logoPreview}
@@ -1192,11 +1151,11 @@ function MerchantStoreAdminContent() {
                       id="logo-file-input"
                     />
 
-                    <div className="flex flex-col gap-1.5 w-full">
+                    <div className="flex flex-col gap-2 w-full">
                       <button
                         type="button"
                         onClick={() => logoInputRef.current?.click()}
-                        className="px-3 py-2 bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px]"
+                        className="w-full h-10 px-4 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md"
                       >
                         {logoFile || currentLogoUrl ? 'Substituir Logotipo' : 'Carregar Logotipo'}
                       </button>
@@ -1205,10 +1164,10 @@ function MerchantStoreAdminContent() {
                         <button
                           type="button"
                           onClick={handleOpenLogoAdjust}
-                          className="px-3 py-1.5 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-[10.5px] font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px] flex items-center justify-center gap-1.5 bg-neutral-50 shadow-2xs"
-                          title="Dar zoom na imagem e fazer caber perfeitamente no círculo"
+                          className="w-full h-10 px-4 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md flex items-center justify-center gap-1.5 bg-white"
+                          title="Ajustar enquadramento circular"
                         >
-                          <span>🔍 Ajustar Zoom no Círculo</span>
+                          <span>Ajustar Zoom</span>
                         </button>
                       )}
 
@@ -1216,23 +1175,23 @@ function MerchantStoreAdminContent() {
                         <button
                           type="button"
                           onClick={cancelLogoSelection}
-                          className="px-3 py-1 text-[10.5px] text-rose-600 hover:text-rose-800 font-semibold cursor-pointer"
+                          className="py-1 text-xs text-rose-600 hover:text-rose-800 font-semibold cursor-pointer"
                         >
                           Cancelar seleção
                         </button>
                       )}
 
-                      <span className="text-[10px] text-neutral-400 mt-1 leading-tight">
-                        Formatos: JPEG, PNG, WebP (até 5MB).
+                      <span className="text-xs text-neutral-500 mt-1">
+                        JPEG, PNG ou WebP até 5 MB
                       </span>
                     </div>
                   </div>
 
                   {/* Campos Cadastrais */}
-                  <div className="md:col-span-2 space-y-4">
+                  <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700 mb-1">
-                        Nome Comercial da Loja *
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Nome da Loja *
                       </label>
                       <input
                         type="text"
@@ -1243,13 +1202,13 @@ function MerchantStoreAdminContent() {
                           setIsDirty(true)
                         }}
                         placeholder="Ex.: Elegance Moda & Outlet"
-                        className="w-full border border-neutral-300 px-3.5 py-2 text-sm text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700 mb-1">
-                        Nome do Responsável Legal *
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Responsável Legal *
                       </label>
                       <input
                         type="text"
@@ -1260,191 +1219,174 @@ function MerchantStoreAdminContent() {
                           setIsDirty(true)
                         }}
                         placeholder="Ex.: Carlos Eduardo Santos"
-                        className="w-full border border-neutral-300 px-3.5 py-2 text-sm text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700 mb-1">
-                          WhatsApp da Loja *
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={phone}
-                          onChange={(e) => {
-                            setPhone(formatPhone(e.target.value))
-                            setIsDirty(true)
-                          }}
-                          placeholder="(67) 99876-5432"
-                          className="w-full border border-neutral-300 px-3.5 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                        <span className="text-[10px] text-neutral-400 mt-0.5 block">
-                          Clientes chamarão diretamente neste número.
-                        </span>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700 mb-1">
-                          CNPJ
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={18}
-                          value={cnpjCpf}
-                          onChange={(e) => {
-                            setCnpjCpf(formatCnpj(e.target.value))
-                            setIsDirty(true)
-                          }}
-                          placeholder="00.000.000/0001-00"
-                          className="w-full border border-neutral-300 px-3.5 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        WhatsApp *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => {
+                          setPhone(formatPhone(e.target.value))
+                          setIsDirty(true)
+                        }}
+                        placeholder="(67) 99876-5432"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
                     </div>
 
                     <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
-                          Descrição Comercial da Loja
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        CNPJ
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={18}
+                        value={cnpjCpf}
+                        onChange={(e) => {
+                          setCnpjCpf(formatCnpj(e.target.value))
+                          setIsDirty(true)
+                        }}
+                        placeholder="00.000.000/0001-00"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
+                          Descrição da Loja
                         </label>
-                        <span className={`text-[10.5px] font-medium ${
-                          description.length > 500 ? 'text-rose-600 font-bold' : 'text-neutral-400'
+                        <span className={`text-xs font-medium ${
+                          description.length > 500 ? 'text-rose-600 font-bold' : 'text-neutral-500'
                         }`}>
-                          {description.length}/500 caracteres
+                          {description.length}/500
                         </span>
                       </div>
                       <textarea
-                        rows={3}
+                        rows={4}
                         maxLength={500}
                         value={description}
                         onChange={(e) => {
                           setDescription(e.target.value)
                           setIsDirty(true)
                         }}
-                        placeholder="Apresente sua loja aos consumidores da região, principais marcas, especialidades e diferenciais..."
-                        className="w-full border border-neutral-300 px-3.5 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
+                        placeholder="Principais marcas, especialidades e diferenciais da sua loja..."
+                        className="w-full border border-neutral-300 px-3.5 py-2.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors leading-relaxed"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Divisória e Seção de Endereço Comercial integrada no Tópico 01 */}
+                {/* Endereço Comercial alinhado em grid de 12 colunas */}
                 <div className="border-t border-neutral-200 mt-8 pt-6">
-                  <div className="mb-4">
-                    <h3 className="text-sm font-black uppercase tracking-tight text-neutral-900">
-                      Endereço Comercial & Localização Física
-                    </h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Endereço para os consumidores encontrarem seu estabelecimento e calcularem proximidade.
-                    </p>
-                  </div>
+                  <h3 className="font-heading text-base sm:text-lg font-extrabold text-neutral-900 mb-4">
+                    Endereço Comercial
+                  </h3>
 
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          CEP {loadingCep && <span className="text-xs text-[#FB6600] animate-pulse">Buscando...</span>}
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={9}
-                          value={cep}
-                          onChange={handleCepChange}
-                          placeholder="79000-000"
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                        <span className="text-[10px] text-neutral-400 mt-0.5 block">
-                          Auto-preenchimento ViaCEP
-                        </span>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          Logradouro / Rua / Avenida
-                        </label>
-                        <input
-                          type="text"
-                          value={street}
-                          onChange={(e) => {
-                            setStreet(e.target.value)
-                            setIsDirty(true)
-                          }}
-                          placeholder="Ex.: Rua 14 de Julho"
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-12 gap-4">
+                    <div className="sm:col-span-3">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        CEP {loadingCep && <span className="text-xs text-[#FB6600] animate-pulse">...</span>}
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={9}
+                        value={cep}
+                        onChange={handleCepChange}
+                        placeholder="79000-000"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          Número
-                        </label>
-                        <input
-                          type="text"
-                          value={number}
-                          onChange={(e) => {
-                            setNumber(e.target.value)
-                            setIsDirty(true)
-                          }}
-                          placeholder="1234 ou S/N"
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                      </div>
+                    <div className="sm:col-span-7">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Rua / Avenida
+                      </label>
+                      <input
+                        type="text"
+                        value={street}
+                        onChange={(e) => {
+                          setStreet(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="Ex.: Av. Afonso Pena"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          Bairro
-                        </label>
-                        <input
-                          type="text"
-                          value={neighborhood}
-                          onChange={(e) => {
-                            setNeighborhood(e.target.value)
-                            setIsDirty(true)
-                          }}
-                          placeholder="Centro"
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                      </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Número
+                      </label>
+                      <input
+                        type="text"
+                        value={number}
+                        onChange={(e) => {
+                          setNumber(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="1234"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          Cidade / Município
-                        </label>
-                        <input
-                          type="text"
-                          value={city}
-                          onChange={(e) => {
-                            setCity(e.target.value)
-                            setIsDirty(true)
-                          }}
-                          placeholder="Campo Grande"
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px]"
-                        />
-                      </div>
+                    <div className="sm:col-span-4">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Bairro
+                      </label>
+                      <input
+                        type="text"
+                        value={neighborhood}
+                        onChange={(e) => {
+                          setNeighborhood(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="Centro"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-[11px] font-semibold uppercase text-neutral-700 mb-1">
-                          Estado (UF)
-                        </label>
-                        <select
-                          value={state}
-                          onChange={(e) => {
-                            setState(e.target.value)
-                            setIsDirty(true)
-                          }}
-                          className="w-full border border-neutral-300 px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-black rounded-[2px] bg-white font-semibold"
-                        >
-                          <option value="">Selecione o Estado</option>
-                          {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map((uf) => (
-                            <option key={uf} value={uf}>
-                              {uf}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                    <div className="sm:col-span-5">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Cidade
+                      </label>
+                      <input
+                        type="text"
+                        value={city}
+                        onChange={(e) => {
+                          setCity(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="Campo Grande"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-3">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Estado (UF)
+                      </label>
+                      <select
+                        value={state}
+                        onChange={(e) => {
+                          setState(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        className="w-full h-11 border border-neutral-300 px-3 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md font-semibold transition-colors"
+                      >
+                        <option value="">UF</option>
+                        {['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'].map((uf) => (
+                          <option key={uf} value={uf}>
+                            {uf}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -1455,25 +1397,22 @@ function MerchantStoreAdminContent() {
             {/* TÓPICO 02: CATEGORIAS E SEGMENTOS                                  */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 2 && (
-              <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
-                <div className="border-b border-neutral-100 pb-4 mb-6">
-                  <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
+              <section className="bg-white border border-neutral-200 p-5 sm:p-8 rounded-md shadow-xs animate-in fade-in duration-200">
+                <div className="border-b border-neutral-200 pb-4 mb-6">
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
                     Tópico 02
                   </span>
-                  <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
-                    Segmento Comercial & Subcategorias
+                  <h2 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-900">
+                    Categoria &amp; Subcategorias
                   </h2>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Selecione o nicho principal da sua loja e marque as subcategorias que definem os produtos vendidos.
-                  </p>
                 </div>
 
                 {/* Seleção da Categoria Principal */}
-                <div className="mb-6">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800 mb-2">
-                    Categoria Principal da Loja *
+                <div className="mb-7">
+                  <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-3">
+                    Categoria Principal *
                   </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {CATEGORIAS.map((cat) => {
                       const isCatSelected = category === cat.id
                       return (
@@ -1481,14 +1420,14 @@ function MerchantStoreAdminContent() {
                           key={cat.id}
                           type="button"
                           onClick={() => handleCategoryChange(cat.id)}
-                          className={`p-3.5 border rounded-[2px] text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                          className={`min-h-[52px] px-4 py-3 border rounded-md text-left transition-all cursor-pointer flex items-center gap-3 ${
                             isCatSelected
                               ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
                               : 'bg-white text-neutral-800 border-neutral-200 hover:border-neutral-400'
                           }`}
                         >
-                          <span className="text-lg">{cat.icon}</span>
-                          <span className="text-xs font-bold uppercase tracking-wider">
+                          <span className="text-xl shrink-0">{cat.icon}</span>
+                          <span className="text-sm font-bold">
                             {cat.label}
                           </span>
                         </button>
@@ -1498,10 +1437,10 @@ function MerchantStoreAdminContent() {
                 </div>
 
                 {/* Seleção das Subcategorias */}
-                <div className="pt-4 border-t border-neutral-100">
-                  <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-neutral-800">
-                      Subcategorias e Especialidades Atendidas
+                <div className="pt-6 border-t border-neutral-200">
+                  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                    <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
+                      Subcategorias
                     </label>
                     {subcategories.length > 0 && (
                       <button
@@ -1510,18 +1449,14 @@ function MerchantStoreAdminContent() {
                           setSubcategories([])
                           setIsDirty(true)
                         }}
-                        className="text-[11px] text-neutral-500 hover:text-rose-600 font-semibold underline cursor-pointer"
-                        title="Desmarcar todas as subcategorias selecionadas"
+                        className="text-xs text-neutral-500 hover:text-rose-600 font-semibold underline cursor-pointer"
                       >
-                        Limpar informações
+                        Limpar seleção
                       </button>
                     )}
                   </div>
-                  <p className="text-[11px] text-neutral-500 mb-3">
-                    Clique nas subcategorias para selecionar ou desmarcar. O destaque laranja indica que a loja será filtrada por este termo.
-                  </p>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2.5">
                     {(SUBCATEGORIAS_POR_CATEGORIA[category] || []).map((sub) => {
                       const isSelected = subcategories.includes(sub)
                       return (
@@ -1529,10 +1464,10 @@ function MerchantStoreAdminContent() {
                           key={sub}
                           type="button"
                           onClick={() => toggleSubcategory(sub)}
-                          className={`text-xs px-3.5 py-1.5 rounded-[2px] font-bold uppercase tracking-wider transition-all cursor-pointer border ${
+                          className={`text-xs sm:text-sm px-4 py-2 rounded-md font-semibold transition-all cursor-pointer border ${
                             isSelected
                               ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
-                              : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300'
+                              : 'bg-neutral-50 text-neutral-800 border-neutral-200 hover:bg-neutral-100 hover:border-neutral-300'
                           }`}
                         >
                           {isSelected ? `✓ ${sub}` : `+ ${sub}`}
@@ -1545,21 +1480,21 @@ function MerchantStoreAdminContent() {
                     subcategories.some((s) =>
                       ['usados', 'concessionária', 'concessionaria'].includes(s.toLowerCase().trim())
                     ) && (
-                      <div className="mt-4 p-4 bg-orange-50/80 border border-[#FB6600]/40 rounded-[2px] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="text-xs text-neutral-800 space-y-0.5">
-                          <strong className="font-black text-[#FB6600] uppercase tracking-wider block">
-                            🚗 Cadastro Especial de Veículos (Carro / Usados e Concessionária) Ativado
+                      <div className="mt-6 p-4 bg-orange-50/80 border border-[#FB6600]/40 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="space-y-1">
+                          <strong className="text-sm font-bold text-[#FB6600] block">
+                            🚗 Ficha Especial de Veículos Ativada
                           </strong>
-                          <p className="text-[11px] text-neutral-600">
-                            No <strong>Tópico 06 (Catálogo de Produtos)</strong>, sua loja possui o formulário exclusivo para veículos (Marca, Modelo, Versão, Ano, KM, Câmbio, Tração, Placa Interna, até 12 fotos, Preço de Custo Interno, Preço de Venda e Preço FIPE Interno).
+                          <p className="text-xs sm:text-sm text-neutral-700">
+                            Formulário exclusivo para veículos disponível no Tópico 06 (Catálogo de Produtos).
                           </p>
                         </div>
                         <button
                           type="button"
                           onClick={() => setCurrentTopic(6)}
-                          className="px-3.5 py-2 bg-neutral-900 hover:bg-black text-white text-[11px] font-bold uppercase tracking-wider rounded-[2px] shrink-0 cursor-pointer transition-colors"
+                          className="h-10 px-4 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md shrink-0 cursor-pointer transition-colors"
                         >
-                          Ir para Catálogo (06) &rarr;
+                          Abrir Catálogo &rarr;
                         </button>
                       </div>
                     )}
@@ -1568,33 +1503,31 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 03: DISPOSITIVO BANNER TRIPLO DA LOJA (TODOS OS PLANOS)      */}
+            {/* TÓPICO 03: BANNER TRIPLO DA LOJA                                    */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 3 && (
-              <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
-                <div className="border-b border-neutral-100 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
+              <section className="bg-white border border-neutral-200 p-5 sm:p-8 rounded-md shadow-xs animate-in fade-in duration-200">
+                <div className="border-b border-neutral-200 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Tópico 03 • Banner Triplo da Loja (Liberado em Todos os Planos)
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
+                      Tópico 03
                     </span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
-                      Dispositivo Banner Triplo Grande (940 × 370 px)
+                    <h2 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-900">
+                      Banner Triplo (940 × 370 px)
                     </h2>
-                    <p className="text-xs text-neutral-500 mt-0.5">
+                    <p className="text-xs sm:text-sm text-neutral-600 mt-1">
                       {currentPlanConfig.feedBannerType === 'triple'
-                        ? 'Banner Triplo exibido no topo da página da sua loja e também em 3 colunas no filtro Lojas (Plano Ouro).'
-                        : currentPlanConfig.feedBannerType === 'double'
-                        ? `Banner Triplo exibido dentro da página da sua loja. No filtro Lojas aparecerá o seu Banner Duplo (Tópico 04).`
-                        : 'Banner Triplo exibido dentro da página da sua loja (Plano Bronze Gratuito). Não aparece no filtro Lojas (onde aparece o seu Banner Single do Tópico 04).'}
+                        ? 'Exibido no topo da página da loja e na vitrine principal.'
+                        : 'Exibido no topo interno da página da sua loja.'}
                     </p>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px] bg-black text-[#FB6600]">
-                    Pacote Atual: Plano {currentPlanConfig.name}
+                  <span className="text-xs font-bold px-3 py-1.5 rounded-md bg-neutral-900 text-[#FB6600]">
+                    Plano {currentPlanConfig.name}
                   </span>
                 </div>
 
                 {/* Prévia do Banner Triplo da Loja */}
-                <div className="relative w-full aspect-[21/9] sm:aspect-[21/7] max-h-[340px] bg-neutral-900 border border-neutral-300 rounded-[2px] overflow-hidden flex items-center justify-center mb-4 shadow-inner">
+                <div className="relative w-full aspect-[21/9] sm:aspect-[21/7] max-h-[340px] bg-neutral-900 border border-neutral-300 rounded-md overflow-hidden flex items-center justify-center mb-5 shadow-inner">
                   {largeBannerPreview ? (
                     <img
                       src={largeBannerPreview}
@@ -1610,25 +1543,11 @@ function MerchantStoreAdminContent() {
                   ) : (
                     <div className="text-center p-6 text-neutral-400">
                       <span className="text-4xl block mb-2">🖼️</span>
-                      <span className="text-xs font-bold uppercase tracking-wider block text-white">
-                        {name || 'Nome da Loja'} — Banner Triplo da Loja
-                      </span>
-                      <span className="text-[11px] text-neutral-400">
-                        Dimensão recomendada: 940 × 370 px (Capa interna da loja{currentPlanConfig.feedBannerType === 'triple' ? ' + 3 Colunas no Filtro Lojas' : ''})
+                      <span className="text-sm font-bold block text-white">
+                        {name || 'Sua Loja'} — 940 × 370 px
                       </span>
                     </div>
                   )}
-
-                  {/* Badges de sobreposição no banner */}
-                  <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-xs text-white text-[9.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-[2px]">
-                    {currentPlanConfig.feedBannerType === 'triple'
-                      ? 'Banner Triplo • Loja + Filtro Lojas (3 Colunas)'
-                      : 'Banner Triplo • Exclusivo Dentro da Sua Loja'}
-                  </div>
-
-                  <div className="absolute top-3 right-3 bg-[#FB6600] text-white text-[9.5px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-[2px]">
-                    Plano {currentPlanConfig.name}
-                  </div>
                 </div>
 
                 <input
@@ -1643,21 +1562,19 @@ function MerchantStoreAdminContent() {
                   <button
                     type="button"
                     onClick={() => largeBannerInputRef.current?.click()}
-                    className="px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px]"
+                    className="h-11 px-5 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md"
                   >
-                    {largeBannerFile
-                      ? 'Substituir Banner Triplo (940 × 370 px)'
-                      : 'Enviar Banner Triplo (940 × 370 px)'}
+                    {largeBannerFile || currentLargeBannerUrl ? 'Substituir Banner Triplo' : 'Enviar Banner Triplo'}
                   </button>
 
                   {(largeBannerPreview || currentLargeBannerUrl) && (
                     <button
                       type="button"
                       onClick={handleOpenLargeBannerAdjust}
-                      className="px-4 py-2.5 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px] flex items-center gap-1.5 bg-neutral-50 shadow-2xs"
-                      title="Mover para cima, baixo, esquerda, direita e dar zoom"
+                      className="h-11 px-4 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md flex items-center gap-2 bg-white"
+                      title="Ajustar zoom e posição"
                     >
-                      <span>🔍 Ajustar Zoom & Posição</span>
+                      <span>Ajustar Enquadramento</span>
                     </button>
                   )}
 
@@ -1665,120 +1582,96 @@ function MerchantStoreAdminContent() {
                     <button
                       type="button"
                       onClick={cancelLargeBannerSelection}
-                      className="px-4 py-2 text-xs text-rose-600 hover:text-rose-800 font-bold uppercase tracking-wider cursor-pointer"
+                      className="px-3 py-2 text-xs sm:text-sm text-rose-600 hover:text-rose-800 font-semibold cursor-pointer"
                     >
-                      Cancelar Seleção
+                      Cancelar seleção
                     </button>
                   )}
                 </div>
 
-                <div className="mt-4 p-3 bg-neutral-50 rounded-[2px] border border-neutral-200 text-[11px] text-neutral-600 space-y-1">
-                  <p>
-                    • <strong>Onde este Banner Triplo aparece:</strong>{' '}
-                    {currentPlanConfig.feedBannerType === 'triple' ? (
-                      <span>No topo interno da página da sua loja <strong>e também em destaque de 3 colunas no filtro Lojas</strong> (benefício exclusivo do Plano Ouro).</span>
-                    ) : currentPlanConfig.feedBannerType === 'double' ? (
-                      <span>No topo interno da página da sua loja. <strong>No filtro Lojas aparece apenas o seu Banner Duplo</strong> (configure no Tópico 04).</span>
-                    ) : (
-                      <span>No topo interno da página da sua loja (inclusive no Plano Bronze Gratuito). <strong>Este banner grande não aparece no filtro Lojas</strong> — no filtro Lojas aparece o seu Banner Single (Tópico 04).</span>
-                    )}
-                  </p>
-                  <p>• Formatos aceitos: <strong>JPEG, PNG ou WebP</strong> com peso máximo de até <strong>5 MB</strong>.</p>
-                </div>
+                <p className="mt-4 text-xs text-neutral-500">
+                  Formatos aceitos: JPEG, PNG ou WebP (até 5 MB).
+                </p>
               </section>
             )}
 
             {/* ------------------------------------------------------------------- */}
-            {/* TÓPICO 04: DISPOSITIVO BANNER DO FILTRO LOJAS (SINGLE OU DUPLO)     */}
+            {/* TÓPICO 04: BANNER DO FILTRO LOJAS (SINGLE OU DUPLO)                 */}
             {/* ------------------------------------------------------------------- */}
             {currentTopic === 4 && (
-              <section className="bg-white border border-neutral-200 p-6 sm:p-8 rounded-[2px] shadow-sm animate-in fade-in duration-200">
-                <div className="border-b border-neutral-100 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
+              <section className="bg-white border border-neutral-200 p-5 sm:p-8 rounded-md shadow-xs animate-in fade-in duration-200">
+                <div className="border-b border-neutral-200 pb-4 mb-6 flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Tópico 04 • {isBronze ? 'Banner Single no Filtro Lojas (Plano Bronze)' : currentPlanConfig.feedBannerType === 'double' ? `Banner Duplo no Filtro Lojas (Plano ${currentPlanConfig.name})` : 'Plano Ouro (Usa Banner Triplo em Lojas)'}
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
+                      Tópico 04
                     </span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900">
+                    <h2 className="font-heading text-xl sm:text-2xl font-extrabold tracking-tight text-neutral-900">
                       {isBronze
-                        ? 'Dispositivo Banner Single para o Filtro Lojas (1 Coluna • 400 × 250 px)'
+                        ? 'Banner Single (400 × 250 px)'
                         : currentPlanConfig.feedBannerType === 'double'
-                        ? 'Dispositivo Banner Duplo para o Filtro Lojas (2 Colunas • 620 × 220 px)'
-                        : 'Banner do Filtro Lojas (Plano Ouro • 3 Colunas)'}
+                        ? 'Banner Duplo (620 × 220 px)'
+                        : 'Banner do Filtro Lojas'}
                     </h2>
-                    <p className="text-xs text-neutral-500 mt-0.5">
+                    <p className="text-xs sm:text-sm text-neutral-600 mt-1">
                       {isBronze
-                        ? 'Banner Single (1 coluna) exibido no filtro Lojas para o seu Plano Bronze (Gratuito).'
+                        ? 'Exibido em 1 coluna na busca de Lojas.'
                         : currentPlanConfig.feedBannerType === 'double'
-                        ? `No Plano ${currentPlanConfig.name}, você tem o Banner Triplo dentro da loja (Tópico 03) e este Banner Duplo (2 colunas) que aparece no filtro Lojas.`
-                        : 'No Plano Ouro, o seu Banner Triplo cadastrado no Tópico 03 já aparece diretamente em 3 colunas no filtro Lojas.'}
+                        ? 'Exibido em 2 colunas na busca de Lojas.'
+                        : 'No seu plano, o Banner Triplo do Tópico 03 já aparece diretamente na busca de Lojas.'}
                     </p>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[2px] bg-black text-[#FB6600]">
-                    Pacote Atual: Plano {currentPlanConfig.name}
+                  <span className="text-xs font-bold px-3 py-1.5 rounded-md bg-neutral-900 text-[#FB6600]">
+                    Plano {currentPlanConfig.name}
                   </span>
                 </div>
 
                 {currentPlanConfig.feedBannerType === 'triple' ? (
-                  <div className="border-2 border-dashed border-neutral-300 bg-neutral-50 p-8 text-center rounded-[2px]">
+                  <div className="border border-dashed border-neutral-300 bg-neutral-50 p-8 text-center rounded-md">
                     <span className="text-4xl block mb-3">👑</span>
-                    <h3 className="text-base font-black uppercase tracking-tight text-neutral-900 mb-2">
-                      Seu Plano Ouro Exibe o Banner Triplo Direto em Lojas
+                    <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 mb-2">
+                      Banner Triplo Ativo na Página Principal
                     </h3>
-                    <p className="text-xs text-neutral-600 max-w-lg mx-auto mb-5 leading-relaxed">
-                      Como sua loja está no <strong>Plano Ouro</strong>, o seu <strong>Banner Triplo (3 Colunas)</strong> cadastrado no <strong>Tópico 03</strong> é exibido tanto dentro da sua loja quanto em destaque máximo no filtro <strong>Lojas</strong>.
+                    <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto mb-5 leading-relaxed">
+                      O Plano {currentPlanConfig.name} utiliza o Banner Triplo do Tópico 03 diretamente no feed.
                     </p>
                     <button
                       type="button"
                       onClick={() => setCurrentTopic(3)}
-                      className="px-5 py-2.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer transition-colors"
+                      className="h-11 px-5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs sm:text-sm font-bold rounded-md cursor-pointer transition-colors"
                     >
-                      Gerenciar Meu Banner Triplo (Tópico 03)
+                      Gerenciar Banner Triplo &rarr;
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                    {/* Prévia do Card Banner (Single para Bronze / Duplo para Bronze Plus e Prata) */}
-                    <div
-                      className={`w-full ${
-                        currentPlanConfig.feedBannerType === 'double'
-                          ? 'max-w-[460px] aspect-[16/10]'
-                          : 'max-w-[340px] aspect-[16/10]'
-                      } bg-neutral-900 border border-neutral-300 rounded-[2px] overflow-hidden flex items-center justify-center relative shadow-sm`}
-                    >
-                      {smallBannerPreview ? (
-                        <img
-                          src={smallBannerPreview}
-                          alt={isBronze ? 'Banner Single' : 'Banner Duplo'}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : currentSmallBannerUrl ? (
-                        <img
-                          src={currentSmallBannerUrl}
-                          alt={name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="text-center p-4 text-neutral-400">
-                          <span className="text-3xl block mb-1">🪪</span>
-                          <span className="text-xs font-bold uppercase tracking-wider block text-white">
-                            {isBronze ? 'Banner Single (1 Coluna em Lojas)' : 'Banner Duplo (2 Colunas em Lojas)'}
-                          </span>
-                          <span className="text-[10px] text-neutral-400">
-                            {isBronze ? 'Proporção 16:10 (400 × 250 px)' : 'Exibido em 2 colunas no filtro Lojas'}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="absolute bottom-2 left-2 right-2 bg-black/80 backdrop-blur-xs p-2 rounded text-white">
-                        <span className="text-[11px] font-bold block truncate">{name || 'Nome da Loja'}</span>
-                        <span className="text-[9px] text-neutral-300 block capitalize">
-                          {isBronze ? 'Exibido em 1 coluna no filtro Lojas' : 'Exibido em 2 colunas no filtro Lojas'}
-                        </span>
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                    {/* Prévia do Card Banner */}
+                    <div className="md:col-span-6 flex items-center justify-center bg-neutral-50 border border-neutral-200 rounded-md p-4">
+                      <div className="w-full max-w-[440px] aspect-[16/10] bg-neutral-900 border border-neutral-300 rounded-md overflow-hidden flex items-center justify-center relative shadow-sm">
+                        {smallBannerPreview ? (
+                          <img
+                            src={smallBannerPreview}
+                            alt={isBronze ? 'Banner Single' : 'Banner Duplo'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : currentSmallBannerUrl ? (
+                          <img
+                            src={currentSmallBannerUrl}
+                            alt={name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="text-center p-4 text-neutral-400">
+                            <span className="text-3xl block mb-1.5">🪪</span>
+                            <span className="text-sm font-bold block text-white">
+                              {isBronze ? 'Banner Single (1 Coluna)' : 'Banner Duplo (2 Colunas)'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Controles de Upload */}
-                    <div>
+                    {/* Controles de Upload alinhados */}
+                    <div className="md:col-span-6 bg-neutral-50 border border-neutral-200 rounded-md p-5 flex flex-col justify-center gap-3">
                       <input
                         ref={smallBannerInputRef}
                         type="file"
@@ -1787,55 +1680,42 @@ function MerchantStoreAdminContent() {
                         className="hidden"
                       />
 
-                      <div className="flex flex-col gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => smallBannerInputRef.current?.click()}
+                        className="w-full h-11 px-5 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md text-center"
+                      >
+                        {smallBannerFile || currentSmallBannerUrl
+                          ? `Substituir ${isBronze ? 'Banner Single' : 'Banner Duplo'}`
+                          : isBronze
+                          ? 'Enviar Banner Single'
+                          : 'Enviar Banner Duplo'}
+                      </button>
+
+                      {(smallBannerPreview || currentSmallBannerUrl) && (
                         <button
                           type="button"
-                          onClick={() => smallBannerInputRef.current?.click()}
-                          className="w-full sm:w-auto px-5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px] text-center"
+                          onClick={handleOpenSmallBannerAdjust}
+                          className="w-full h-11 px-4 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md flex items-center justify-center gap-2 bg-white text-center"
+                          title="Ajustar zoom e enquadramento"
                         >
-                          {smallBannerFile
-                            ? `Substituir ${isBronze ? 'Banner Single' : 'Banner Duplo'}`
-                            : isBronze
-                            ? 'Enviar Banner Single (Filtro Lojas)'
-                            : 'Enviar Banner Duplo (Filtro Lojas)'}
+                          <span>Ajustar Enquadramento</span>
                         </button>
+                      )}
 
-                        {(smallBannerPreview || currentSmallBannerUrl) && (
-                          <button
-                            type="button"
-                            onClick={handleOpenSmallBannerAdjust}
-                            className="w-full sm:w-auto px-4 py-2 border border-neutral-300 hover:border-black text-neutral-800 hover:text-black text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer rounded-[2px] flex items-center justify-center gap-1.5 bg-neutral-50 shadow-2xs text-center"
-                            title="Mover para cima, baixo, esquerda, direita e dar zoom"
-                          >
-                            <span>🔍 Ajustar Zoom & Enquadramento</span>
-                          </button>
-                        )}
+                      {smallBannerFile && (
+                        <button
+                          type="button"
+                          onClick={cancelSmallBannerSelection}
+                          className="py-1 text-xs sm:text-sm text-rose-600 hover:text-rose-800 font-semibold cursor-pointer text-center"
+                        >
+                          Cancelar seleção
+                        </button>
+                      )}
 
-                        {smallBannerFile && (
-                          <button
-                            type="button"
-                            onClick={cancelSmallBannerSelection}
-                            className="px-3 py-1 text-xs text-rose-600 hover:text-rose-800 font-bold uppercase cursor-pointer text-left"
-                          >
-                            Cancelar seleção
-                          </button>
-                        )}
-
-                        <div className="p-3 bg-neutral-50 rounded-[2px] border border-neutral-200 text-[11px] text-neutral-600 space-y-1">
-                          {isBronze ? (
-                            <>
-                              <p>• <strong>Regra do Plano Bronze (Gratuito):</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 03) para o topo interno da sua loja e este <strong>Banner Single (1 coluna)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
-                              <p>• O seu Banner Triplo não aparece no filtro Lojas no Plano Bronze.</p>
-                            </>
-                          ) : (
-                            <>
-                              <p>• <strong>Regra do Plano {currentPlanConfig.name}:</strong> Você tem o <strong>Banner Triplo</strong> (Tópico 03) para o topo interno da sua loja e este <strong>Banner Duplo (2 colunas)</strong> que aparece no filtro <strong>Lojas</strong>.</p>
-                              <p>• No filtro Lojas aparece exclusivamente o seu Banner Duplo.</p>
-                            </>
-                          )}
-                          <p>• Formatos suportados: JPEG, PNG ou WebP até 5 MB.</p>
-                        </div>
-                      </div>
+                      <p className="text-xs text-neutral-500 text-center pt-1">
+                        Formatos aceitos: JPEG, PNG ou WebP até 5 MB.
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1932,37 +1812,37 @@ function MerchantStoreAdminContent() {
             {/* =================================================================== */}
             {/* BARRA DE NAVEGAÇÃO E AÇÕES                                         */}
             {/* =================================================================== */}
-            <div className="bg-white border border-neutral-200 p-4 sm:p-5 rounded-[2px] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+            <div className="bg-white border border-neutral-200 p-4 sm:p-5 rounded-md shadow-xs flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
               
               {/* Botões de Avançar / Voltar entre os 12 Tópicos */}
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+              <div className="grid grid-cols-2 sm:flex items-center gap-2.5">
                 <button
                   type="button"
                   disabled={currentTopic <= 1}
                   onClick={() => setCurrentTopic((prev) => Math.max(1, prev - 1))}
-                  className="px-3.5 py-2.5 border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors rounded-[2px] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="h-11 px-4 border border-neutral-300 hover:border-black text-xs sm:text-sm font-semibold text-neutral-800 hover:text-black transition-colors rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  &larr; Tópico Anterior
+                  &larr; Anterior
                 </button>
 
                 <button
                   type="button"
                   disabled={currentTopic >= 12}
                   onClick={() => setCurrentTopic((prev) => Math.min(12, prev + 1))}
-                  className="px-3.5 py-2.5 border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors rounded-[2px] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="h-11 px-4 border border-neutral-300 hover:border-black text-xs sm:text-sm font-semibold text-neutral-800 hover:text-black transition-colors rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  Próximo Tópico &rarr;
+                  Próximo &rarr;
                 </button>
               </div>
 
               {/* Botões de Ação Final */}
-              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsPreviewOpen(true)}
-                  className="px-4 py-2.5 border border-black hover:bg-neutral-100 text-neutral-900 text-xs font-bold uppercase tracking-wider transition-colors rounded-[2px] cursor-pointer"
+                  className="h-11 px-4 border border-neutral-300 hover:border-black hover:bg-neutral-50 text-neutral-900 text-xs sm:text-sm font-semibold transition-colors rounded-md cursor-pointer"
                 >
-                  Pré-visualizar Loja
+                  Pré-visualizar
                 </button>
 
                 {currentTopic <= 4 ? (
@@ -1970,7 +1850,7 @@ function MerchantStoreAdminContent() {
                     type="submit"
                     form="store-profile-form"
                     disabled={isSaving}
-                    className="px-6 py-2.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 rounded-[2px]"
+                    className="h-11 px-6 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 rounded-md"
                   >
                     {isSaving ? 'Salvando...' : 'Salvar Alterações'}
                   </button>
@@ -1979,9 +1859,9 @@ function MerchantStoreAdminContent() {
                     type="submit"
                     form="store-profile-form"
                     disabled={isSaving}
-                    className="px-6 py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 rounded-[2px]"
+                    className="h-11 px-6 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50 rounded-md"
                   >
-                    {isSaving ? 'Salvando...' : 'Salvar Alterações Pendentes'}
+                    {isSaving ? 'Salvando...' : 'Salvar Pendências'}
                   </button>
                 ) : null}
               </div>
