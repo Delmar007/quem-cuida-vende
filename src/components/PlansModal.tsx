@@ -149,8 +149,8 @@ export default function PlansModal({
             )}
             {plan.id === 'auto_100' && (
               <span>
-                Para <strong className="font-bold text-black">Concessionárias</strong>: máxima exposição com{' '}
-                <strong className="font-bold text-black">Banner Triplo</strong> na Home e no feed.
+                Para <strong className="font-bold text-black">Concessionárias</strong>: acesso ao{' '}
+                <strong className="font-bold text-black">Banner Triplo da página principal</strong> e no feed.
               </span>
             )}
           </div>
@@ -249,9 +249,6 @@ export default function PlansModal({
               <h2 className="font-heading text-sm sm:text-base font-bold uppercase tracking-wider text-white">
                 Escolha seu Plano • Kittanda Outlet
               </h2>
-              <p className="text-[11px] sm:text-xs text-gray-300">
-                Planos para lojas em geral e pacotes dedicados para carros e concessionárias
-              </p>
             </div>
           </div>
 

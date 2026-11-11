@@ -238,9 +238,9 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     description: 'Exposição máxima para concessionárias e grandes pátios com até 100 veículos e Banner Triplo.',
     benefits: [
       'Todos os benefícios do Plano Loja de Carros, mais:',
-      'Banner Triplo (3 colunas) dentro da loja e em linha inteira no filtro Lojas',
+      'Acesso ao Banner Triplo da página principal',
+      'Banner Triplo (3 colunas) dentro da loja, na categoria Carro e em linha inteira no filtro Lojas',
       'Cadastro e vitrine de até 100 veículos ativos com até 12 fotos cada',
-      'Banner de divulgação na página principal e na categoria Carro',
       'Ficha técnica completa + Tabela FIPE e Custo internos privados no painel',
       'Acesso à lista de aniversariantes seguidores (LGPD) e favoritos',
       'Participação em campanhas e feirões mensais da Kittanda',

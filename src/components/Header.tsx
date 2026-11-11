@@ -7,6 +7,8 @@ import AuthModal from '@/components/AuthModal'
 import PlansModal from '@/components/PlansModal'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 import { logoutAction, getSessionUserAction } from '@/app/login/actions'
+import { ALPHABET, getStreetInitialLetter, mergeAndGroupStreetsByLetter, streetsMatch } from '@/lib/streets'
+import { getCommercialStreetsByLetterAction } from '@/app/actions/streets'
 
 export default function Header() {
   const router = useRouter()
@@ -17,15 +19,25 @@ export default function Header() {
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
+  const [streetsByLetter, setStreetsByLetter] = useState<Record<string, string[]>>(() =>
+    mergeAndGroupStreetsByLetter()
+  )
   
   const searchParams = useSearchParams()
-  const hasParams = searchParams.has('tipo') || searchParams.has('cat') || searchParams.has('q') || searchParams.has('filtro')
+  const hasParams =
+    searchParams.has('tipo') ||
+    searchParams.has('cat') ||
+    searchParams.has('q') ||
+    searchParams.has('filtro') ||
+    searchParams.has('rua')
   const currentView = searchParams.get('tipo') || (hasParams ? 'lojas' : '')
   const currentCategory = searchParams.get('cat') || ''
   const currentSubcat = searchParams.get('subcat') || ''
   const rawFiltro = searchParams.get('filtro') || ''
   const currentFiltro = rawFiltro
   const currentQuery = searchParams.get('q') || ''
+  const currentRua = searchParams.get('rua') || ''
 
   const tiposPromocao: { id: string; label: string; isOrange?: boolean }[] = [
     { id: 'outlet', label: 'Outlet' },
@@ -163,12 +175,14 @@ export default function Header() {
     subcat = currentSubcat,
     filtro = currentFiltro,
     q = currentQuery,
+    rua = currentRua,
   }: {
     tipo?: string
     cat?: string
     subcat?: string
     filtro?: string
     q?: string
+    rua?: string
   }) => {
     const params = new URLSearchParams()
     if (tipo) params.set('tipo', tipo)
@@ -177,11 +191,32 @@ export default function Header() {
     if (subcat && cat && SUBCATEGORIAS_POR_CATEGORIA[cat]?.some((s) => s.toLowerCase() === subcat.toLowerCase())) {
       params.set('subcat', subcat.toLowerCase())
     }
+    if (cat === 'por_rua' && rua) {
+      params.set('rua', rua)
+    }
     if (filtro) params.set('filtro', filtro)
     if (q) params.set('q', q)
     const qs = params.toString()
     return qs ? `/?${qs}` : '/'
   }
+
+  useEffect(() => {
+    if (currentCategory !== 'por_rua') {
+      setSelectedLetter(null)
+      return
+    }
+    let active = true
+    getCommercialStreetsByLetterAction()
+      .then((grouped) => {
+        if (active && grouped) {
+          setStreetsByLetter(grouped)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [currentCategory])
 
   const [searchTerm, setSearchTerm] = useState(currentQuery)
 
@@ -230,7 +265,7 @@ export default function Header() {
     setIsAuthOpen(true)
   }
 
-  const categories = [
+  const categories: { label: string; id: string; isOrange?: boolean }[] = [
     { label: 'Moda', id: 'moda' },
     { label: 'Pet', id: 'pet' },
     { label: 'Agro', id: 'agro' },
@@ -239,6 +274,7 @@ export default function Header() {
     { label: 'Eletro', id: 'eletro' },
     { label: 'Casa', id: 'casa' },
     { label: 'Beleza', id: 'beleza' },
+    { label: 'Por Rua', id: 'por_rua', isOrange: true },
   ]
 
   return (
@@ -408,7 +444,7 @@ export default function Header() {
           <div className="hidden md:flex items-center justify-between gap-3 px-4">
             
             {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
-            <div className="flex items-center gap-5 font-heading text-[13.5px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
+            <div className="flex items-center gap-3.5 lg:gap-4 font-heading text-[13px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
               {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
               <Link
@@ -445,7 +481,8 @@ export default function Header() {
                 // Ao clicar em outra categoria, verifica compatibilidade da subcategoria
                 const targetCat = isCatActive ? '' : cat.id
                 const targetSubcat = isCatActive ? '' : currentSubcat
-                const targetUrl = buildFilterUrl({ cat: targetCat, subcat: targetSubcat })
+                const targetRua = isCatActive || cat.id !== 'por_rua' ? '' : currentRua
+                const targetUrl = buildFilterUrl({ cat: targetCat, subcat: targetSubcat, rua: targetRua })
 
                 const lineStyle = isCatActive
                   ? "after:content-[''] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2.5px] after:bg-[#FB6600] font-bold"
@@ -459,6 +496,8 @@ export default function Header() {
                     className={`py-3.5 whitespace-nowrap transition-colors duration-200 relative shrink-0 ${
                       isCatActive
                         ? 'text-[#FB6600] font-bold ' + lineStyle
+                        : cat.isOrange
+                        ? 'text-[#FB6600] font-bold hover:text-[#e05b00]'
                         : 'text-black hover:text-[#FB6600]'
                     }`}
                   >
@@ -479,7 +518,7 @@ export default function Header() {
                     : 'bg-white border-gray-300 text-gray-800 hover:border-black hover:text-black font-bold'
                 }`}
               >
-                <span>{activePromoObj ? `Promoção: ${activePromoObj.label}` : 'Tipo de Promoção'}</span>
+                <span>{activePromoObj ? activePromoObj.label : 'Tipo de Promoção'}</span>
                 <svg
                   className={`w-3.5 h-3.5 stroke-[2.2] transition-transform duration-200 ${
                     isPromoMenuOpen ? 'rotate-180' : ''
@@ -746,7 +785,8 @@ export default function Header() {
                     const isCatActive = currentCategory === cat.id
                     const targetCat = isCatActive ? '' : cat.id
                     const targetSubcat = isCatActive ? '' : currentSubcat
-                    const targetUrl = buildFilterUrl({ cat: targetCat, subcat: targetSubcat })
+                    const targetRua = isCatActive || cat.id !== 'por_rua' ? '' : currentRua
+                    const targetUrl = buildFilterUrl({ cat: targetCat, subcat: targetSubcat, rua: targetRua })
 
                     return (
                       <Link
@@ -759,6 +799,8 @@ export default function Header() {
                         className={`flex items-center justify-between px-3 py-3 text-xs tracking-wide transition-colors ${
                           isCatActive
                             ? 'text-[#FB6600] font-bold bg-orange-50/50'
+                            : cat.isOrange
+                            ? 'text-[#FB6600] font-bold hover:bg-orange-50/40'
                             : 'text-neutral-900 hover:text-[#FB6600] hover:bg-gray-50'
                         }`}
                       >
@@ -793,32 +835,137 @@ export default function Header() {
         )}
 
         {/* ========================================================= */}
-        {/* D. SUBCATEGORIAS DINÂMICAS: Moda, Pet, Agro, Carro, Escritório, Eletro, Casa, Beleza, etc. (Apenas palavras, entre o banner e a linha inferior) */}
+        {/* D. SUBCATEGORIAS DINÂMICAS OU BARRA DE RUAS A-Z ("Por Rua") */}
         {/* ========================================================= */}
-        {(currentCategory && SUBCATEGORIAS_POR_CATEGORIA[currentCategory]) && (
-          <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200">
-            <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar text-[12.5px] sm:text-[13px]">
-              {SUBCATEGORIAS_POR_CATEGORIA[currentCategory].map((sub) => {
-                const isSelected = currentSubcat.toLowerCase() === sub.toLowerCase()
-                const targetSubcat = isSelected ? '' : sub.toLowerCase()
-                const targetUrl = buildFilterUrl({ subcat: targetSubcat })
+        {currentCategory === 'por_rua' ? (
+          <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200 relative">
+            <div className="mx-auto max-w-[940px] px-4 py-2 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#FB6600]">
+                  Escolha a inicial da rua comercial:
+                </span>
+                {currentRua && (
+                  <div className="flex items-center gap-1.5 text-[11px] bg-orange-50 border border-orange-200 text-[#FB6600] font-bold px-2.5 py-0.5 rounded-[2px]">
+                    <span>Rua selecionada: {currentRua}</span>
+                    <Link
+                      href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: '' })}
+                      className="text-gray-500 hover:text-black ml-1"
+                      title="Limpar rua selecionada"
+                    >
+                      ×
+                    </Link>
+                  </div>
+                )}
+              </div>
 
-                return (
-                  <Link
-                    key={sub}
-                    href={targetUrl}
-                    className={`whitespace-nowrap transition-colors duration-150 py-1 font-medium ${
-                      isSelected
-                        ? 'text-[#FB6600] font-bold border-b-2 border-[#FB6600]'
-                        : 'text-gray-700 hover:text-[#FB6600]'
-                    }`}
-                  >
-                    {sub}
-                  </Link>
-                )
-              })}
+              <div className="flex items-center justify-between gap-1 flex-wrap sm:flex-nowrap overflow-x-auto no-scrollbar pb-0.5">
+                {ALPHABET.map((letter) => {
+                  const isLetterOpen = selectedLetter === letter
+                  const isActiveStreetLetter =
+                    Boolean(currentRua) && getStreetInitialLetter(currentRua) === letter
+                  const count = (streetsByLetter[letter] || []).length
+
+                  return (
+                    <button
+                      key={letter}
+                      type="button"
+                      onClick={() => setSelectedLetter((prev) => (prev === letter ? null : letter))}
+                      title={count > 0 ? `${count} rua(s) com a letra ${letter}` : `Letra ${letter}`}
+                      className={`min-w-[26px] h-7 px-1 text-[12px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
+                        isLetterOpen
+                          ? 'bg-[#FB6600] text-white shadow-xs'
+                          : isActiveStreetLetter
+                          ? 'bg-orange-100 text-[#FB6600] border border-[#FB6600]'
+                          : 'text-gray-700 hover:bg-orange-50 hover:text-[#FB6600]'
+                      }`}
+                    >
+                      {letter}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
+
+            {selectedLetter && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setSelectedLetter(null)}
+                />
+                <div className="mx-auto max-w-[940px] px-4 relative z-50">
+                  <div className="w-full bg-white border border-orange-200 shadow-xl rounded-[2px] p-4 mb-3 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
+                      <span className="text-[11px] font-bold uppercase tracking-widest text-[#FB6600]">
+                        Principais ruas comerciais — Letra {selectedLetter} (ordem alfabética)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLetter(null)}
+                        className="text-xs font-semibold text-gray-400 hover:text-black cursor-pointer"
+                      >
+                        Fechar ×
+                      </button>
+                    </div>
+
+                    {(streetsByLetter[selectedLetter] || []).length > 0 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 max-h-64 overflow-y-auto pr-1">
+                        {(streetsByLetter[selectedLetter] || []).map((street) => {
+                          const isSelectedStreet = streetsMatch(street, currentRua)
+                          return (
+                            <Link
+                              key={street}
+                              href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: street })}
+                              onClick={() => setSelectedLetter(null)}
+                              className={`px-2.5 py-2 text-[12.5px] rounded-[2px] transition-colors flex items-center justify-between gap-2 ${
+                                isSelectedStreet
+                                  ? 'bg-[#FB6600] text-white font-bold'
+                                  : 'text-gray-800 hover:bg-orange-50 hover:text-[#FB6600] font-medium'
+                              }`}
+                            >
+                              <span className="truncate">{street}</span>
+                              {isSelectedStreet && (
+                                <span className="text-[10px] uppercase tracking-wider shrink-0">Ativa</span>
+                              )}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500 py-3">
+                        Nenhuma rua comercial cadastrada com a letra {selectedLetter} no momento.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
+        ) : (
+          currentCategory && SUBCATEGORIAS_POR_CATEGORIA[currentCategory] && (
+            <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200">
+              <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar text-[12.5px] sm:text-[13px]">
+                {SUBCATEGORIAS_POR_CATEGORIA[currentCategory].map((sub) => {
+                  const isSelected = currentSubcat.toLowerCase() === sub.toLowerCase()
+                  const targetSubcat = isSelected ? '' : sub.toLowerCase()
+                  const targetUrl = buildFilterUrl({ subcat: targetSubcat })
+
+                  return (
+                    <Link
+                      key={sub}
+                      href={targetUrl}
+                      className={`whitespace-nowrap transition-colors duration-150 py-1 font-medium ${
+                        isSelected
+                          ? 'text-[#FB6600] font-bold border-b-2 border-[#FB6600]'
+                          : 'text-gray-700 hover:text-[#FB6600]'
+                      }`}
+                    >
+                      {sub}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )
         )}
       </nav>
 

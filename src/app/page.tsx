@@ -7,6 +7,7 @@ import { getLocalStores } from "@/lib/stores-storage";
 import { getLocalProducts } from "@/lib/products-storage";
 import { getFollowedStoreIdsFromServer } from "@/app/actions/user-office";
 import { getAllPromoTimersServer } from "@/lib/promo-timer-storage";
+import { streetsMatch } from "@/lib/streets";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -22,7 +23,7 @@ function formatCurrencyBRL(value: number | string | null | undefined): string {
 export const instant = false;
 
 interface HomeProps {
-  searchParams: Promise<{ tipo?: string; cat?: string; subcat?: string; filtro?: string; q?: string }>;
+  searchParams: Promise<{ tipo?: string; cat?: string; subcat?: string; filtro?: string; q?: string; rua?: string }>;
 }
 
 export interface StoreItem {
@@ -34,6 +35,7 @@ export interface StoreItem {
   large_banner_url?: string | null;
   small_banner_url?: string | null;
   logo_url?: string | null;
+  street?: string | null;
   description?: string | null;
   plan?: string;
   is_active: boolean;
@@ -82,6 +84,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=120&q=80",
+    street: "Av. Afonso Pena",
     description: "Moda feminina contemporânea e looks exclusivos para festas e eventos.",
     plan: "ouro",
     is_active: true,
@@ -95,6 +98,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=120&q=80",
+    street: "Rua Barão do Rio Branco",
     description: "Coleções de moda feminina, linha fitness para treino e moda praia para o verão.",
     plan: "prata",
     is_active: true,
@@ -108,6 +112,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=120&q=80",
+    street: "Av. Mato Grosso",
     description: "Móveis e artigos finos de decoração e utilidades domésticas.",
     plan: "bronze_plus",
     is_active: true,
@@ -121,6 +126,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=120&q=80",
+    street: "Rua Quatorze de Julho",
     description: "Roupas masculinas de alfaiataria, jeanswear e peças para o dia a dia.",
     plan: "bronze",
     is_active: true,
@@ -134,6 +140,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=120&q=80",
+    street: "Av. Afonso Pena",
     description: "Produtos de maquiagem importada, fragrâncias e tratamento facial.",
     plan: "ouro",
     is_active: true,
@@ -147,6 +154,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=120&q=80",
+    street: "Rua Ceará",
     description: "Acessórios, rações nobres e cuidados completos para cães e gatos.",
     plan: "prata",
     is_active: true,
@@ -160,6 +168,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=120&q=80",
+    street: "Av. Afonso Pena",
     description: "Smartphones, periféricos gamers e tecnologia de ponta.",
     plan: "ouro",
     is_active: true,
@@ -172,6 +181,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Peças", "Pneus", "Acessórios", "Som Automotivo"],
     large_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=400&q=80",
+    street: "Av. Coronel Antonino",
     description: "Peças originais, rodas esportivas e som para veículos leves e pesados.",
     plan: "bronze",
     is_active: true,
@@ -184,6 +194,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Usados", "Concessionária", "Picapes"],
     large_banner_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=400&q=80",
+    street: "Av. Eduardo Elias Zahran",
     description: "Seminovos e usados revisados com garantia de procedência e financiamento.",
     plan: "bronze",
     is_active: true,
@@ -196,6 +207,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Agropecuária", "Sementes", "Rações"],
     large_banner_url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=400&q=80",
+    street: "Av. Guaicurus",
     description: "Insumos agrícolas, sementes selecionadas e nutrição animal para o campo.",
     plan: "bronze",
     is_active: true,
@@ -208,6 +220,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Papelaria", "Escolar", "Móveis"],
     large_banner_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=400&q=80",
+    street: "Rua Joaquim Murtinho",
     description: "Materiais escolares, cadeiras ergonômicas e suprimentos corporativos.",
     plan: "bronze",
     is_active: true,
@@ -220,6 +233,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Infantil", "Festa"],
     large_banner_url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=400&q=80",
+    street: "Rua Antônio Maria Coelho",
     description: "Enxoval completo e moda infantil confortável para todas as idades.",
     plan: "bronze",
     is_active: true,
@@ -232,6 +246,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Decoração", "Iluminação", "Jardim e Piscina"],
     large_banner_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80",
+    street: "Rua Euclides da Cunha",
     description: "Luminárias, quadros, vasos artesanais e peças de design para sua casa.",
     plan: "bronze",
     is_active: true,
@@ -244,6 +259,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Barbearia", "Cosméticos", "Perfumes"],
     large_banner_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
+    street: "Rua Rui Barbosa",
     description: "Linha profissional para barba, cabelo e cuidados masculinos.",
     plan: "bronze",
     is_active: true,
@@ -722,12 +738,13 @@ const SEED_PRODUCTS: ProductItem[] = [
 export default async function Home({ searchParams }: HomeProps) {
   await connection();
   const resolvedParams = await searchParams;
-  const isHomePage = !resolvedParams.cat && !resolvedParams.tipo && !resolvedParams.q && !resolvedParams.filtro;
+  const isHomePage = !resolvedParams.cat && !resolvedParams.tipo && !resolvedParams.q && !resolvedParams.filtro && !resolvedParams.rua;
   const tipo = resolvedParams.tipo || (isHomePage ? "produtos" : "lojas");
   const cat = (resolvedParams.cat || "").toLowerCase().trim();
   const subcat = (resolvedParams.subcat || "").toLowerCase().trim();
   const rawFiltro = (resolvedParams.filtro || "").toLowerCase().trim();
   const query = (resolvedParams.q || "").toLowerCase().trim();
+  const rua = (resolvedParams.rua || "").trim();
 
   // Dicionário amigável de nomes de categorias
   const nomesCategorias: Record<string, string> = {
@@ -739,6 +756,7 @@ export default async function Home({ searchParams }: HomeProps) {
     eletro: "Eletro",
     casa: "Casa",
     beleza: "Beleza",
+    por_rua: "Por Rua",
   };
 
   // Dicionário amigável de Tipos de Promoção
@@ -828,6 +846,7 @@ export default async function Home({ searchParams }: HomeProps) {
         large_banner_url: s.large_banner_url,
         small_banner_url: s.small_banner_url,
         logo_url: s.logo_url,
+        street: s.street || null,
         description: s.description,
         plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
         is_active: Boolean(s.is_active),
@@ -892,6 +911,7 @@ export default async function Home({ searchParams }: HomeProps) {
     large_banner_url: s.large_banner_url,
     small_banner_url: s.small_banner_url,
     logo_url: s.logo_url,
+    street: s.street || null,
     description: s.description,
     plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
     is_active: Boolean(s.is_active),
@@ -985,9 +1005,19 @@ export default async function Home({ searchParams }: HomeProps) {
   // 2. FILTRAGEM COMBINADA DE PRODUTOS (POR INTERSEÇÃO)
   // =========================================================================
   const produtosFiltrados = allProducts.filter((prod) => {
-    // A. Categoria principal
-    if (cat && prod.category !== cat) {
+    // A. Categoria principal (ignora quando está em modo "por_rua")
+    if (cat && cat !== "por_rua" && prod.category !== cat) {
       return false;
+    }
+
+    // A2. Filtro Por Rua (verifica a rua da loja proprietária do produto)
+    if (rua) {
+      const storeObj = allStores.find(
+        (s) => s.id === prod.store_id || s.name === prod.store_name
+      );
+      if (!streetsMatch(storeObj?.street, rua)) {
+        return false;
+      }
     }
 
     // B. Subcategoria
@@ -1031,6 +1061,11 @@ export default async function Home({ searchParams }: HomeProps) {
   // para a subcategoria e modalidade selecionadas."
   // =========================================================================
   const lojasFiltradas = allStores.filter((store) => {
+    // Filtro Por Rua
+    if (rua && !streetsMatch(store.street, rua)) {
+      return false;
+    }
+
     // Termo de busca
     if (query) {
       const matchStoreName = store.name.toLowerCase().includes(query);
@@ -1046,8 +1081,8 @@ export default async function Home({ searchParams }: HomeProps) {
         return false;
       }
 
-      // Se categoria foi selecionada
-      if (cat && p.category !== cat) {
+      // Se categoria foi selecionada (exceto modo especial "por_rua")
+      if (cat && cat !== "por_rua" && p.category !== cat) {
         return false;
       }
 
@@ -1066,11 +1101,11 @@ export default async function Home({ searchParams }: HomeProps) {
 
     // Se houver filtros específicos de subcategoria, categoria ou tipo de promoção aplicados, a loja é elegível se tiver produtos correspondentes
     // ou se for uma loja recém-aberta na plataforma que ainda está montando seu catálogo na respectiva categoria
-    if (cat || subcat || modalidadesSelecionadas.length > 0) {
+    if ((cat && cat !== "por_rua") || subcat || modalidadesSelecionadas.length > 0) {
       if (produtosElegiveisDaLoja.length > 0) {
         return true;
       }
-      const matchesCat = !cat || store.category.toLowerCase() === cat.toLowerCase();
+      const matchesCat = !cat || cat === "por_rua" || store.category.toLowerCase() === cat.toLowerCase();
       const matchesSubcat = !subcat || store.subcategories?.some((s: string) => s.toLowerCase() === subcat.toLowerCase());
       const hasAnyProduct = allProducts.some((p) => p.store_id === store.id || p.store_name === store.name);
       return matchesCat && matchesSubcat && !hasAnyProduct;
@@ -1137,42 +1172,52 @@ export default async function Home({ searchParams }: HomeProps) {
     }[] = [];
 
     if (lojasFiltradas.length > 0) {
-      let sIdx = 0;
-      let dIdx = 0;
-      let tIdx = 0;
+      if (rua) {
+        lojasFiltradas.forEach((store, idx) => {
+          orderedFeedStores.push({
+            loja: store,
+            bannerType: getStoreBannerType(store.plan),
+            renderKey: `${store.id}-rua-${idx}`,
+          });
+        });
+      } else {
+        let sIdx = 0;
+        let dIdx = 0;
+        let tIdx = 0;
 
-      const pickNextStore = (type: "single" | "double" | "triple"): StoreItem => {
-        if (type === "single") {
-          const pool = singleQueue.length > 0 ? singleQueue : fallbackSingles;
-          return pool[sIdx++ % pool.length];
-        }
-        if (type === "double") {
-          const pool = doubleQueue.length > 0 ? doubleQueue : fallbackDoubles;
-          return pool[dIdx++ % pool.length];
-        }
-        const pool = tripleQueue.length > 0 ? tripleQueue : fallbackTriples;
-        return pool[tIdx++ % pool.length];
-      };
+        const pickNextStore = (type: "single" | "double" | "triple"): StoreItem => {
+          if (type === "single") {
+            const pool = singleQueue.length > 0 ? singleQueue : fallbackSingles;
+            return pool[sIdx++ % pool.length];
+          }
+          if (type === "double") {
+            const pool = doubleQueue.length > 0 ? doubleQueue : fallbackDoubles;
+            return pool[dIdx++ % pool.length];
+          }
+          const pool = tripleQueue.length > 0 ? tripleQueue : fallbackTriples;
+          return pool[tIdx++ % pool.length];
+        };
 
-      const cyclesNeeded = Math.max(
-        1,
-        Math.ceil(singleQueue.length / 8),
-        Math.ceil(doubleQueue.length / 2),
-        Math.ceil(tripleQueue.length / 2)
-      );
+        const cyclesNeeded = Math.max(
+          1,
+          Math.ceil(singleQueue.length / 8),
+          Math.ceil(doubleQueue.length / 2),
+          Math.ceil(tripleQueue.length / 2)
+        );
 
-      for (let cycle = 0; cycle < cyclesNeeded; cycle++) {
-        for (let rowIndex = 0; rowIndex < ROW_PATTERN.length; rowIndex++) {
-          const rowSlots = ROW_PATTERN[rowIndex];
-          for (let slotIndex = 0; slotIndex < rowSlots.length; slotIndex++) {
-            const bType = rowSlots[slotIndex];
-            const store = pickNextStore(bType);
-            if (store) {
-              orderedFeedStores.push({
-                loja: store,
-                bannerType: bType,
-                renderKey: `${store.id}-c${cycle}-r${rowIndex}-s${slotIndex}`,
-              });
+        for (let cycle = 0; cycle < cyclesNeeded; cycle++) {
+          for (let rowIndex = 0; rowIndex < ROW_PATTERN.length; rowIndex++) {
+            const rowSlots = ROW_PATTERN[rowIndex];
+            for (let slotIndex = 0; slotIndex < rowSlots.length; slotIndex++) {
+              const bType = rowSlots[slotIndex];
+              const store = pickNextStore(bType);
+              if (store) {
+                orderedFeedStores.push({
+                  loja: store,
+                  bannerType: bType,
+                  renderKey: `${store.id}-c${cycle}-r${rowIndex}-s${slotIndex}`,
+                });
+              }
             }
           }
         }
@@ -1190,6 +1235,11 @@ export default async function Home({ searchParams }: HomeProps) {
             <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-black text-white tracking-widest rounded-none">
               {categoriaAtual}
             </span>
+            {rua && (
+              <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
+                {rua}
+              </span>
+            )}
             {subcat && (
               <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
                 {subcat}
@@ -1204,10 +1254,12 @@ export default async function Home({ searchParams }: HomeProps) {
         {orderedFeedStores.length === 0 ? (
           <div className="text-center py-16 bg-gray-50 border border-dashed border-gray-200 p-8 my-6">
             <p className="text-sm text-gray-600 font-medium mb-1">
-              Nenhuma loja com produtos elegíveis encontrada para os filtros selecionados.
+              {rua
+                ? `Nenhuma loja cadastrada encontrada na rua "${rua}" para os filtros selecionados.`
+                : "Nenhuma loja com produtos elegíveis encontrada para os filtros selecionados."}
             </p>
             <p className="text-xs text-gray-400">
-              Critérios aplicados: {categoriaAtual} {subcat ? `> ${subcat}` : ""} &bull; Modalidade: {modalidadeLegenda}
+              Critérios aplicados: {categoriaAtual} {rua ? `> ${rua}` : ""} {subcat ? `> ${subcat}` : ""} &bull; Modalidade: {modalidadeLegenda}
             </p>
           </div>
         ) : (
@@ -1306,6 +1358,11 @@ export default async function Home({ searchParams }: HomeProps) {
           <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-black text-white tracking-widest rounded-none">
             {categoriaAtual}
           </span>
+          {rua && (
+            <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
+              {rua}
+            </span>
+          )}
           {subcat && (
             <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
               {subcat}
