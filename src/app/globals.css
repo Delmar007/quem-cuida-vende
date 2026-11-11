@@ -1,8 +1,21 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-plus-jakarta), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+@layer base {
+  h1, h2, h3, h4, .font-heading {
+    font-family: var(--font-heading);
+  }
+}
+
 html, body {
   max-width: 100%;
   overflow-x: clip;
+  font-family: var(--font-sans);
 }
 
 /* Ocultar barra de rolagem mantendo rolagem horizontal suave */

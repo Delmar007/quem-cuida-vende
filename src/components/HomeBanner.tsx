@@ -54,33 +54,33 @@ export default function HomeBanner() {
       {/* Camada clara gradiente para garantir legibilidade dos textos e do selo */}
       <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent w-3/5 md:w-3/5 pointer-events-none" />
 
-      {/* Conteúdo Tipográfico Idêntico ao Padrão Privalia - Escala Proporcional 940x370 */}
-      <div className="absolute inset-y-0 left-3 sm:left-8 md:left-14 flex flex-col justify-center max-w-[55%] sm:max-w-[320px] md:max-w-[420px] z-10">
+      {/* Conteúdo Tipográfico Editorial com Playfair Display + Plus Jakarta Sans */}
+      <div className="absolute inset-y-0 left-3 sm:left-8 md:left-14 flex flex-col justify-center max-w-[58%] sm:max-w-[340px] md:max-w-[440px] z-10">
         {/* Título: Especial Kids */}
         <div className="flex flex-col leading-none">
-          <span className="text-xs sm:text-2xl md:text-3xl font-serif italic text-neutral-800">
+          <span className="text-sm sm:text-2xl md:text-3xl font-serif italic font-normal tracking-wide text-neutral-800">
             {active.tituloPre}
           </span>
-          <span className="text-2xl sm:text-5xl md:text-7xl font-serif font-black tracking-tight text-neutral-950 mt-0.5">
+          <span className="text-2xl sm:text-5xl md:text-7xl font-serif font-extrabold tracking-tight text-neutral-950 mt-0.5 leading-[0.95]">
             {active.tituloPrincipal}
           </span>
         </div>
 
         {/* Badge / Caixa com borda arredondada de Desconto: Até 80% OFF */}
-        <div className="mt-1 sm:mt-3 md:mt-5 inline-flex items-center gap-1 sm:gap-1.5 md:gap-2 bg-white/95 backdrop-blur-[2px] border border-gray-200/80 px-2 py-0.5 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full shadow-sm w-fit">
-          <span className="text-[8px] sm:text-xs md:text-sm italic font-serif text-neutral-600">
+        <div className="mt-1.5 sm:mt-3 md:mt-5 inline-flex items-center gap-1.5 sm:gap-2 bg-white/95 backdrop-blur-[2px] border border-gray-200/80 px-2.5 py-1 sm:px-3.5 sm:py-1.5 md:px-4 md:py-2 rounded-full shadow-sm w-fit">
+          <span className="text-[10px] sm:text-xs md:text-sm italic font-serif text-neutral-600">
             Até
           </span>
-          <span className="text-sm sm:text-2xl md:text-3xl font-black text-neutral-950 tracking-tight leading-none">
+          <span className="text-base sm:text-2xl md:text-3xl font-heading font-extrabold text-neutral-950 tracking-tight leading-none tabular-nums">
             {active.desconto}%
           </span>
-          <span className="text-[8px] sm:text-xs font-bold uppercase tracking-wider text-neutral-900 border-l border-gray-300 pl-1 sm:pl-1.5 md:pl-2">
+          <span className="text-[10px] sm:text-xs font-heading font-bold uppercase tracking-wider text-neutral-900 border-l border-gray-300 pl-1.5 sm:pl-2">
             OFF
           </span>
         </div>
 
         {/* Subtexto sutil: exibido quando houver espaço suficiente */}
-        <p className="hidden sm:block text-[9px] sm:text-[11px] md:text-xs text-neutral-600 font-normal mt-1 sm:mt-2 md:mt-2.5 ml-0.5 sm:ml-1 line-clamp-1">
+        <p className="hidden sm:block text-xs md:text-[13px] text-neutral-700 font-medium leading-relaxed mt-2 md:mt-3 ml-0.5 sm:ml-1 line-clamp-1">
           {active.subtexto}
         </p>
       </div>

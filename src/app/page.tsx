@@ -43,6 +43,7 @@ export interface ProductItem {
   id: string;
   store_id: string;
   store_name: string;
+  store_logo_url?: string | null;
   name: string;
   description?: string | null;
   price: string;
@@ -80,6 +81,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Feminina", "Festa", "Streetwear"],
     large_banner_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=120&q=80",
     description: "Moda feminina contemporânea e looks exclusivos para festas e eventos.",
     plan: "ouro",
     is_active: true,
@@ -92,6 +94,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Feminina", "Fitness", "Praia"],
     large_banner_url: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=120&q=80",
     description: "Coleções de moda feminina, linha fitness para treino e moda praia para o verão.",
     plan: "prata",
     is_active: true,
@@ -104,6 +107,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Móveis", "Decoração", "Cama, Mesa e Banho"],
     large_banner_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=120&q=80",
     description: "Móveis e artigos finos de decoração e utilidades domésticas.",
     plan: "bronze_plus",
     is_active: true,
@@ -116,6 +120,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Masculina", "Streetwear", "Country"],
     large_banner_url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=120&q=80",
     description: "Roupas masculinas de alfaiataria, jeanswear e peças para o dia a dia.",
     plan: "bronze",
     is_active: true,
@@ -128,6 +133,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Cosméticos", "Maquiagem", "Perfumes", "Skincare", "Salão"],
     large_banner_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=120&q=80",
     description: "Produtos de maquiagem importada, fragrâncias e tratamento facial.",
     plan: "ouro",
     is_active: true,
@@ -140,6 +146,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Shop", "Banho", "Clínica", "Farmácia"],
     large_banner_url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=120&q=80",
     description: "Acessórios, rações nobres e cuidados completos para cães e gatos.",
     plan: "prata",
     is_active: true,
@@ -152,6 +159,7 @@ const SEED_STORES: StoreItem[] = [
     subcategories: ["Celulares", "Informática", "Games"],
     large_banner_url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=400&q=80",
+    logo_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=120&q=80",
     description: "Smartphones, periféricos gamers e tecnologia de ponta.",
     plan: "ouro",
     is_active: true,
@@ -829,7 +837,7 @@ export default async function Home({ searchParams }: HomeProps) {
     // Consulta de Produtos
     const { data: productsData } = await supabase
       .from("products")
-      .select("*, stores(name)")
+      .select("*, stores(name, logo_url)")
       .eq("is_active", true);
 
     if (productsData && productsData.length > 0) {
@@ -841,6 +849,7 @@ export default async function Home({ searchParams }: HomeProps) {
           id: p.id,
           store_id: p.store_id,
           store_name: p.stores?.name || "Loja Parceira",
+          store_logo_url: p.stores?.logo_url || null,
           name: p.name,
           description: p.description,
           price: typeof displayPrice === "number" ? `R$ ${formatCurrencyBRL(displayPrice)}` : String(p.price || "R$ 0,00"),
@@ -888,7 +897,13 @@ export default async function Home({ searchParams }: HomeProps) {
     is_active: Boolean(s.is_active),
   }));
 
-  const baseStores: StoreItem[] = dbStores.length > 0 ? dbStores : SEED_STORES;
+  const baseStores: StoreItem[] =
+    dbStores.length >= 6
+      ? dbStores
+      : [
+          ...dbStores,
+          ...SEED_STORES.filter((seed) => !dbStores.some((db) => db.id === seed.id)),
+        ];
   const combinedStores: StoreItem[] = [...baseStores];
   for (const ls of localStores) {
     if (!combinedStores.some((s) => s.id === ls.id)) {
@@ -922,6 +937,7 @@ export default async function Home({ searchParams }: HomeProps) {
         id: lp.id,
         store_id: lp.store_id,
         store_name: storeObj?.name || "Loja Parceira",
+        store_logo_url: storeObj?.logo_url || null,
         name: lp.name,
         description: lp.description,
         price: `R$ ${formatCurrencyBRL(effectivePrice)}`,
@@ -950,7 +966,13 @@ export default async function Home({ searchParams }: HomeProps) {
       };
     });
 
-  const baseProducts: ProductItem[] = dbProducts.length > 0 ? dbProducts : SEED_PRODUCTS;
+  const baseProducts: ProductItem[] =
+    dbProducts.length >= 8
+      ? dbProducts
+      : [
+          ...dbProducts,
+          ...SEED_PRODUCTS.filter((seed) => !dbProducts.some((db) => db.id === seed.id)),
+        ];
   const combinedProducts: ProductItem[] = [...baseProducts];
   for (const lpm of localProdsMapped) {
     if (!combinedProducts.some((p) => p.id === lpm.id)) {
@@ -1219,29 +1241,29 @@ export default async function Home({ searchParams }: HomeProps) {
               return (
                 <div
                   key={renderKey}
-                  className={`flex flex-col w-full max-w-full shadow-sm hover:shadow-md transition-all duration-300 rounded-[6px] overflow-hidden ${colSpanOnly}`}
+                  className={`flex flex-col w-full max-w-full shadow-sm hover:shadow-md transition-all duration-300 rounded-t-none rounded-b-[16px] overflow-hidden ${colSpanOnly}`}
                 >
                   <Link
                     href={`/loja/${loja.slug || loja.id}`}
-                    className={`group relative overflow-hidden bg-neutral-100 border-t border-x border-gray-200 rounded-t-[6px] cursor-pointer w-full max-w-full flex flex-col justify-between p-4 ${heightClass}`}
+                    className={`group relative overflow-hidden bg-neutral-100 border-t border-x border-gray-200 rounded-none cursor-pointer w-full max-w-full flex flex-col justify-between p-4 ${heightClass}`}
                   >
                     <img
                       src={bgImg}
                       alt={loja.name}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20 group-hover:from-black/90 transition-colors" />
+                    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/35 to-transparent group-hover:from-black/90 transition-colors" />
 
                     {/* Topo do Card de Loja (Livre) */}
                     <div className="relative z-10" />
 
                     {/* Rodapé do Card de Loja */}
                     <div className="relative z-10">
-                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-black tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1`}>
+                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-heading font-extrabold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1`}>
                         {loja.name}
                       </h3>
                       {loja.description && (
-                        <p className="text-xs text-gray-200 line-clamp-1 drop-shadow-md max-w-2xl">
+                        <p className="text-xs sm:text-[13px] text-gray-100 leading-relaxed line-clamp-1 drop-shadow-md max-w-2xl">
                           {loja.description}
                         </p>
                       )}
@@ -1374,6 +1396,8 @@ export default async function Home({ searchParams }: HomeProps) {
                 : [produto.image_url, ...sameCatImages].filter(Boolean).slice(0, 6);
 
             const prodStoreTimer = promoTimers[produto.store_id];
+            const prodStoreObj = allStores.find((s) => s.id === produto.store_id);
+            const storeLogoUrl = produto.store_logo_url || prodStoreObj?.logo_url || null;
 
             return (
               <div
@@ -1389,7 +1413,7 @@ export default async function Home({ searchParams }: HomeProps) {
                   <div className="h-[38px]" />
                   <div className="p-4 flex flex-col justify-between">
                     <div className="h-[78px]" />
-                    <div className="mt-3 pt-3 h-[46px]" />
+                    <div className="mt-3 pt-3 h-[84px]" />
                   </div>
                 </div>
 
@@ -1422,11 +1446,28 @@ export default async function Home({ searchParams }: HomeProps) {
                   {/* Conteúdo do Card */}
                   <div className="p-4 flex flex-col flex-grow justify-between bg-white">
                     <div className="flex flex-col flex-grow">
-                      <div className="flex items-center justify-between text-[11px] text-gray-400 uppercase tracking-wide mb-1">
-                        <span className="font-semibold text-gray-600 line-clamp-1">{produto.store_name}</span>
-                        {dataFormatada && <span className="text-[10px] shrink-0 text-gray-400">{dataFormatada}</span>}
+                      <div className="flex items-center justify-between text-xs text-gray-500 tracking-wide mb-1.5 gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
+                            {storeLogoUrl ? (
+                              <img
+                                src={storeLogoUrl}
+                                alt={produto.store_name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="font-heading text-[10px] font-bold text-gray-600 leading-none select-none">
+                                {produto.store_name.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1">
+                            {produto.store_name}
+                          </span>
+                        </div>
+                        {dataFormatada && <span className="text-[11px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
                       </div>
-                      <h3 className="text-sm text-gray-900 font-semibold leading-snug mb-1.5 line-clamp-2">
+                      <h3 className="font-heading text-[15px] text-gray-900 font-semibold leading-snug tracking-tight mb-1.5 line-clamp-2">
                         {produto.name}
                       </h3>
 
@@ -1478,28 +1519,30 @@ export default async function Home({ searchParams }: HomeProps) {
                         </div>
                       ) : (
                         produto.description && (
-                          <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                          <p className="text-[13px] text-gray-600 leading-relaxed line-clamp-2 mb-2">
                             {produto.description}
                           </p>
                         )
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Preço</span>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-base font-bold text-neutral-900">{produto.price}</span>
-                          {hasDiscount && produto.regular_price && (
-                            <span className="text-[10px] text-gray-400 line-through">
-                              R$ {formatCurrencyBRL(produto.regular_price)}
-                            </span>
-                          )}
-                        </div>
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-1">
+                      {/* 1. Preço de venda (R$ perfeitamente alinhado na mesma fonte e linha) */}
+                      <div className="font-heading text-base font-bold text-neutral-900 tracking-normal tabular-nums leading-tight">
+                        R$ {String(produto.price || "").replace(/^R\$\s*/i, "").trim()}
                       </div>
+
+                      {/* 2. Preço anterior / referência riscado logo abaixo */}
+                      {hasDiscount && produto.regular_price && (
+                        <div className="text-xs text-gray-400 line-through tabular-nums leading-tight">
+                          R$ {formatCurrencyBRL(produto.regular_price)}
+                        </div>
+                      )}
+
+                      {/* 3. Botão abaixo dos preços */}
                       <button
                         type="button"
-                        className="text-xs border border-gray-300 px-3 py-1.5 text-gray-700 hover:border-black hover:text-black font-semibold transition-colors"
+                        className="mt-1.5 w-full font-heading text-xs border border-gray-300 px-3 py-2 text-gray-800 hover:border-black hover:text-black font-semibold tracking-tight transition-colors"
                       >
                         Ver Detalhes
                       </button>

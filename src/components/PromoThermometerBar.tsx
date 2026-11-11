@@ -33,16 +33,26 @@ function computeThermometerMetrics(
   endDate?: string | null
 ): TimeMetrics {
   const now = Date.now()
-  const startMs = startDate ? new Date(startDate).getTime() : now - 12 * 3600 * 1000
+  if (!startDate && !endDate) {
+    return {
+      expired: false,
+      remainingPercent: 50,
+      finalizaText: 'Finaliza em 5 dias',
+      hoursRemaining: 120,
+      totalHours: 240,
+    }
+  }
+
+  const startMs = startDate ? new Date(startDate).getTime() : now - 5 * 24 * 3600 * 1000
   const endMs = endDate ? new Date(endDate).getTime() : now + 5 * 24 * 3600 * 1000
 
   if (isNaN(startMs) || isNaN(endMs) || endMs <= startMs) {
     return {
       expired: false,
-      remainingPercent: 80,
+      remainingPercent: 50,
       finalizaText: 'Finaliza em 5 dias',
       hoursRemaining: 120,
-      totalHours: 144,
+      totalHours: 240,
     }
   }
 
@@ -145,7 +155,9 @@ export default function PromoThermometerBar({
 
   return (
     <div
-      className={`w-full bg-white border-x border-b border-gray-200 rounded-b-[6px] overflow-hidden select-none ${className}`}
+      className={`w-full bg-white border-x border-b border-gray-200 ${
+        variant === 'banner' ? 'rounded-b-[16px]' : 'rounded-b-[6px]'
+      } overflow-hidden select-none ${className}`}
     >
       <div
         className={`flex items-center justify-between ${

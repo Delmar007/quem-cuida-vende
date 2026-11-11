@@ -408,7 +408,7 @@ export default function Header() {
           <div className="hidden md:flex items-center justify-between gap-3 px-4">
             
             {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
-            <div className="flex items-center gap-5 text-[13.5px] font-semibold overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
+            <div className="flex items-center gap-5 font-heading text-[13.5px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
               {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
               <Link
@@ -557,7 +557,7 @@ export default function Header() {
             <div className="border-l border-gray-200 pl-6 flex items-center h-full shrink-0">
               <Link
                 href={buildFilterUrl({ tipo: 'produtos' })}
-                className={`flex items-center gap-2 py-3.5 text-[14px] font-semibold transition-colors relative shrink-0 ${
+                className={`flex items-center gap-2 py-3.5 font-heading text-[14px] font-semibold tracking-tight transition-colors relative shrink-0 ${
                   currentView === 'produtos'
                     ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                     : "text-black hover:text-[#FB6600]"
@@ -582,7 +582,7 @@ export default function Header() {
           {/* ========================================================= */}
           {/* B. VERSÃO MOBILE (md:hidden): Lojas | Categorias ▾ | Produtos */}
           {/* ========================================================= */}
-          <div className="flex md:hidden items-center justify-between px-3 h-11 relative z-[60]">
+          <div className="flex md:hidden items-center justify-between px-3 h-11 font-heading relative z-[60]">
             {/* LADO ESQUERDO: Lojas */}
             <Link
               href={buildFilterUrl({ tipo: 'lojas' })}

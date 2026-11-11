@@ -1,13 +1,30 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, DM_Sans, Playfair_Display } from "next/font/google";
 import { Suspense } from "react";
 import Header from "@/components/Header";
 import ProfileNoticeModal from "@/components/ProfileNoticeModal";
 import "./globals.css";
 
-const inter = Inter({ 
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -21,8 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.className} min-h-screen bg-white text-neutral-900 antialiased`}>
+    <html
+      lang="pt-BR"
+      className={`${dmSans.variable} ${plusJakarta.variable} ${playfair.variable}`}
+    >
+      <body className={`${dmSans.className} min-h-screen bg-white text-neutral-900 antialiased`}>
         {/* Cabeçalho Interativo com Modal de Autenticação envolvido em Suspense */}
         <Suspense fallback={<div className="h-[120px] w-full bg-white" />}>
           <Header />
