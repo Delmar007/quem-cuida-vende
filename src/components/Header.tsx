@@ -444,7 +444,7 @@ export default function Header() {
           <div className="hidden md:flex items-center justify-between gap-3 px-4">
             
             {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
-            <div className="flex items-center gap-3.5 lg:gap-4 font-heading text-[13px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
+            <div className="flex items-center gap-3 lg:gap-3.5 font-heading text-[12.5px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
               {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
               <Link
@@ -505,6 +505,21 @@ export default function Header() {
                   </Link>
                 )
               })}
+
+              {/* BOTÃO ARREDONDADO PRETO: LIMPA FILTRO */}
+              <Link
+                href="/"
+                onClick={() => {
+                  setIsPromoMenuOpen(false)
+                  setSelectedLetter(null)
+                  setSearchTerm('')
+                }}
+                title="Limpar todos os filtros"
+                className="inline-flex flex-col items-center justify-center px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded-full text-[8px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors shadow-2xs"
+              >
+                <span>Limpa</span>
+                <span>Filtro</span>
+              </Link>
             </div>
 
             {/* BOTÃO "TIPO DE PROMOÇÃO" COM MENU VERTICAL DROPDOWN */}
@@ -815,18 +830,31 @@ export default function Header() {
                   })}
                 </div>
 
-                {/* Opção para limpar / ver todas as categorias */}
-                <div className="mt-2 pt-2 border-t border-gray-100 px-3 pb-2">
+                {/* Opção para limpar todos os filtros */}
+                <div className="mt-2 pt-2 border-t border-gray-100 px-3 pb-2 flex items-center justify-between gap-2">
                   <Link
-                    href={buildFilterUrl({ cat: '', subcat: '' })}
+                    href={buildFilterUrl({ cat: '', subcat: '', rua: '' })}
                     onClick={(e) => {
                       e.stopPropagation()
                       setIsMobileCatOpen(false)
                     }}
                     className="text-xs text-gray-500 hover:text-[#FB6600] flex items-center justify-between py-1 font-medium"
                   >
-                    <span>Limpar filtro de categoria</span>
-                    <span className="text-gray-400">&times;</span>
+                    <span>Limpar categoria</span>
+                  </Link>
+                  <Link
+                    href="/"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setIsMobileCatOpen(false)
+                      setSelectedLetter(null)
+                      setSearchTerm('')
+                    }}
+                    title="Limpar todos os filtros"
+                    className="inline-flex flex-col items-center justify-center px-3 py-1 bg-black hover:bg-neutral-800 text-white rounded-full text-[8.5px] font-bold uppercase leading-[1.05] tracking-tight shrink-0"
+                  >
+                    <span>Limpa</span>
+                    <span>Filtro</span>
                   </Link>
                 </div>
               </div>
