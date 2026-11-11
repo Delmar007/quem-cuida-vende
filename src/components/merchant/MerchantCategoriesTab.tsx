@@ -344,45 +344,36 @@ export default function MerchantCategoriesTab({
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho do Dispositivo nº 6 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 border border-neutral-200 rounded-[2px] shadow-sm">
+      {/* Cabeçalho do Tópico 05 */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-8 border border-neutral-200 rounded-md shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <span className="text-[10px] font-mono font-black uppercase text-[#FB6600] bg-orange-50 px-2 py-0.5 rounded">
-              Dispositivo nº 6
-            </span>
-            <span className="text-xs font-bold text-neutral-500">• Organização do Catálogo</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">
-              Ilimitado
-            </span>
-          </div>
-          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight">
-            Categorias e Subcategorias de Produtos
+          <span className="text-xs font-bold uppercase tracking-widest text-[#FB6600] block mb-1">
+            Tópico 05
+          </span>
+          <h2 className="font-heading text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
+            Categorias de Produtos
           </h2>
-          <p className="text-xs text-neutral-500 mt-1 max-w-xl">
-            Cadastre quantas categorias e subcategorias precisar para sua loja (sem limite de quantidade). Essa estrutura alimentará automaticamente os menus de navegação e os filtros de produtos da sua vitrine pública.
-          </p>
         </div>
 
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="shrink-0 flex flex-wrap items-center gap-2.5">
           {categories.length > 0 && (
             <button
               type="button"
               onClick={() => setIsClearModalOpen(true)}
-              className="px-3.5 py-2.5 border border-neutral-300 hover:border-rose-300 hover:text-rose-700 hover:bg-rose-50 text-neutral-700 text-xs font-semibold rounded-[2px] transition-colors cursor-pointer flex items-center gap-1.5 bg-white shadow-2xs"
+              className="h-10 px-4 border border-neutral-300 hover:border-rose-300 hover:text-rose-700 hover:bg-rose-50 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-2 bg-white"
               title="Limpar todas as categorias e subcategorias"
             >
-              <svg className="w-3.5 h-3.5 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              <span>Limpar Informações</span>
+              <span>Limpar Tudo</span>
             </button>
           )}
 
           <button
             type="button"
             onClick={handleOpenNewCategoryModal}
-            className="px-4 py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-semibold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer flex items-center gap-2 shadow-sm"
+            className="h-10 px-4 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-2 shadow-xs"
           >
             <span>+ Nova Categoria</span>
           </button>
@@ -392,64 +383,47 @@ export default function MerchantCategoriesTab({
       {/* Alerta de Feedback */}
       {feedback && (
         <div
-          className={`p-4 text-xs rounded-[2px] flex items-center justify-between border animate-in fade-in duration-200 ${
+          className={`p-4 text-sm rounded-md flex items-center justify-between border animate-in fade-in duration-200 ${
             feedback.type === 'success'
               ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
               : 'bg-rose-50 text-rose-900 border-rose-300'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <span>{feedback.type === 'success' ? '✓' : '⚠️'}</span>
-            <span>{feedback.message}</span>
+          <div className="flex items-center gap-2.5">
+            <span className="text-base">{feedback.type === 'success' ? '✓' : '⚠️'}</span>
+            <span className="font-medium">{feedback.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-sm font-bold opacity-60 hover:opacity-100 cursor-pointer"
+            className="text-base font-bold opacity-60 hover:opacity-100 ml-4 cursor-pointer"
           >
             &times;
           </button>
         </div>
       )}
 
-      {/* Exemplo Didático / Card Informativo de Funcionamento Hierárquico */}
-      <div className="bg-gradient-to-r from-neutral-50 to-orange-50/40 p-4 border border-neutral-200 rounded-[2px] text-xs text-neutral-600">
-        <div className="flex items-start gap-2.5">
-          <span className="text-base">💡</span>
-          <div>
-            <strong className="text-neutral-900 block font-bold mb-0.5">
-              Como funciona a classificação hierárquica na sua loja:
-            </strong>
-            <p className="leading-relaxed">
-              Você pode criar uma categoria principal como <strong>Camisas</strong> e desdobrá-la em subcategorias como{' '}
-              <span className="font-semibold text-neutral-800">Cavada</span>,{' '}
-              <span className="font-semibold text-neutral-800">Manga Longa</span>,{' '}
-              <span className="font-semibold text-neutral-800">Gola Rolê</span> e{' '}
-              <span className="font-semibold text-neutral-800">Polo</span>. Ao cadastrar produtos no dispositivo seguinte, essas opções aparecerão automaticamente vinculadas!
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Listagem Hierárquica de Categorias e Subcategorias */}
       {loading ? (
-        <div className="py-16 text-center text-xs text-neutral-500">
-          <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          Carregando categorias e subcategorias...
+        <div className="py-16 text-center text-sm text-neutral-500">
+          <div className="w-7 h-7 border-2 border-black border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          Carregando categorias...
         </div>
       ) : categories.length === 0 ? (
-        <div className="bg-white p-12 border border-dashed border-neutral-300 rounded-[2px] text-center">
-          <span className="text-3xl block mb-2">🏷️</span>
-          <h3 className="text-sm font-bold text-neutral-800">Nenhuma categoria cadastrada ainda</h3>
-          <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
-            Crie sua primeira categoria principal para começar a organizar seu catálogo de produtos.
+        <div className="bg-white p-10 sm:p-12 border border-dashed border-neutral-300 rounded-md text-center">
+          <span className="text-4xl block mb-3">🏷️</span>
+          <h3 className="text-base sm:text-lg font-bold text-neutral-900">
+            Nenhuma categoria cadastrada
+          </h3>
+          <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+            Crie a primeira categoria para organizar os produtos da sua loja.
           </p>
           <button
             type="button"
             onClick={handleOpenNewCategoryModal}
-            className="mt-4 px-4 py-2 bg-black text-white text-xs font-bold uppercase tracking-wider rounded-[2px] hover:bg-neutral-800 cursor-pointer"
+            className="mt-5 h-11 px-5 bg-neutral-900 text-white text-xs sm:text-sm font-semibold rounded-md hover:bg-black cursor-pointer transition-colors"
           >
-            + Criar Primeira Categoria
+            + Nova Categoria
           </button>
         </div>
       ) : (
@@ -462,46 +436,47 @@ export default function MerchantCategoriesTab({
             return (
               <div
                 key={cat.id}
-                className={`bg-white border rounded-[2px] overflow-hidden transition-all shadow-xs ${
+                className={`bg-white border rounded-md overflow-hidden transition-all shadow-xs ${
                   cat.is_active ? 'border-neutral-200' : 'border-neutral-200 opacity-75'
                 }`}
               >
-                {/* Linha da Categoria Principal */}
-                <div className="p-4 bg-neutral-50 border-b border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                {/* Cabeçalho da Categoria Principal */}
+                <div className="p-4 sm:p-5 bg-neutral-50/90 border-b border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3.5 min-w-0">
                     <button
                       type="button"
                       onClick={() => toggleExpand(cat.id)}
-                      className="w-7 h-7 flex items-center justify-center rounded-[2px] bg-white border border-neutral-300 text-neutral-600 hover:text-black hover:border-black cursor-pointer font-bold text-xs"
-                      title={isExpanded ? 'Recolher subcategorias' : 'Expandir subcategorias'}
+                      className="w-8 h-8 flex items-center justify-center rounded-md bg-white border border-neutral-300 text-neutral-600 hover:text-black hover:border-black cursor-pointer font-bold text-xs shrink-0 mt-0.5 sm:mt-0"
+                      title={isExpanded ? 'Recolher' : 'Expandir'}
                     >
                       {isExpanded ? '▼' : '►'}
                     </button>
 
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono font-bold text-neutral-400">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="text-xs sm:text-sm font-mono font-bold text-neutral-400">
                           #{String(index + 1).padStart(2, '0')}
                         </span>
-                        <h3 className="text-sm font-black uppercase tracking-tight text-neutral-900">
+                        <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 tracking-tight">
                           {cat.name}
                         </h3>
                         <span
-                          className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded ${
+                          className={`px-2.5 py-0.5 text-[11px] font-bold rounded-full ${
                             cat.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-700'
                           }`}
                         >
                           {cat.is_active ? 'Ativa' : 'Inativa'}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[11px] text-neutral-500">
+
+                      <div className="flex items-center gap-2 flex-wrap mt-1 text-xs sm:text-sm text-neutral-600">
                         <span>{subCount} subcategoria(s)</span>
-                        <span>•</span>
-                        <span className="text-neutral-700 font-semibold">{prodCount} produto(s) vinculado(s)</span>
+                        <span className="text-neutral-300">&bull;</span>
+                        <span className="font-semibold text-neutral-800">{prodCount} produto(s)</span>
                         {cat.description && (
                           <>
-                            <span>•</span>
-                            <span className="italic text-neutral-400 truncate max-w-xs">{cat.description}</span>
+                            <span className="text-neutral-300">&bull;</span>
+                            <span className="text-neutral-500 truncate max-w-sm">{cat.description}</span>
                           </>
                         )}
                       </div>
@@ -509,11 +484,11 @@ export default function MerchantCategoriesTab({
                   </div>
 
                   {/* Ações da Categoria */}
-                  <div className="flex items-center gap-2 self-end sm:self-center">
+                  <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
                     <button
                       type="button"
                       onClick={() => handleOpenNewSubcategoryModal(cat)}
-                      className="px-2.5 py-1.5 bg-[#FB6600] hover:bg-[#e01283] text-white text-[11px] font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer flex items-center gap-1"
+                      className="h-9 px-3.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer flex items-center gap-1"
                     >
                       <span>+ Subcategoria</span>
                     </button>
@@ -521,7 +496,7 @@ export default function MerchantCategoriesTab({
                     <button
                       type="button"
                       onClick={() => handleOpenEditCategoryModal(cat)}
-                      className="px-2.5 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                      className="h-9 px-3.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer"
                     >
                       Editar
                     </button>
@@ -529,57 +504,59 @@ export default function MerchantCategoriesTab({
                     <button
                       type="button"
                       onClick={() => handleDeleteCategoryPrompt(cat)}
-                      className="px-2.5 py-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[11px] font-bold uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
+                      className="h-9 px-3.5 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-xs sm:text-sm font-semibold rounded-md transition-colors cursor-pointer"
                     >
                       Excluir
                     </button>
                   </div>
                 </div>
 
-                {/* Subcategorias (Hierarquia / Árvore) */}
+                {/* Subcategorias */}
                 {isExpanded && (
-                  <div className="p-4 bg-white">
+                  <div className="p-4 sm:p-5 bg-white">
                     {subCount === 0 ? (
-                      <div className="p-4 bg-neutral-50/70 border border-dashed border-neutral-200 rounded-[2px] text-center text-xs text-neutral-500">
-                        <span>Nenhuma subcategoria vinculada a <strong>{cat.name}</strong>.</span>
+                      <div className="p-5 bg-neutral-50/80 border border-dashed border-neutral-200 rounded-md flex flex-col sm:flex-row items-center justify-center gap-2.5 text-center text-xs sm:text-sm text-neutral-600">
+                        <span>
+                          Nenhuma subcategoria vinculada a <strong className="text-neutral-900">{cat.name}</strong>.
+                        </span>
                         <button
                           type="button"
                           onClick={() => handleOpenNewSubcategoryModal(cat)}
-                          className="ml-2 text-[#FB6600] font-bold hover:underline cursor-pointer"
+                          className="text-[#FB6600] font-bold hover:underline cursor-pointer"
                         >
-                          + Adicionar primeira subcategoria
+                          + Adicionar subcategoria
                         </button>
                       </div>
                     ) : (
-                      <div className="space-y-2">
-                        <div className="text-[10px] font-black uppercase tracking-widest text-neutral-400 px-2">
-                          Subcategorias vinculadas ({subCount})
+                      <div className="space-y-3">
+                        <div className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                          Subcategorias ({subCount})
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {cat.subcategories.map((sub) => {
                             const subProdCount = (sub as any).products_count || 0
                             return (
                               <div
                                 key={sub.id}
-                                className="p-3 bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200 rounded-[2px] flex items-center justify-between gap-3 transition-colors"
+                                className="p-3.5 sm:p-4 bg-neutral-50/70 hover:bg-neutral-100/80 border border-neutral-200 rounded-md flex items-center justify-between gap-3 transition-colors"
                               >
                                 <div className="flex items-center gap-2.5 min-w-0">
-                                  <span className="text-[#FB6600] text-xs font-bold">↳</span>
+                                  <span className="text-[#FB6600] text-sm font-bold shrink-0">↳</span>
                                   <div className="min-w-0">
-                                    <div className="flex items-center gap-2">
-                                      <h4 className="text-xs font-bold text-neutral-900 truncate">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <h4 className="text-sm font-bold text-neutral-900 truncate">
                                         {sub.name}
                                       </h4>
                                       <span
-                                        className={`px-1.5 py-0.2 text-[8.5px] font-black uppercase rounded ${
+                                        className={`px-2 py-0.5 text-[11px] font-semibold rounded-full ${
                                           sub.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-200 text-neutral-600'
                                         }`}
                                       >
                                         {sub.is_active ? 'Ativa' : 'Inativa'}
                                       </span>
                                     </div>
-                                    <span className="text-[10px] text-neutral-500 block truncate">
-                                      {subProdCount} produto(s) classificado(s)
+                                    <span className="text-xs text-neutral-600 block mt-0.5">
+                                      {subProdCount} produto(s)
                                     </span>
                                   </div>
                                 </div>
@@ -588,7 +565,7 @@ export default function MerchantCategoriesTab({
                                   <button
                                     type="button"
                                     onClick={() => handleOpenEditSubcategoryModal(cat, sub)}
-                                    className="p-1 text-neutral-600 hover:text-black text-xs font-bold cursor-pointer"
+                                    className="w-8 h-8 rounded-md border border-neutral-200 bg-white hover:border-neutral-400 text-neutral-700 hover:text-black flex items-center justify-center text-sm cursor-pointer transition-colors"
                                     title="Editar subcategoria"
                                   >
                                     ✏️
@@ -596,7 +573,7 @@ export default function MerchantCategoriesTab({
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteSubcategoryPrompt(cat, sub)}
-                                    className="p-1 text-rose-500 hover:text-rose-700 text-xs font-bold cursor-pointer"
+                                    className="w-8 h-8 rounded-md border border-neutral-200 bg-white hover:border-rose-300 hover:bg-rose-50 text-rose-500 hover:text-rose-700 flex items-center justify-center text-sm cursor-pointer transition-colors"
                                     title="Excluir subcategoria"
                                   >
                                     🗑️
@@ -619,15 +596,15 @@ export default function MerchantCategoriesTab({
       {/* Modal de Criação / Edição de Categoria */}
       {isCategoryModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden">
-            <div className="p-4 bg-neutral-900 text-white flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider">
-                {editingCategory ? 'Editar Categoria Principal' : 'Nova Categoria Principal'}
+          <div className="bg-white w-full max-w-md rounded-md shadow-2xl border border-neutral-200 overflow-hidden">
+            <div className="p-4 sm:p-5 bg-neutral-900 text-white flex items-center justify-between">
+              <h3 className="text-sm sm:text-base font-bold">
+                {editingCategory ? 'Editar Categoria' : 'Nova Categoria'}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsCategoryModalOpen(false)}
-                className="text-neutral-400 hover:text-white font-bold text-base cursor-pointer"
+                className="text-neutral-400 hover:text-white font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
@@ -642,7 +619,7 @@ export default function MerchantCategoriesTab({
               className="p-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                   Nome da Categoria *
                 </label>
                 <input
@@ -650,42 +627,42 @@ export default function MerchantCategoriesTab({
                   required
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  placeholder="Ex: Camisas, Calças, Vestidos, Acessórios..."
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black"
+                  placeholder="Ex.: Camisas, Sedan, Acessórios..."
+                  className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                   Descrição (Opcional)
                 </label>
                 <textarea
                   rows={2}
                   value={categoryDescription}
                   onChange={(e) => setCategoryDescription(e.target.value)}
-                  placeholder="Breve explicação sobre os produtos desta categoria..."
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black resize-none"
+                  placeholder="Breve descrição da categoria..."
+                  className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 resize-none"
                 />
               </div>
 
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-neutral-800">
+              <div className="pt-1">
+                <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm font-semibold text-neutral-800">
                   <input
                     type="checkbox"
                     checked={categoryIsActive}
                     onChange={(e) => setCategoryIsActive(e.target.checked)}
                     className="w-4 h-4 text-[#FB6600] rounded"
                   />
-                  <span>Categoria ativa (visível no menu e filtros da loja)</span>
+                  <span>Categoria ativa na vitrine</span>
                 </label>
               </div>
 
-              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsCategoryModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold uppercase rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -697,9 +674,9 @@ export default function MerchantCategoriesTab({
                     handleSaveCategory()
                   }}
                   disabled={submitting}
-                  className="px-5 py-2 bg-black hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer disabled:opacity-50"
+                  className="h-10 px-5 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'Salvando...' : editingCategory ? 'Salvar Alterações' : 'Criar Categoria'}
+                  {submitting ? 'Salvando...' : editingCategory ? 'Salvar' : 'Criar Categoria'}
                 </button>
               </div>
             </form>
@@ -710,15 +687,15 @@ export default function MerchantCategoriesTab({
       {/* Modal de Criação / Edição de Subcategoria */}
       {isSubcategoryModalOpen && selectedParentCategory && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden">
-            <div className="p-4 bg-neutral-900 text-white flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider">
+          <div className="bg-white w-full max-w-md rounded-md shadow-2xl border border-neutral-200 overflow-hidden">
+            <div className="p-4 sm:p-5 bg-neutral-900 text-white flex items-center justify-between">
+              <h3 className="text-sm sm:text-base font-bold">
                 {editingSubcategory ? 'Editar Subcategoria' : 'Nova Subcategoria'}
               </h3>
               <button
                 type="button"
                 onClick={() => setIsSubcategoryModalOpen(false)}
-                className="text-neutral-400 hover:text-white font-bold text-base cursor-pointer"
+                className="text-neutral-400 hover:text-white font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
@@ -733,19 +710,19 @@ export default function MerchantCategoriesTab({
               className="p-5 space-y-4"
             >
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
-                  Categoria Principal Vinculada
+                <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                  Categoria Principal
                 </label>
                 <input
                   type="text"
                   disabled
                   value={selectedParentCategory.name}
-                  className="w-full px-3 py-2 text-xs bg-neutral-100 border border-neutral-300 rounded-[2px] text-neutral-700 font-bold"
+                  className="w-full h-11 px-3.5 text-sm bg-neutral-100 border border-neutral-300 rounded-md text-neutral-700 font-bold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                   Nome da Subcategoria *
                 </label>
                 <input
@@ -753,14 +730,14 @@ export default function MerchantCategoriesTab({
                   required
                   value={subcategoryName}
                   onChange={(e) => setSubcategoryName(e.target.value)}
-                  placeholder="Ex: Cavada, Manga Longa, Polo..."
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black"
+                  placeholder="Ex.: Polo, Chevrolet, Volkswagen..."
+                  className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-neutral-700 uppercase mb-1">
+                <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                   Descrição (Opcional)
                 </label>
                 <textarea
@@ -768,27 +745,27 @@ export default function MerchantCategoriesTab({
                   value={subcategoryDescription}
                   onChange={(e) => setSubcategoryDescription(e.target.value)}
                   placeholder="Detalhes adicionais..."
-                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-[2px] focus:outline-none focus:border-black resize-none"
+                  className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 resize-none"
                 />
               </div>
 
-              <div className="pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-neutral-800">
+              <div className="pt-1">
+                <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm font-semibold text-neutral-800">
                   <input
                     type="checkbox"
                     checked={subcategoryIsActive}
                     onChange={(e) => setSubcategoryIsActive(e.target.checked)}
                     className="w-4 h-4 text-[#FB6600] rounded"
                   />
-                  <span>Subcategoria ativa (disponível no catálogo e filtros)</span>
+                  <span>Subcategoria ativa na vitrine</span>
                 </label>
               </div>
 
-              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsSubcategoryModalOpen(false)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold uppercase rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -800,9 +777,9 @@ export default function MerchantCategoriesTab({
                     handleSaveSubcategory()
                   }}
                   disabled={submitting}
-                  className="px-5 py-2 bg-[#FB6600] hover:bg-[#e01283] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer disabled:opacity-50"
+                  className="h-10 px-5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'Salvando...' : editingSubcategory ? 'Salvar Subcategoria' : 'Criar Subcategoria'}
+                  {submitting ? 'Salvando...' : editingSubcategory ? 'Salvar' : 'Criar Subcategoria'}
                 </button>
               </div>
             </form>
@@ -810,40 +787,40 @@ export default function MerchantCategoriesTab({
         </div>
       )}
 
-      {/* Modal de Confirmação de Exclusão com Detecção de Vínculos de Produtos */}
+      {/* Modal de Confirmação de Exclusão */}
       {deleteConfirmation && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden">
-            <div className="p-4 bg-rose-600 text-white flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <div className="bg-white w-full max-w-md rounded-md shadow-2xl border border-neutral-200 overflow-hidden">
+            <div className="p-4 sm:p-5 bg-rose-600 text-white flex items-center justify-between">
+              <h3 className="text-sm sm:text-base font-bold flex items-center gap-2">
                 <span>⚠️</span>
                 <span>Confirmar Exclusão</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setDeleteConfirmation(null)}
-                className="text-white/80 hover:text-white font-bold text-base cursor-pointer"
+                className="text-white/80 hover:text-white font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
-            <div className="p-5 space-y-3">
-              <p className="text-xs text-neutral-700 leading-relaxed">
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-neutral-700 leading-relaxed">
                 {deleteConfirmation.message}
               </p>
 
               {deleteConfirmation.linkedProductsCount > 0 && (
-                <div className="p-3 bg-amber-50 border border-amber-300 rounded-[2px] text-amber-950 text-[11px]">
-                  <strong>Garantia de segurança:</strong> Seus produtos NÃO serão apagados. Eles apenas serão desvinculados desta classificação e continuarão salvos no seu catálogo.
+                <div className="p-3 bg-amber-50 border border-amber-300 rounded-md text-amber-950 text-xs sm:text-sm">
+                  <strong>Aviso:</strong> Os produtos não serão apagados do catálogo, apenas desvinculados.
                 </div>
               )}
 
-              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setDeleteConfirmation(null)}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-bold uppercase rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -851,47 +828,45 @@ export default function MerchantCategoriesTab({
                   type="button"
                   onClick={handleConfirmDelete}
                   disabled={submitting}
-                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer disabled:opacity-50"
+                  className="h-10 px-5 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'Excluindo...' : 'Sim, Excluir Registro'}
+                  {submitting ? 'Excluindo...' : 'Excluir'}
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
       {/* Modal de Confirmação de Limpar Todas as Categorias */}
       {isClearModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2px] shadow-2xl border border-neutral-200 overflow-hidden animate-in fade-in duration-200">
-            <div className="p-4 bg-neutral-900 text-white flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-white w-full max-w-md rounded-md shadow-2xl border border-neutral-200 overflow-hidden animate-in fade-in duration-200">
+            <div className="p-4 sm:p-5 bg-neutral-900 text-white flex items-center justify-between">
+              <h3 className="text-sm sm:text-base font-bold flex items-center gap-2">
                 <span>⚠️</span>
-                <span>Limpar Categorias e Subcategorias</span>
+                <span>Limpar Categorias</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsClearModalOpen(false)}
-                className="text-neutral-400 hover:text-white font-bold text-base cursor-pointer"
+                className="text-neutral-400 hover:text-white font-bold text-lg cursor-pointer"
               >
                 &times;
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <p className="text-xs text-neutral-700 leading-relaxed">
-                Deseja realmente limpar todas as <strong>{categories.length} categoria(s)</strong> e suas subcategorias cadastradas nesta loja?
+            <div className="p-5 sm:p-6 space-y-4">
+              <p className="text-sm text-neutral-700 leading-relaxed">
+                Deseja remover todas as <strong>{categories.length} categoria(s)</strong> e suas subcategorias? Seus produtos continuarão salvos no catálogo.
               </p>
-              <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-[2px] text-[11px] text-neutral-600 leading-relaxed">
-                Essa ação removerá os registros para que você possa organizar a estrutura de categorias personalizada da sua loja do zero. Seus produtos cadastrados continuarão intactos no catálogo.
-              </div>
 
-              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsClearModalOpen(false)}
                   disabled={clearing}
-                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-[2px] hover:bg-neutral-50 cursor-pointer"
+                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -899,9 +874,9 @@ export default function MerchantCategoriesTab({
                   type="button"
                   onClick={handleClearAllCategories}
                   disabled={clearing}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold uppercase tracking-wider rounded-[2px] cursor-pointer shadow-xs disabled:opacity-50"
+                  className="h-10 px-4 bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer shadow-xs disabled:opacity-50"
                 >
-                  {clearing ? 'Limpando...' : 'Sim, Limpar Tudo'}
+                  {clearing ? 'Limpando...' : 'Limpar Tudo'}
                 </button>
               </div>
             </div>
