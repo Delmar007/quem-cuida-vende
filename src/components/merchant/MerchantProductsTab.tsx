@@ -1132,7 +1132,7 @@ export default function MerchantProductsTab({
                           )}
                           {prod.vehicle_traction && (
                             <span className="whitespace-nowrap">
-                              <strong className="text-neutral-800">Tração:</strong> {prod.vehicle_traction}
+                              {prod.vehicle_traction}
                             </span>
                           )}
                           {prod.vehicle_plate_internal && (
