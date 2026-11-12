@@ -1023,9 +1023,16 @@ export default function MerchantProductsTab({
         <div className="flex flex-col gap-4">
           {filteredProducts.map((prod) => {
             const hasPromo = Boolean(prod.promotional_price && prod.promotional_price < prod.price)
-            const discountPercent = hasPromo
-              ? Math.round(((prod.price - prod.promotional_price!) / prod.price) * 100)
+            const salePrice = hasPromo ? prod.promotional_price! : prod.price
+            const referencePrice = hasPromo
+              ? prod.price
+              : prod.fipe_price_internal && prod.fipe_price_internal > prod.price
+                ? prod.fipe_price_internal
+                : null
+            const discountPercent = referencePrice
+              ? Math.round(((referencePrice - salePrice) / referencePrice) * 100)
               : 0
+            const isHorizontalPhoto = Boolean(prod.is_vehicle || prod.photo_orientation === 'horizontal')
 
             return (
               <div
@@ -1034,13 +1041,17 @@ export default function MerchantProductsTab({
                   !prod.is_active ? 'opacity-70 bg-neutral-50/40' : ''
                 }`}
               >
-                <div className="p-3 sm:p-3.5 flex flex-col md:flex-row gap-3 sm:gap-4 md:items-center">
-                  {/* Coluna 1 (Esquerda): Foto do Produto (tamanho mantido) */}
+                <div className="p-3 sm:p-3.5 flex flex-col lg:flex-row gap-3 sm:gap-4 lg:items-center">
+                  {/* Coluna A: Foto horizontal para carro, vertical para produto */}
                   <div className="shrink-0 flex items-center">
                     <button
                       type="button"
                       onClick={() => setPreviewProduct(prod)}
-                      className="w-28 h-32 sm:w-32 sm:h-36 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden relative shrink-0 flex items-center justify-center cursor-pointer group"
+                      className={`${
+                        isHorizontalPhoto
+                          ? 'w-44 h-28 sm:w-48 sm:h-32'
+                          : 'w-24 h-32 sm:w-28 sm:h-36'
+                      } bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden relative shrink-0 flex items-center justify-center cursor-pointer group`}
                       title="Clique para pré-visualizar"
                     >
                       {prod.image_url ? (
@@ -1060,11 +1071,11 @@ export default function MerchantProductsTab({
                     </button>
                   </div>
 
-                  {/* Coluna 2 (Meio): Dividida em 2 colunas para distribuir melhor as informações */}
+                  {/* Coluna B: Dividida em B1 e B2 */}
                   <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 items-center">
-                    {/* Subcoluna 2A: Tipo de promoção e Modelo */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                    {/* B1: Tipo de promoção, nome do veículo, categoria, subcategoria, SKU */}
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
                           {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
                         </span>
@@ -1078,10 +1089,7 @@ export default function MerchantProductsTab({
                       <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
                         {prod.name}
                       </h4>
-                    </div>
 
-                    {/* Subcoluna 2B: Categoria, SKU, Ano, KM, Câmbio e Placa */}
-                    <div className="min-w-0 space-y-1">
                       <div className="text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
                         <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
                         {prod.subcategory && (
@@ -1097,65 +1105,83 @@ export default function MerchantProductsTab({
                           </>
                         )}
                       </div>
+                    </div>
 
-                      {prod.is_vehicle && (
-                        <div className="space-y-1">
-                          <span className="text-xs sm:text-sm text-neutral-600 block">
-                            {[
-                              prod.vehicle_year_model || prod.vehicle_year_fab,
-                              prod.vehicle_km
-                                ? String(prod.vehicle_km).toLowerCase().includes('km')
+                    {/* B2: Ano, KM, Câmbio, Tração/Combustível */}
+                    <div className="min-w-0 space-y-1 text-xs sm:text-sm text-neutral-600">
+                      {prod.is_vehicle ? (
+                        <>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                            {(prod.vehicle_year_model || prod.vehicle_year_fab) && (
+                              <span>
+                                <strong className="text-neutral-800">Ano:</strong>{' '}
+                                {prod.vehicle_year_model || prod.vehicle_year_fab}
+                              </span>
+                            )}
+                            {prod.vehicle_km && (
+                              <span>
+                                <strong className="text-neutral-800">KM:</strong>{' '}
+                                {String(prod.vehicle_km).toLowerCase().includes('km')
                                   ? prod.vehicle_km
-                                  : `${prod.vehicle_km} km`
-                                : null,
-                              prod.vehicle_transmission,
-                              prod.vehicle_traction,
-                            ]
-                              .filter(Boolean)
-                              .join(' • ')}
-                          </span>
+                                  : `${prod.vehicle_km} km`}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                            {prod.vehicle_transmission && (
+                              <span>
+                                <strong className="text-neutral-800">Câmbio:</strong> {prod.vehicle_transmission}
+                              </span>
+                            )}
+                            {prod.vehicle_traction && (
+                              <span>
+                                <strong className="text-neutral-800">Tração:</strong> {prod.vehicle_traction}
+                              </span>
+                            )}
+                          </div>
                           {prod.vehicle_plate_internal && (
                             <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-[11px] rounded">
                               🔒 Placa: {prod.vehicle_plate_internal}
                             </span>
                           )}
-                        </div>
+                        </>
+                      ) : (
+                        prod.description && (
+                          <p className="text-xs text-neutral-500 line-clamp-3">{prod.description}</p>
+                        )
                       )}
                     </div>
                   </div>
 
-                  {/* Coluna 3 (Direita): Preços e Botões na vertical */}
-                  <div className="shrink-0 pt-2.5 md:pt-0 md:pl-4 border-t md:border-t-0 md:border-l border-neutral-100 flex items-center justify-between md:justify-end gap-4">
-                    {/* Preços na vertical */}
-                    <div className="flex flex-col md:items-end gap-0.5">
-                      {hasPromo ? (
-                        <>
-                          <span className="text-base sm:text-lg font-extrabold text-[#FB6600] leading-tight whitespace-nowrap">
-                            R$ {formatCurrencyBRL(prod.promotional_price)}
+                  {/* Coluna C: Preço de venda, FIPE/preço riscado e percentual + 2 colunas de botões (C1 e C2) */}
+                  <div className="lg:w-64 shrink-0 pt-2.5 lg:pt-0 lg:pl-4 border-t lg:border-t-0 lg:border-l border-neutral-100 flex flex-col justify-between gap-2.5">
+                    {/* Preços */}
+                    <div className="flex flex-col lg:items-end gap-0.5">
+                      <span className={`text-lg font-extrabold leading-tight whitespace-nowrap ${hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'}`}>
+                        R$ {formatCurrencyBRL(salePrice)}
+                      </span>
+
+                      {referencePrice && (
+                        <div className="flex items-center gap-1.5 flex-wrap lg:justify-end">
+                          <span className="line-through text-neutral-400 text-xs font-medium whitespace-nowrap">
+                            {!hasPromo && prod.fipe_price_internal ? 'FIPE ' : ''}R$ {formatCurrencyBRL(referencePrice)}
                           </span>
-                          <div className="flex items-center gap-1.5 flex-wrap md:justify-end">
-                            <span className="line-through text-neutral-400 text-xs font-medium whitespace-nowrap">
-                              R$ {formatCurrencyBRL(prod.price)}
-                            </span>
+                          {discountPercent > 0 && (
                             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                               -{discountPercent}%
                             </span>
-                          </div>
-                        </>
-                      ) : (
-                        <span className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight whitespace-nowrap">
-                          R$ {formatCurrencyBRL(prod.price)}
-                        </span>
+                          )}
+                        </div>
                       )}
 
-                      {(prod.cost_price_internal || prod.fipe_price_internal) && (
-                        <div className="flex flex-col md:items-end gap-1 mt-1">
+                      {(prod.cost_price_internal || (hasPromo && prod.fipe_price_internal)) && (
+                        <div className="flex items-center gap-1.5 flex-wrap lg:justify-end mt-0.5">
                           {prod.cost_price_internal && (
                             <span className="text-[11px] font-semibold text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔒 Custo: R$ {formatCurrencyBRL(prod.cost_price_internal)}
                             </span>
                           )}
-                          {prod.fipe_price_internal && (
+                          {hasPromo && prod.fipe_price_internal && (
                             <span className="text-[11px] font-semibold text-amber-900 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔒 FIPE: R$ {formatCurrencyBRL(prod.fipe_price_internal)}
                             </span>
@@ -1164,41 +1190,48 @@ export default function MerchantProductsTab({
                       )}
                     </div>
 
-                    {/* Botões na vertical (mesma altura da foto) */}
-                    <div className="flex flex-col gap-1 w-32 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleActive(prod)}
-                        className={`h-7 px-2.5 text-[11px] font-bold rounded-md transition-colors cursor-pointer border text-center whitespace-nowrap ${
-                          prod.is_active
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                            : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
-                        }`}
-                        title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
-                      >
-                        {prod.is_active ? '✓ Ativo na Vitrine' : '✕ Inativo'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPreviewProduct(prod)}
-                        className="h-7 px-2.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
-                      >
-                        Prévia
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleOpenEditModal(prod)}
-                        className="h-7 px-2.5 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeleteConfirmation(prod)}
-                        className="h-7 px-2.5 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
-                      >
-                        Excluir
-                      </button>
+                    {/* Botões em 2 colunas: C1 (Ativo, Prévia) e C2 (Editar, Excluir) */}
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {/* C1 */}
+                      <div className="flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(prod)}
+                          className={`h-7 px-2 text-[11px] font-bold rounded-md transition-colors cursor-pointer border text-center whitespace-nowrap truncate ${
+                            prod.is_active
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                              : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
+                          }`}
+                          title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
+                        >
+                          {prod.is_active ? '✓ Ativo' : '✕ Inativo'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPreviewProduct(prod)}
+                          className="h-7 px-2 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Prévia
+                        </button>
+                      </div>
+
+                      {/* C2 */}
+                      <div className="flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(prod)}
+                          className="h-7 px-2 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirmation(prod)}
+                          className="h-7 px-2 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Excluir
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
