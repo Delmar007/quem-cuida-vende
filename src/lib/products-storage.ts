@@ -28,6 +28,10 @@ export interface StoredProduct {
   vehicle_transmission?: string | null
   vehicle_traction?: string | null
   vehicle_plate_internal?: string | null
+  unit_type?: string | null
+  unit_value?: string | null
+  sizes?: string[] | null
+  colors?: string[] | null
   is_outlet: boolean
   is_novidade: boolean
   is_active: boolean

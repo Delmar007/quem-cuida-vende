@@ -44,6 +44,10 @@ export interface CreateProductInput {
   vehicleTransmission?: string
   vehicleTraction?: string
   vehiclePlateInternal?: string
+  unitType?: string
+  unitValue?: string
+  sizes?: string[]
+  colors?: string[]
   isOutlet?: boolean
   isNovidade?: boolean
   isActive?: boolean
@@ -76,6 +80,10 @@ export interface UpdateProductInput {
   vehicleTransmission?: string
   vehicleTraction?: string
   vehiclePlateInternal?: string
+  unitType?: string
+  unitValue?: string
+  sizes?: string[]
+  colors?: string[]
   isOutlet?: boolean
   isNovidade?: boolean
   isActive?: boolean
@@ -253,6 +261,10 @@ export async function createProductAction(data: CreateProductInput): Promise<{
     vehicle_transmission: data.vehicleTransmission?.trim() || null,
     vehicle_traction: data.vehicleTraction?.trim() || null,
     vehicle_plate_internal: data.vehiclePlateInternal?.trim() || null,
+    unit_type: data.unitType?.trim() || null,
+    unit_value: data.unitValue?.trim() || null,
+    sizes: data.sizes && data.sizes.length > 0 ? data.sizes : null,
+    colors: data.colors && data.colors.length > 0 ? data.colors : null,
     is_outlet: isOutlet,
     is_novidade: isNovidade,
     is_active: data.isActive ?? true,
@@ -431,6 +443,10 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     vehicle_transmission: data.vehicleTransmission !== undefined ? data.vehicleTransmission?.trim() || null : existing.vehicle_transmission,
     vehicle_traction: data.vehicleTraction !== undefined ? data.vehicleTraction?.trim() || null : existing.vehicle_traction,
     vehicle_plate_internal: data.vehiclePlateInternal !== undefined ? data.vehiclePlateInternal?.trim() || null : existing.vehicle_plate_internal,
+    unit_type: data.unitType !== undefined ? data.unitType?.trim() || null : (existing as any).unit_type,
+    unit_value: data.unitValue !== undefined ? data.unitValue?.trim() || null : (existing as any).unit_value,
+    sizes: data.sizes !== undefined ? (data.sizes.length > 0 ? data.sizes : null) : (existing as any).sizes,
+    colors: data.colors !== undefined ? (data.colors.length > 0 ? data.colors : null) : (existing as any).colors,
     is_outlet: isOutlet,
     is_novidade: isNovidade,
     is_active: data.isActive !== undefined ? Boolean(data.isActive) : existing.is_active,

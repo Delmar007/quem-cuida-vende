@@ -17,6 +17,12 @@ import { StoredProduct } from '@/lib/products-storage'
 import { getPlan, PlanId } from '@/lib/plans'
 import { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog'
 import ProductCardImageCarousel from '@/components/ProductCardImageCarousel'
+import { FIPE_MARCAS } from '@/lib/fipeMarcas'
+
+// Marcas FIPE únicas ordenadas alfabeticamente
+const FIPE_VEHICLE_BRANDS: string[] = Array.from(
+  new Set(FIPE_MARCAS.map((m: any) => m.nome.trim()))
+).sort((a: string, b: string) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
 
 interface MerchantProductsTabProps {
   storeId: string
@@ -128,8 +134,16 @@ export default function MerchantProductsTab({
   const [formHighlight, setFormHighlight] = useState<'none' | 'novidade' | 'outlet'>('novidade')
   const [formIsActive, setFormIsActive] = useState(true)
 
+  // Estados para Unidades, Pesos e Medidas (Produtos Gerais Pro Max)
+  const [formUnitValue, setFormUnitValue] = useState('')
+  const [formUnitType, setFormUnitType] = useState('un')
+  const [formSizes, setFormSizes] = useState<string[]>([])
+  const [formColors, setFormColors] = useState<string[]>([])
+  const [customSizeInput, setCustomSizeInput] = useState('')
+  const [customColorInput, setCustomColorInput] = useState('')
+
   // Estados exclusivos para Cadastro de Veículos (Segmento Carro / Usados e Concessionária)
-  const [formVehicleCategory, setFormVehicleCategory] = useState('Carro')
+  const [formVehicleCategory, setFormVehicleCategory] = useState('Carros')
   const [formVehicleBrand, setFormVehicleBrand] = useState('')
   const [formVehicleModel, setFormVehicleModel] = useState('')
   const [formVehicleVersion, setFormVehicleVersion] = useState('')
@@ -152,13 +166,13 @@ export default function MerchantProductsTab({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const CATEGORIAS_VEICULOS = [
-    { id: 'Carro', label: 'Carro', icon: '🚗' },
-    { id: 'Moto', label: 'Moto', icon: '🏍️' },
-    { id: 'Caminhão', label: 'Caminhão', icon: '🚚' },
-    { id: 'Ônibus/Van', label: 'Ônibus/Van', icon: '🚐' },
-    { id: 'Triciclo/Quadriciclo/UTV', label: 'Triciclo/Quadriciclo/UTV', icon: '🛞' },
-    { id: 'Náutica', label: 'Náutica', icon: '🚤' },
-    { id: 'Tratores/Rebocáveis', label: 'Tratores/Rebocáveis', icon: '🚜' },
+    { id: 'Carros', label: 'Carros', icon: '🚗' },
+    { id: 'Motos', label: 'Motos', icon: '🏍️' },
+    { id: 'Caminhões', label: 'Caminhões', icon: '🚚' },
+    { id: 'Ônibus/Vans', label: 'Ônibus/Vans', icon: '🚐' },
+    { id: 'Triciclos/Quadriciclos/UTV', label: 'Triciclos/Quadriciclos/UTV', icon: '🛞' },
+    { id: 'Náutico', label: 'Náutico', icon: '🚤' },
+    { id: 'Tratatores/Rebocáveis', label: 'Tratatores/Rebocáveis', icon: '🚜' },
   ]
 
   const TIPOS_PROMOCAO_VEICULOS = [
@@ -337,8 +351,16 @@ export default function MerchantProductsTab({
     setFormImages([])
     setFormPhotoOrientation(useVehicleMode ? 'horizontal' : 'vertical')
 
+    // Campos Pro Max de Produtos Gerais
+    setFormUnitValue('')
+    setFormUnitType('un')
+    setFormSizes([])
+    setFormColors([])
+    setCustomSizeInput('')
+    setCustomColorInput('')
+
     // Campos de veículo resetados
-    setFormVehicleCategory('Carro')
+    setFormVehicleCategory('Carros')
     setFormVehicleBrand('')
     setFormVehicleModel('')
     setFormVehicleVersion('')
@@ -381,7 +403,15 @@ export default function MerchantProductsTab({
     setFormCategory(prod.category || (categories[0]?.name || ''))
     setFormSubcategory(prod.subcategory || '')
 
-    setFormVehicleCategory(prod.vehicle_category || 'Carro')
+    // Campos Pro Max de Produtos Gerais
+    setFormUnitValue(prod.unit_value || '')
+    setFormUnitType(prod.unit_type || 'un')
+    setFormSizes(prod.sizes || [])
+    setFormColors(prod.colors || [])
+    setCustomSizeInput('')
+    setCustomColorInput('')
+
+    setFormVehicleCategory(prod.vehicle_category || 'Carros')
     setFormVehicleBrand(prod.vehicle_brand || '')
     setFormVehicleModel(prod.vehicle_model || '')
     setFormVehicleVersion(prod.vehicle_version || '')
@@ -551,6 +581,7 @@ export default function MerchantProductsTab({
 
     try {
       const coverImage = formImages.length > 0 ? formImages[0] : undefined
+      const effectivePhotoOrientation: 'vertical' | 'horizontal' = formIsVehicle ? 'horizontal' : 'vertical'
 
       if (editingProduct) {
         const payload: UpdateProductInput = {
@@ -565,7 +596,7 @@ export default function MerchantProductsTab({
           fipePriceInternal: parsedFipeInternal,
           imageUrl: coverImage,
           images: formImages.slice(0, MAX_PHOTOS),
-          photoOrientation: formPhotoOrientation,
+          photoOrientation: effectivePhotoOrientation,
           category: effectiveCategory,
           subcategory: formSubcategory || undefined,
           promoType: formPromoType,
@@ -580,6 +611,10 @@ export default function MerchantProductsTab({
           vehicleTransmission: formIsVehicle ? formVehicleTransmission : undefined,
           vehicleTraction: formIsVehicle ? formVehicleTraction : undefined,
           vehiclePlateInternal: formIsVehicle ? formVehiclePlateInternal : undefined,
+          unitType: !formIsVehicle ? formUnitType : undefined,
+          unitValue: !formIsVehicle ? formUnitValue : undefined,
+          sizes: !formIsVehicle && formSizes.length > 0 ? formSizes : undefined,
+          colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
           isActive: formIsActive,
@@ -605,7 +640,7 @@ export default function MerchantProductsTab({
           fipePriceInternal: parsedFipeInternal,
           imageUrl: coverImage,
           images: formImages.slice(0, MAX_PHOTOS),
-          photoOrientation: formPhotoOrientation,
+          photoOrientation: effectivePhotoOrientation,
           category: effectiveCategory,
           subcategory: formSubcategory || undefined,
           promoType: formPromoType,
@@ -620,6 +655,10 @@ export default function MerchantProductsTab({
           vehicleTransmission: formIsVehicle ? formVehicleTransmission : undefined,
           vehicleTraction: formIsVehicle ? formVehicleTraction : undefined,
           vehiclePlateInternal: formIsVehicle ? formVehiclePlateInternal : undefined,
+          unitType: !formIsVehicle ? formUnitType : undefined,
+          unitValue: !formIsVehicle ? formUnitValue : undefined,
+          sizes: !formIsVehicle && formSizes.length > 0 ? formSizes : undefined,
+          colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
           isActive: formIsActive,
@@ -1032,7 +1071,8 @@ export default function MerchantProductsTab({
             const discountPercent = referencePrice
               ? Math.round(((referencePrice - salePrice) / referencePrice) * 100)
               : 0
-            const isHorizontalPhoto = Boolean(prod.is_vehicle || prod.photo_orientation === 'horizontal')
+            // Carros sempre na horizontal e produtos sempre na vertical
+            const isHorizontalPhoto = Boolean(prod.is_vehicle)
 
             return (
               <div
@@ -1080,7 +1120,7 @@ export default function MerchantProductsTab({
 
                   {/* Coluna B: B1 à esquerda e B2 à direita aproveitando todo o espaço */}
                   <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
-                    {/* B1 (Esquerda): Categoria do veículo, categoria, subcategoria, SKU */}
+                    {/* B1 (Esquerda): Categoria do veículo, categoria, subcategoria, SKU e Unidade/Peso */}
                     <div className="min-w-0 flex-1 space-y-1">
                       {prod.is_vehicle && prod.vehicle_category && (
                         <div className="flex items-center gap-1.5 flex-wrap">
@@ -1099,10 +1139,38 @@ export default function MerchantProductsTab({
                           <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
                         )}
                       </div>
+
+                      {/* Unidade / Peso / Medida para produtos gerais */}
+                      {!prod.is_vehicle && (prod.unit_value || prod.unit_type) && (
+                        <div className="pt-0.5">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 border border-orange-200 text-neutral-900 rounded font-bold text-xs">
+                            <span>📦</span>
+                            <span>
+                              {prod.unit_value ? `${prod.unit_value} ` : ''}
+                              {prod.unit_type || 'un'}
+                            </span>
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Cores disponíveis para produtos gerais */}
+                      {!prod.is_vehicle && prod.colors && prod.colors.length > 0 && (
+                        <div className="pt-0.5 flex items-center gap-1 flex-wrap text-xs text-neutral-600">
+                          <span className="font-semibold text-neutral-700 text-[11px]">Cores:</span>
+                          {prod.colors.slice(0, 4).map((c) => (
+                            <span key={c} className="px-1.5 py-0.2 text-[10px] bg-neutral-100 border border-neutral-200 rounded font-medium">
+                              {c}
+                            </span>
+                          ))}
+                          {prod.colors.length > 4 && (
+                            <span className="text-[10px] text-neutral-400">+{prod.colors.length - 4}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    {/* B2 (Direita): Ano, KM, Câmbio, Tração */}
-                    <div className="min-w-0 sm:text-right flex flex-col sm:items-end gap-0.5 text-xs sm:text-sm text-neutral-600 shrink-0">
+                    {/* B2 (Direita): Ano/KM/Câmbio/Tração para veículo OU Grade de Tamanhos / Descrição para produto */}
+                    <div className="min-w-0 sm:text-right flex flex-col sm:items-end gap-1 text-xs sm:text-sm text-neutral-600 shrink-0">
                       {prod.is_vehicle ? (
                         <>
                           {(prod.vehicle_year_model || prod.vehicle_year_fab) && (
@@ -1134,9 +1202,29 @@ export default function MerchantProductsTab({
                           )}
                         </>
                       ) : (
-                        prod.description && (
-                          <p className="text-xs text-neutral-500 line-clamp-3 max-w-xs sm:text-right">{prod.description}</p>
-                        )
+                        <>
+                          {/* Grade de Tamanhos em Destaque */}
+                          {prod.sizes && prod.sizes.length > 0 && (
+                            <div className="flex flex-col sm:items-end gap-1">
+                              <span className="text-[10px] font-extrabold uppercase tracking-wider text-neutral-500">
+                                Tamanhos:
+                              </span>
+                              <div className="flex flex-wrap gap-1 sm:justify-end max-w-[220px]">
+                                {prod.sizes.map((sz) => (
+                                  <span
+                                    key={sz}
+                                    className="px-1.5 py-0.5 bg-neutral-900 text-white rounded text-[10px] font-bold shadow-2xs"
+                                  >
+                                    {sz}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {prod.description && (
+                            <p className="text-xs text-neutral-500 line-clamp-2 max-w-xs sm:text-right mt-0.5">{prod.description}</p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -1316,47 +1404,43 @@ export default function MerchantProductsTab({
 
                 {formIsVehicle ? (
                   <div className="space-y-4">
-                    {/* Categoria do Veículo */}
+                    {/* Categoria do Veículo (Menu vertical / dropdown selecionável) */}
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Categoria *
+                        Categoria do Veículo *
                       </label>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                        {CATEGORIAS_VEICULOS.map((vCat) => {
-                          const selected = formVehicleCategory === vCat.id
-                          return (
-                            <button
-                              key={vCat.id}
-                              type="button"
-                              onClick={() => setFormVehicleCategory(vCat.id)}
-                              className={`h-10 px-3 text-xs sm:text-sm rounded-md border text-left transition-all cursor-pointer flex items-center gap-2 ${
-                                selected
-                                  ? 'bg-[#FB6600] border-[#FB6600] text-white font-bold shadow-2xs'
-                                  : 'bg-white border-neutral-300 text-neutral-800 hover:border-black font-semibold'
-                              }`}
-                            >
-                              <span>{vCat.icon}</span>
-                              <span className="truncate">{vCat.label}</span>
-                            </button>
-                          )
-                        })}
-                      </div>
+                      <select
+                        value={formVehicleCategory}
+                        onChange={(e) => setFormVehicleCategory(e.target.value)}
+                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white cursor-pointer"
+                      >
+                        <option value="">____SELECIONE____</option>
+                        {CATEGORIAS_VEICULOS.map((vCat) => (
+                          <option key={vCat.id} value={vCat.id}>
+                            {vCat.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
-                    {/* Marca, Modelo e Versão */}
+                    {/* Marca (Tabela FIPE), Modelo e Versão */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Marca *
+                          Marca (Tabela FIPE) *
                         </label>
-                        <input
-                          type="text"
-                          required
+                        <select
                           value={formVehicleBrand}
                           onChange={(e) => setFormVehicleBrand(e.target.value)}
-                          placeholder="Ex.: Toyota, VW, Honda..."
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
-                        />
+                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white cursor-pointer"
+                        >
+                          <option value="">____SELECIONE A MARCA FIPE____</option>
+                          {FIPE_VEHICLE_BRANDS.map((brandName) => (
+                            <option key={brandName} value={brandName}>
+                              {brandName}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       <div>
@@ -1580,6 +1664,396 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
+                    {/* Medidas, Peso, Volume e Unidade de Venda (Kilo, Litro, Gramas, etc.) */}
+                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
+                          📦 Medida, Peso ou Volume (Ex.: 1kg de café, 500g, 750ml, 1 par de sapatos...)
+                        </label>
+                        <span className="text-[11px] text-neutral-500 font-medium">
+                          Para alimentos, bebidas, calçados, moda e produtos gerais
+                        </span>
+                      </div>
+
+                      {/* Atalhos Rápidos */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] font-bold text-neutral-600">Atalhos rápidos:</span>
+                        {[
+                          { val: '1', type: 'kg', label: '1kg' },
+                          { val: '500', type: 'g', label: '500g' },
+                          { val: '250', type: 'g', label: '250g' },
+                          { val: '100', type: 'g', label: '100g' },
+                          { val: '1', type: 'L', label: '1L' },
+                          { val: '750', type: 'ml', label: '750ml' },
+                          { val: '500', type: 'ml', label: '500ml' },
+                          { val: '350', type: 'ml', label: '350ml' },
+                          { val: '1', type: 'un', label: '1 un' },
+                          { val: '1', type: 'par', label: '1 par' },
+                          { val: '1', type: 'kit', label: '1 kit' },
+                          { val: '1', type: 'cx', label: '1 cx' },
+                        ].map((preset) => {
+                          const isSelected = formUnitValue === preset.val && formUnitType === preset.type
+                          return (
+                            <button
+                              key={preset.label}
+                              type="button"
+                              onClick={() => {
+                                setFormUnitValue(preset.val)
+                                setFormUnitType(preset.type)
+                              }}
+                              className={`px-2 py-0.5 text-xs font-bold rounded border transition-colors cursor-pointer ${
+                                isSelected
+                                  ? 'bg-[#FB6600] text-white border-[#FB6600]'
+                                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-black'
+                              }`}
+                            >
+                              {preset.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      {/* Campos Quantidade e Unidade */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div>
+                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                            Quantidade / Valor (Ex.: 1, 500, 750, 2)
+                          </label>
+                          <input
+                            type="text"
+                            value={formUnitValue}
+                            onChange={(e) => setFormUnitValue(e.target.value)}
+                            placeholder="Ex.: 1 (para 1kg), 500 (para 500g)..."
+                            className="w-full h-10 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-semibold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                            Unidade de Medida
+                          </label>
+                          <select
+                            value={formUnitType}
+                            onChange={(e) => setFormUnitType(e.target.value)}
+                            className="w-full h-10 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-semibold cursor-pointer"
+                          >
+                            <option value="un">un (Unidade)</option>
+                            <option value="kg">kg (Quilograma - Ex.: 1kg de café)</option>
+                            <option value="g">g (Gramas - Ex.: 500g)</option>
+                            <option value="L">L (Litros - Ex.: 1L de azeite / bebida)</option>
+                            <option value="ml">ml (Mililitros - Ex.: 350ml, 750ml)</option>
+                            <option value="par">par (Par - Ex.: 1 par de sapatos)</option>
+                            <option value="kit">kit (Kit com múltiplos itens)</option>
+                            <option value="cx">cx (Caixa fechada)</option>
+                            <option value="pct">pct (Pacote)</option>
+                            <option value="m">m (Metros)</option>
+                            <option value="cm">cm (Centímetros)</option>
+                            <option value="duzia">dúzia (Dúzia)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Grade de Tamanhos / Numerações (Calçados e Roupas Infantil ao Adulto) */}
+                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
+                          📏 Grade de Tamanhos e Numerações (Calçados e Roupas Infantil ao Adulto)
+                        </label>
+                        {formSizes.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setFormSizes([])}
+                            className="text-xs text-rose-600 hover:underline font-bold cursor-pointer"
+                          >
+                            Limpar selecionados ({formSizes.length})
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Roupas Adulto */}
+                      <div>
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
+                          👕 Roupas Adulto (PP ao XXG e Plus Size):
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {['PP', 'P', 'M', 'G', 'GG', 'XG', 'XXG', 'G1', 'G2', 'G3', 'Único'].map((size) => {
+                            const isSelected = formSizes.includes(size)
+                            return (
+                              <button
+                                key={size}
+                                type="button"
+                                onClick={() => {
+                                  setFormSizes((prev) =>
+                                    isSelected ? prev.filter((s) => s !== size) : [...prev, size]
+                                  )
+                                }}
+                                className={`min-w-9 h-8 px-2 text-xs font-bold rounded border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                }`}
+                              >
+                                {size}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Calçados / Sapatos: Infantil ao Adulto (18 ao 46) */}
+                      <div>
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
+                          👟 Calçados (Numeração Infantil ao Adulto - 18 ao 46):
+                        </span>
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {[
+                            '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
+                            '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41',
+                            '42', '43', '44', '45', '46'
+                          ].map((num) => {
+                            const isSelected = formSizes.includes(num)
+                            return (
+                              <button
+                                key={num}
+                                type="button"
+                                onClick={() => {
+                                  setFormSizes((prev) =>
+                                    isSelected ? prev.filter((s) => s !== num) : [...prev, num]
+                                  )
+                                }}
+                                className={`w-8 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                }`}
+                              >
+                                {num}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Roupas Infantil / Bebê */}
+                      <div>
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
+                          👶 Roupas Infantil e Bebê:
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {[
+                            'RN', '0-3m', '3-6m', '6-9m', '9-12m', '1 ano', '2 anos', '3 anos',
+                            '4 anos', '6 anos', '8 anos', '10 anos', '12 anos', '14 anos', '16 anos'
+                          ].map((inf) => {
+                            const isSelected = formSizes.includes(inf)
+                            return (
+                              <button
+                                key={inf}
+                                type="button"
+                                onClick={() => {
+                                  setFormSizes((prev) =>
+                                    isSelected ? prev.filter((s) => s !== inf) : [...prev, inf]
+                                  )
+                                }}
+                                className={`px-2 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-neutral-800 text-white border-neutral-800 shadow-xs'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                }`}
+                              >
+                                {inf}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Cama, Mesa e Banho */}
+                      <div>
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
+                          🛏️ Cama, Mesa e Banho:
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {['Solteiro', 'Casal', 'Queen', 'King', 'Super King'].map((cama) => {
+                            const isSelected = formSizes.includes(cama)
+                            return (
+                              <button
+                                key={cama}
+                                type="button"
+                                onClick={() => {
+                                  setFormSizes((prev) =>
+                                    isSelected ? prev.filter((s) => s !== cama) : [...prev, cama]
+                                  )
+                                }}
+                                className={`px-2.5 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                }`}
+                              >
+                                {cama}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Adicionar Tamanho Personalizado */}
+                      <div className="pt-2 border-t border-neutral-200 flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={customSizeInput}
+                          onChange={(e) => setCustomSizeInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              const trimmed = customSizeInput.trim()
+                              if (trimmed && !formSizes.includes(trimmed)) {
+                                setFormSizes((prev) => [...prev, trimmed])
+                                setCustomSizeInput('')
+                              }
+                            }
+                          }}
+                          placeholder="Outro tamanho (ex.: 48, G4, 120x80cm, Sob Medida...)"
+                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-medium"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const trimmed = customSizeInput.trim()
+                            if (trimmed && !formSizes.includes(trimmed)) {
+                              setFormSizes((prev) => [...prev, trimmed])
+                              setCustomSizeInput('')
+                            }
+                          }}
+                          className="h-9 px-3 bg-neutral-900 hover:bg-black text-white text-xs font-bold rounded-md cursor-pointer"
+                        >
+                          + Adicionar
+                        </button>
+                      </div>
+
+                      {/* Tags Selecionadas */}
+                      {formSizes.length > 0 && (
+                        <div className="p-2.5 bg-white border border-neutral-200 rounded-md flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-neutral-700">Tamanhos selecionados:</span>
+                          {formSizes.map((sz) => (
+                            <span
+                              key={sz}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-900 text-white rounded text-xs font-bold"
+                            >
+                              {sz}
+                              <button
+                                type="button"
+                                onClick={() => setFormSizes((prev) => prev.filter((s) => s !== sz))}
+                                className="hover:text-red-300 text-xs cursor-pointer ml-0.5"
+                              >
+                                &times;
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Cores Disponíveis (Opcional) */}
+                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-2.5">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
+                          🎨 Cores Disponíveis (Opcional)
+                        </label>
+                        {formColors.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setFormColors([])}
+                            className="text-xs text-rose-600 hover:underline font-bold cursor-pointer"
+                          >
+                            Limpar cores ({formColors.length})
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {[
+                          'Preto', 'Branco', 'Cinza', 'Azul', 'Vermelho', 'Verde',
+                          'Amarelo', 'Rosa', 'Bege', 'Marrom', 'Colorido'
+                        ].map((cor) => {
+                          const isSelected = formColors.includes(cor)
+                          return (
+                            <button
+                              key={cor}
+                              type="button"
+                              onClick={() => {
+                                setFormColors((prev) =>
+                                  isSelected ? prev.filter((c) => c !== cor) : [...prev, cor]
+                                )
+                              }}
+                              className={`px-2.5 py-1 text-xs font-semibold rounded-full border transition-colors cursor-pointer ${
+                                isSelected
+                                  ? 'bg-neutral-900 text-white border-neutral-900 font-bold'
+                                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-black'
+                              }`}
+                            >
+                              {cor}
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <input
+                          type="text"
+                          value={customColorInput}
+                          onChange={(e) => setCustomColorInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault()
+                              const trimmed = customColorInput.trim()
+                              if (trimmed && !formColors.includes(trimmed)) {
+                                setFormColors((prev) => [...prev, trimmed])
+                                setCustomColorInput('')
+                              }
+                            }
+                          }}
+                          placeholder="Outra cor (ex.: Azul Marinho, Estampado, Dourado...)"
+                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-medium"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const trimmed = customColorInput.trim()
+                            if (trimmed && !formColors.includes(trimmed)) {
+                              setFormColors((prev) => [...prev, trimmed])
+                              setCustomColorInput('')
+                            }
+                          }}
+                          className="h-9 px-3 bg-neutral-900 hover:bg-black text-white text-xs font-bold rounded-md cursor-pointer"
+                        >
+                          + Adicionar Cor
+                        </button>
+                      </div>
+
+                      {formColors.length > 0 && (
+                        <div className="p-2 bg-white border border-neutral-200 rounded-md flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-neutral-700">Cores selecionadas:</span>
+                          {formColors.map((c) => (
+                            <span
+                              key={c}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-neutral-900 rounded-full text-xs font-semibold"
+                            >
+                              {c}
+                              <button
+                                type="button"
+                                onClick={() => setFormColors((prev) => prev.filter((x) => x !== c))}
+                                className="hover:text-red-500 cursor-pointer ml-0.5"
+                              >
+                                &times;
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
                         Descrição (Opcional)
@@ -1797,48 +2271,38 @@ export default function MerchantProductsTab({
                   })}
                 </div>
 
-                {/* Opção de Orientação da Foto no Card */}
+                {/* Enquadramento Travado: Veículos sempre horizontal, Produtos sempre vertical */}
                 <div className="pt-4 mt-3 border-t border-neutral-200">
                   <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-2">
-                    Enquadramento no Card da Vitrine
+                    Enquadramento da Foto no Card da Vitrine
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setFormPhotoOrientation('vertical')}
-                      className={`p-3 border rounded-md text-left transition-all cursor-pointer flex items-center gap-3 ${
-                        formPhotoOrientation === 'vertical'
-                          ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
-                          : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
-                      }`}
-                    >
-                      <span className="text-lg">📱</span>
+                  {formIsVehicle ? (
+                    <div className="p-3 bg-neutral-900 text-white rounded-md flex items-center gap-3 shadow-xs">
+                      <span className="text-xl">🚗</span>
                       <div>
-                        <span className="text-xs sm:text-sm font-bold block">Foto Vertical (Padrão)</span>
-                        <span className={`text-xs block ${formPhotoOrientation === 'vertical' ? 'text-neutral-300' : 'text-neutral-500'}`}>
-                          Moda, vestuário e produtos verticais
+                        <span className="text-xs sm:text-sm font-bold block flex items-center gap-1.5">
+                          <span>🔒 Enquadramento Travado: Horizontal (16:9)</span>
+                          <span className="px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded font-bold">Automático</span>
+                        </span>
+                        <span className="text-xs text-neutral-300 block">
+                          Carros e veículos são sempre exibidos em formato horizontal.
                         </span>
                       </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setFormPhotoOrientation('horizontal')}
-                      className={`p-3 border rounded-md text-left transition-all cursor-pointer flex items-center gap-3 ${
-                        formPhotoOrientation === 'horizontal'
-                          ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
-                          : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
-                      }`}
-                    >
-                      <span className="text-lg">🖥️</span>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-neutral-900 text-white rounded-md flex items-center gap-3 shadow-xs">
+                      <span className="text-xl">🛍️</span>
                       <div>
-                        <span className="text-xs sm:text-sm font-bold block">Foto Horizontal</span>
-                        <span className={`text-xs block ${formPhotoOrientation === 'horizontal' ? 'text-orange-100' : 'text-neutral-500'}`}>
-                          Carros e itens horizontais (mostra inteira)
+                        <span className="text-xs sm:text-sm font-bold block flex items-center gap-1.5">
+                          <span>🔒 Enquadramento Travado: Vertical (3:4)</span>
+                          <span className="px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded font-bold">Automático</span>
+                        </span>
+                        <span className="text-xs text-neutral-300 block">
+                          Produtos padrão, roupas, calçados e alimentos são sempre exibidos em formato vertical.
                         </span>
                       </div>
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

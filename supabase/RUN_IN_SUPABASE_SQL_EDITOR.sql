@@ -147,6 +147,10 @@ ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_km TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_transmission TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_traction TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vehicle_plate_internal TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS unit_type TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS unit_value TEXT;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS sizes JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS colors JSONB DEFAULT '[]'::jsonb;
 
 -- Ativar RLS em products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
