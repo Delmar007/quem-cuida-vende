@@ -1090,19 +1090,13 @@ export default function MerchantProductsTab({
                         </div>
                       )}
 
-                      <div className="text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
+                      <div className="text-xs sm:text-sm text-neutral-600 flex flex-col gap-0.5">
                         <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
                         {prod.subcategory && (
-                          <>
-                            <span className="text-neutral-300">&bull;</span>
-                            <span>{prod.subcategory}</span>
-                          </>
+                          <span>{prod.subcategory}</span>
                         )}
                         {prod.sku && (
-                          <>
-                            <span className="text-neutral-300">&bull;</span>
-                            <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
-                          </>
+                          <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
                         )}
                       </div>
                     </div>
