@@ -1042,8 +1042,12 @@ export default function MerchantProductsTab({
                 }`}
               >
                 <div className="p-3 sm:p-3.5 flex flex-col lg:flex-row gap-3 sm:gap-4 lg:items-center">
-                  {/* Coluna A: Foto horizontal para carro, vertical para produto */}
-                  <div className="shrink-0 flex items-center">
+                  {/* Coluna A: Nome em cima da foto + Foto (tipo de promoção no canto inferior esquerdo) */}
+                  <div className={`shrink-0 flex flex-col gap-1 ${isHorizontalPhoto ? 'w-44 sm:w-48' : 'w-24 sm:w-28'}`}>
+                    <h4 className="text-sm sm:text-[15px] font-extrabold text-neutral-900 leading-tight truncate" title={prod.name}>
+                      {prod.name}
+                    </h4>
+
                     <button
                       type="button"
                       onClick={() => setPreviewProduct(prod)}
@@ -1063,8 +1067,11 @@ export default function MerchantProductsTab({
                       ) : (
                         <span className="text-3xl text-neutral-400">🖼️</span>
                       )}
+                      <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] font-bold uppercase tracking-wide rounded shadow-xs">
+                        {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
+                      </span>
                       {prod.images && prod.images.length > 1 && (
-                        <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                        <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                           +{prod.images.length - 1} fotos
                         </span>
                       )}
@@ -1073,22 +1080,15 @@ export default function MerchantProductsTab({
 
                   {/* Coluna B: B1 à esquerda e B2 à direita aproveitando todo o espaço */}
                   <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
-                    {/* B1 (Esquerda): Tipo de promoção, nome do veículo, categoria, subcategoria, SKU */}
+                    {/* B1 (Esquerda): Categoria do veículo, categoria, subcategoria, SKU */}
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
-                          {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
-                        </span>
-                        {prod.is_vehicle && prod.vehicle_category && (
+                      {prod.is_vehicle && prod.vehicle_category && (
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
                             {prod.vehicle_category}
                           </span>
-                        )}
-                      </div>
-
-                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2 break-words" title={prod.name}>
-                        {prod.name}
-                      </h4>
+                        </div>
+                      )}
 
                       <div className="text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
                         <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
