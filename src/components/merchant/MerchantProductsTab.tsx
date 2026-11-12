@@ -1119,10 +1119,8 @@ export default function MerchantProductsTab({
                           )}
                           {prod.vehicle_km && (
                             <span className="whitespace-nowrap">
-                              <strong className="text-neutral-800">KM:</strong>{' '}
-                              {String(prod.vehicle_km).toLowerCase().includes('km')
-                                ? prod.vehicle_km
-                                : `${prod.vehicle_km} km`}
+                              <strong className="text-neutral-800">km</strong>{' '}
+                              {String(prod.vehicle_km).replace(/\D/g, '') || prod.vehicle_km}
                             </span>
                           )}
                           {prod.vehicle_transmission && (
