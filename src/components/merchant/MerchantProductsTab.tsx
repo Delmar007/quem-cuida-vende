@@ -1113,14 +1113,14 @@ export default function MerchantProductsTab({
                         <>
                           {(prod.vehicle_year_model || prod.vehicle_year_fab) && (
                             <span className="whitespace-nowrap">
-                              <strong className="text-neutral-800">Ano:</strong>{' '}
                               {prod.vehicle_year_model || prod.vehicle_year_fab}
                             </span>
                           )}
                           {prod.vehicle_km && (
                             <span className="whitespace-nowrap">
-                              <strong className="text-neutral-800">km</strong>{' '}
-                              {String(prod.vehicle_km).replace(/\D/g, '') || prod.vehicle_km}
+                              {String(prod.vehicle_km).toLowerCase().includes('km')
+                                ? prod.vehicle_km
+                                : `${prod.vehicle_km} km`}
                             </span>
                           )}
                           {prod.vehicle_transmission && (
