@@ -1020,7 +1020,7 @@ export default function MerchantProductsTab({
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           {filteredProducts.map((prod) => {
             const hasPromo = Boolean(prod.promotional_price && prod.promotional_price < prod.price)
             const discountPercent = hasPromo
@@ -1030,111 +1030,116 @@ export default function MerchantProductsTab({
             return (
               <div
                 key={prod.id}
-                className={`bg-white border border-neutral-200 rounded-md shadow-xs overflow-hidden flex flex-col justify-between transition-all hover:border-neutral-300 ${
+                className={`bg-white border border-neutral-200 rounded-md shadow-xs overflow-hidden transition-all hover:border-neutral-300 ${
                   !prod.is_active ? 'opacity-70 bg-neutral-50/40' : ''
                 }`}
               >
-                <div className="p-4 sm:p-5 flex gap-4 sm:gap-5 items-start">
-                  {/* Foto Grande do Produto */}
-                  <button
-                    type="button"
-                    onClick={() => setPreviewProduct(prod)}
-                    className="w-28 h-32 sm:w-32 sm:h-36 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden relative shrink-0 flex items-center justify-center cursor-pointer group"
-                    title="Clique para pré-visualizar"
-                  >
-                    {prod.image_url ? (
-                      <img
-                        src={prod.image_url}
-                        alt={prod.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <span className="text-3xl text-neutral-400">🖼️</span>
-                    )}
-                    {prod.images && prod.images.length > 1 && (
-                      <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
-                        +{prod.images.length - 1} fotos
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Informações e Preços com Fontes Maiores */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                        <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
-                          {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
+                <div className="p-4 sm:p-5 flex flex-col md:flex-row gap-4 sm:gap-5 md:items-center">
+                  {/* Coluna 1 (Esquerda): Foto do Produto (tamanho mantido) */}
+                  <div className="shrink-0 flex items-start">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewProduct(prod)}
+                      className="w-28 h-32 sm:w-32 sm:h-36 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden relative shrink-0 flex items-center justify-center cursor-pointer group"
+                      title="Clique para pré-visualizar"
+                    >
+                      {prod.image_url ? (
+                        <img
+                          src={prod.image_url}
+                          alt={prod.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <span className="text-3xl text-neutral-400">🖼️</span>
+                      )}
+                      {prod.images && prod.images.length > 1 && (
+                        <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+                          +{prod.images.length - 1} fotos
                         </span>
-                        {prod.is_vehicle && prod.vehicle_category && (
-                          <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
-                            {prod.vehicle_category}
-                          </span>
-                        )}
-                      </div>
+                      )}
+                    </button>
+                  </div>
 
-                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
-                        {prod.name}
-                      </h4>
-
-                      <div className="mt-1 text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
-                        <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
-                        {prod.subcategory && (
-                          <>
-                            <span className="text-neutral-300">&bull;</span>
-                            <span>{prod.subcategory}</span>
-                          </>
-                        )}
-                        {prod.sku && (
-                          <>
-                            <span className="text-neutral-300">&bull;</span>
-                            <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
-                          </>
-                        )}
-                      </div>
-
-                      {prod.is_vehicle && (
-                        <div className="mt-1.5 space-y-1">
-                          <span className="text-xs sm:text-sm text-neutral-600 block">
-                            {[
-                              prod.vehicle_year_model || prod.vehicle_year_fab,
-                              prod.vehicle_km ? `${prod.vehicle_km} km` : null,
-                              prod.vehicle_transmission,
-                              prod.vehicle_traction,
-                            ]
-                              .filter(Boolean)
-                              .join(' • ')}
-                          </span>
-                          {prod.vehicle_plate_internal && (
-                            <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-xs rounded">
-                              🔒 Placa: {prod.vehicle_plate_internal}
-                            </span>
-                          )}
-                        </div>
+                  {/* Coluna 2 (Meio): Tipo de promoção, modelo, SKU, ano, km, câmbio */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                      <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
+                        {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
+                      </span>
+                      {prod.is_vehicle && prod.vehicle_category && (
+                        <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
+                          {prod.vehicle_category}
+                        </span>
                       )}
                     </div>
 
-                    {/* Bloco de Preços Legíveis */}
-                    <div className="mt-3 pt-3 border-t border-neutral-100 flex items-baseline gap-2.5 flex-wrap">
-                      {hasPromo ? (
+                    <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
+                      {prod.name}
+                    </h4>
+
+                    <div className="mt-1 text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
+                      {prod.subcategory && (
                         <>
-                          <span className="text-lg sm:text-xl font-extrabold text-[#FB6600]">
-                            R$ {formatCurrencyBRL(prod.promotional_price)}
+                          <span className="text-neutral-300">&bull;</span>
+                          <span>{prod.subcategory}</span>
+                        </>
+                      )}
+                      {prod.sku && (
+                        <>
+                          <span className="text-neutral-300">&bull;</span>
+                          <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
+                        </>
+                      )}
+                    </div>
+
+                    {prod.is_vehicle && (
+                      <div className="mt-1.5 space-y-1">
+                        <span className="text-xs sm:text-sm text-neutral-600 block">
+                          {[
+                            prod.vehicle_year_model || prod.vehicle_year_fab,
+                            prod.vehicle_km ? `${prod.vehicle_km} km` : null,
+                            prod.vehicle_transmission,
+                            prod.vehicle_traction,
+                          ]
+                            .filter(Boolean)
+                            .join(' • ')}
+                        </span>
+                        {prod.vehicle_plate_internal && (
+                          <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-xs rounded">
+                            🔒 Placa: {prod.vehicle_plate_internal}
                           </span>
-                          <span className="line-through text-neutral-400 text-xs sm:text-sm font-medium">
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Coluna 3 (Direita): Preços e Botões (Ativo na vitrine, Prévia, Editar, Excluir) */}
+                  <div className="md:w-72 lg:w-80 shrink-0 pt-3 md:pt-0 md:pl-5 border-t md:border-t-0 md:border-l border-neutral-100 flex flex-col justify-between gap-3 md:items-end">
+                    {/* Bloco de Preços */}
+                    <div className="flex flex-col md:items-end gap-1">
+                      <div className="flex items-baseline gap-2.5 flex-wrap md:justify-end">
+                        {hasPromo ? (
+                          <>
+                            <span className="text-lg sm:text-xl font-extrabold text-[#FB6600]">
+                              R$ {formatCurrencyBRL(prod.promotional_price)}
+                            </span>
+                            <span className="line-through text-neutral-400 text-xs sm:text-sm font-medium">
+                              R$ {formatCurrencyBRL(prod.price)}
+                            </span>
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                              -{discountPercent}%
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-lg sm:text-xl font-extrabold text-neutral-900">
                             R$ {formatCurrencyBRL(prod.price)}
                           </span>
-                          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-                            -{discountPercent}%
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-lg sm:text-xl font-extrabold text-neutral-900">
-                          R$ {formatCurrencyBRL(prod.price)}
-                        </span>
-                      )}
+                        )}
+                      </div>
 
                       {(prod.cost_price_internal || prod.fipe_price_internal) && (
-                        <div className="w-full flex items-center gap-2 flex-wrap mt-1">
+                        <div className="flex items-center gap-2 flex-wrap md:justify-end mt-0.5">
                           {prod.cost_price_internal && (
                             <span className="text-xs font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded">
                               🔒 Custo: R$ {formatCurrencyBRL(prod.cost_price_internal)}
@@ -1148,46 +1153,46 @@ export default function MerchantProductsTab({
                         </div>
                       )}
                     </div>
-                  </div>
-                </div>
 
-                {/* Rodapé de Status e Ações */}
-                <div className="px-4 sm:px-5 py-3 bg-neutral-50 border-t border-neutral-200 flex items-center justify-between gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={() => handleToggleActive(prod)}
-                    className={`h-8 px-3 text-xs font-bold rounded-md transition-colors cursor-pointer border ${
-                      prod.is_active
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                        : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
-                    }`}
-                    title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
-                  >
-                    {prod.is_active ? '✓ Ativo na Vitrine' : '✕ Inativo'}
-                  </button>
+                    {/* Botões de Status e Ações */}
+                    <div className="flex flex-col md:items-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleActive(prod)}
+                        className={`h-8 px-3 text-xs font-bold rounded-md transition-colors cursor-pointer border self-start md:self-end ${
+                          prod.is_active
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                            : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
+                        }`}
+                        title={prod.is_active ? 'Clique para desativar' : 'Clique para ativar'}
+                      >
+                        {prod.is_active ? '✓ Ativo na Vitrine' : '✕ Inativo'}
+                      </button>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPreviewProduct(prod)}
-                      className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                    >
-                      Prévia
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEditModal(prod)}
-                      className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeleteConfirmation(prod)}
-                      className="h-8 px-3 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                    >
-                      Excluir
-                    </button>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewProduct(prod)}
+                          className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Prévia
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditModal(prod)}
+                          className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteConfirmation(prod)}
+                          className="h-8 px-3 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
+                        >
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
