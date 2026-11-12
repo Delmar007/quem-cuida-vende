@@ -1190,14 +1190,14 @@ export default function MerchantProductsTab({
                       )}
                     </div>
 
-                    {/* Botões em 2 colunas: C1 (Ativo, Prévia) e C2 (Editar, Excluir) */}
-                    <div className="grid grid-cols-2 gap-1.5">
+                    {/* Botões em 2 colunas: C1 (Ativo, Prévia) e C2 (Editar, Excluir) — tamanho reduzido pela metade */}
+                    <div className="grid grid-cols-2 gap-1 w-36 lg:ml-auto">
                       {/* C1 */}
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1">
                         <button
                           type="button"
                           onClick={() => handleToggleActive(prod)}
-                          className={`h-7 px-2 text-[11px] font-bold rounded-md transition-colors cursor-pointer border text-center whitespace-nowrap truncate ${
+                          className={`h-5 px-1.5 text-[10px] leading-none font-bold rounded transition-colors cursor-pointer border text-center whitespace-nowrap ${
                             prod.is_active
                               ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                               : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
@@ -1209,25 +1209,25 @@ export default function MerchantProductsTab({
                         <button
                           type="button"
                           onClick={() => setPreviewProduct(prod)}
-                          className="h-7 px-2 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                          className="h-5 px-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[10px] leading-none font-semibold rounded cursor-pointer transition-colors"
                         >
                           Prévia
                         </button>
                       </div>
 
                       {/* C2 */}
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col gap-1">
                         <button
                           type="button"
                           onClick={() => handleOpenEditModal(prod)}
-                          className="h-7 px-2 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                          className="h-5 px-1.5 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-[10px] leading-none font-semibold rounded cursor-pointer transition-colors"
                         >
                           Editar
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteConfirmation(prod)}
-                          className="h-7 px-2 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                          className="h-5 px-1.5 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[10px] leading-none font-semibold rounded cursor-pointer transition-colors"
                         >
                           Excluir
                         </button>
