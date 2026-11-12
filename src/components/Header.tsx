@@ -515,7 +515,7 @@ export default function Header() {
                   setSearchTerm('')
                 }}
                 title="Limpar todos os filtros"
-                className="inline-flex flex-col items-center justify-center px-2.5 py-1 bg-black hover:bg-neutral-800 text-white rounded-full text-[8px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors shadow-2xs"
+                className="inline-flex flex-col items-center justify-center px-[10.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.25px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors shadow-2xs scale-[1.03]"
               >
                 <span>Limpa</span>
                 <span>Filtro</span>
@@ -851,7 +851,7 @@ export default function Header() {
                       setSearchTerm('')
                     }}
                     title="Limpar todos os filtros"
-                    className="inline-flex flex-col items-center justify-center px-3 py-1 bg-black hover:bg-neutral-800 text-white rounded-full text-[8.5px] font-bold uppercase leading-[1.05] tracking-tight shrink-0"
+                    className="inline-flex flex-col items-center justify-center px-[12.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.75px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 scale-[1.03]"
                   >
                     <span>Limpa</span>
                     <span>Filtro</span>
