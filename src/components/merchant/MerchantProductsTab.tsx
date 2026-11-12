@@ -1318,28 +1318,35 @@ export default function MerchantProductsTab({
       )}
 
       {/* ----------------------------------------------------------------- */}
-      {/* MODAL DE CADASTRO E EDIÇÃO DE PRODUTO (COMPLETO)                  */}
+      {/* MODAL DE CADASTRO E EDIÇÃO DE PRODUTO (COMPLETO - PRO MAX UI/UX)   */}
       {/* ----------------------------------------------------------------- */}
       {isFormModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-3xl rounded-md shadow-2xl border border-neutral-200 overflow-hidden my-6">
-            <div className="p-4 sm:p-5 bg-neutral-900 text-white flex items-center justify-between gap-3 flex-wrap">
-              <div>
-                <span className="text-xs uppercase font-bold tracking-widest text-[#FB6600] block">
-                  {editingProduct ? 'Editar Cadastro' : 'Novo Item'} &bull; {formIsVehicle ? 'Veículos' : 'Catálogo'}
-                </span>
-                <h3 className="text-base sm:text-lg font-extrabold tracking-tight">
-                  {editingProduct
-                    ? editingProduct.name
-                    : formIsVehicle
-                    ? 'Cadastro de Veículo'
-                    : 'Cadastro de Produto'}
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-neutral-200/90 overflow-hidden my-auto flex flex-col max-h-[92vh]">
+            {/* Header Pro Max */}
+            <div className="px-5 sm:px-6 py-4 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 text-white flex items-center justify-between gap-3 flex-wrap shrink-0 border-b border-neutral-800">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 rounded-full bg-[#FB6600] animate-pulse" />
+                  <span className="text-[11px] uppercase font-black tracking-widest text-[#FB6600]">
+                    {editingProduct ? 'Editar Cadastro' : 'Novo Item'} &bull; {formIsVehicle ? 'Veículos & FIPE' : 'Catálogo Padrão'}
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                  <span>{formIsVehicle ? '🚗' : '🛍️'}</span>
+                  <span>
+                    {editingProduct
+                      ? editingProduct.name
+                      : formIsVehicle
+                      ? 'Cadastro de Veículo'
+                      : 'Cadastro de Produto'}
+                  </span>
                 </h3>
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Seletor de Modo: Produto Padrão vs Veículo */}
-                <div className="flex items-center bg-neutral-800 p-1 rounded-md border border-neutral-700">
+              <div className="flex items-center gap-2.5">
+                {/* Seletor de Modo: Produto Padrão vs Veículo (Segmented Control Pro) */}
+                <div className="flex items-center bg-neutral-800/90 p-1 rounded-xl border border-neutral-700/80 shadow-inner">
                   <button
                     type="button"
                     onClick={() => {
@@ -1349,13 +1356,14 @@ export default function MerchantProductsTab({
                       }
                       setFormImages((prev) => prev.slice(0, 6))
                     }}
-                    className={`px-3 py-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
                       !formIsVehicle
-                        ? 'bg-white text-black'
+                        ? 'bg-white text-neutral-950 shadow-sm'
                         : 'text-neutral-300 hover:text-white'
                     }`}
                   >
-                    🛍️ Padrão
+                    <span>🛍️</span>
+                    <span>Padrão</span>
                   </button>
                   <button
                     type="button"
@@ -1366,40 +1374,51 @@ export default function MerchantProductsTab({
                         setFormPromoType('semi_novo')
                       }
                     }}
-                    className={`px-3 py-1.5 text-xs font-bold rounded transition-colors cursor-pointer ${
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
                       formIsVehicle
-                        ? 'bg-[#FB6600] text-white'
+                        ? 'bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white shadow-sm'
                         : 'text-neutral-300 hover:text-white'
                     }`}
                   >
-                    🚗 Veículo
+                    <span>🚗</span>
+                    <span>Veículo</span>
                   </button>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setIsFormModalOpen(false)}
-                  className="text-neutral-400 hover:text-white font-bold text-xl cursor-pointer ml-1"
+                  className="w-9 h-9 rounded-xl hover:bg-white/10 text-neutral-400 hover:text-white transition-colors flex items-center justify-center text-xl font-bold cursor-pointer border border-transparent hover:border-neutral-700"
+                  aria-label="Fechar"
                 >
                   &times;
                 </button>
               </div>
             </div>
 
+            {/* Form Body Scrollable */}
             <form
               onSubmit={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
                 handleSaveProduct(e)
               }}
-              className="p-5 sm:p-6 space-y-6 max-h-[82vh] overflow-y-auto"
+              className="p-4 sm:p-6 space-y-6 overflow-y-auto flex-1 bg-neutral-50/40"
             >
               {/* Seção 1: Informações Básicas */}
-              <div>
-                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-4">
-                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
-                    1. Informações Básicas {formIsVehicle ? '— Veículo' : ''}
-                  </h4>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-lg bg-neutral-900 text-white text-xs font-black inline-flex items-center justify-center shadow-xs">
+                      1
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                      Informações Básicas {formIsVehicle ? '— Veículo' : 'do Produto'}
+                    </h4>
+                  </div>
+                  <span className="text-[11px] text-neutral-400 font-semibold">
+                    * Campos obrigatórios
+                  </span>
                 </div>
 
                 {formIsVehicle ? (
@@ -1407,12 +1426,12 @@ export default function MerchantProductsTab({
                     {/* Categoria do Veículo (Menu vertical / dropdown selecionável) */}
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Categoria do Veículo *
+                        Categoria do Veículo <span className="text-[#FB6600]">*</span>
                       </label>
                       <select
                         value={formVehicleCategory}
                         onChange={(e) => setFormVehicleCategory(e.target.value)}
-                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white cursor-pointer"
+                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
                       >
                         <option value="">____SELECIONE____</option>
                         {CATEGORIAS_VEICULOS.map((vCat) => (
@@ -1427,12 +1446,12 @@ export default function MerchantProductsTab({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Marca (Tabela FIPE) *
+                          Marca (Tabela FIPE) <span className="text-[#FB6600]">*</span>
                         </label>
                         <select
                           value={formVehicleBrand}
                           onChange={(e) => setFormVehicleBrand(e.target.value)}
-                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white cursor-pointer"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
                         >
                           <option value="">____SELECIONE A MARCA FIPE____</option>
                           {FIPE_VEHICLE_BRANDS.map((brandName) => (
@@ -1445,7 +1464,7 @@ export default function MerchantProductsTab({
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Modelo *
+                          Modelo <span className="text-[#FB6600]">*</span>
                         </label>
                         <input
                           type="text"
@@ -1453,7 +1472,7 @@ export default function MerchantProductsTab({
                           value={formVehicleModel}
                           onChange={(e) => setFormVehicleModel(e.target.value)}
                           placeholder="Ex.: Corolla, Hilux, Gol..."
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
@@ -1466,7 +1485,7 @@ export default function MerchantProductsTab({
                           value={formVehicleVersion}
                           onChange={(e) => setFormVehicleVersion(e.target.value)}
                           placeholder="Ex.: 2.0 XEi Flex Aut."
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
                     </div>
@@ -1482,7 +1501,7 @@ export default function MerchantProductsTab({
                           value={formVehicleYearFab}
                           onChange={(e) => setFormVehicleYearFab(e.target.value)}
                           placeholder="Ex.: 2023"
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
@@ -1495,7 +1514,7 @@ export default function MerchantProductsTab({
                           value={formVehicleYearModel}
                           onChange={(e) => setFormVehicleYearModel(e.target.value)}
                           placeholder="Ex.: 2023/2024"
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
@@ -1508,7 +1527,7 @@ export default function MerchantProductsTab({
                           value={formVehicleKm}
                           onChange={(e) => setFormVehicleKm(e.target.value)}
                           placeholder="Ex.: 42.000"
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
@@ -1519,7 +1538,7 @@ export default function MerchantProductsTab({
                         <select
                           value={formVehicleTransmission}
                           onChange={(e) => setFormVehicleTransmission(e.target.value)}
-                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white transition-all shadow-2xs"
                         >
                           <option value="Automático">Automático</option>
                           <option value="Manual">Manual</option>
@@ -1536,7 +1555,7 @@ export default function MerchantProductsTab({
                         <select
                           value={formVehicleTraction}
                           onChange={(e) => setFormVehicleTraction(e.target.value)}
-                          className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white transition-all shadow-2xs"
                         >
                           <option value="4x2">4x2</option>
                           <option value="4x4">4x4</option>
@@ -1551,8 +1570,8 @@ export default function MerchantProductsTab({
                           <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
                             Placa (Interno)
                           </label>
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
-                            🔒 Interno
+                          <span className="text-[10px] font-black px-2 py-0.5 bg-amber-100 text-amber-900 rounded-full border border-amber-300/60">
+                            🔒 Privado
                           </span>
                         </div>
                         <input
@@ -1560,7 +1579,7 @@ export default function MerchantProductsTab({
                           value={formVehiclePlateInternal}
                           onChange={(e) => setFormVehiclePlateInternal(e.target.value.toUpperCase())}
                           placeholder="Ex.: ABC-1D23"
-                          className="w-full h-11 px-3.5 text-sm border border-amber-300 bg-amber-50/40 rounded-md focus:outline-none focus:border-[#FB6600] font-mono uppercase"
+                          className="w-full h-11 px-3.5 text-sm border border-amber-300 bg-amber-50/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500 font-mono font-bold uppercase transition-all shadow-2xs"
                         />
                       </div>
                     </div>
@@ -1580,23 +1599,23 @@ export default function MerchantProductsTab({
                               .filter(Boolean)
                               .join(' ') || 'Ex.: Toyota Corolla 2.0 XEi'
                           }
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Status
+                          Status na Vitrine
                         </label>
-                        <label className="flex items-center gap-2.5 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-md bg-neutral-50 text-sm">
+                        <label className="flex items-center gap-3 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-xl bg-neutral-50/80 hover:bg-neutral-100/60 transition-colors shadow-2xs">
                           <input
                             type="checkbox"
                             checked={formIsActive}
                             onChange={(e) => setFormIsActive(e.target.checked)}
-                            className="w-4 h-4 text-[#FB6600] rounded"
+                            className="w-4 h-4 text-[#FB6600] rounded accent-[#FB6600] cursor-pointer"
                           />
-                          <span className="font-semibold text-neutral-800">
-                            {formIsActive ? 'Ativo na vitrine' : 'Inativo (oculto)'}
+                          <span className="font-bold text-xs sm:text-sm text-neutral-800">
+                            {formIsActive ? '🟢 Ativo na vitrine' : '⚪ Inativo (oculto)'}
                           </span>
                         </label>
                       </div>
@@ -1605,14 +1624,14 @@ export default function MerchantProductsTab({
                     {/* Descrição Detalhada (Opcional) */}
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Descrição (Opcional)
+                        Descrição e Opcionais (Opcional)
                       </label>
                       <textarea
                         rows={3}
                         value={formDescription}
                         onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="Opcionais do veículo, revisões, garantia..."
-                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] resize-none"
+                        placeholder="Opcionais do veículo, revisões feitas na concessionária, manual, chave reserva, garantia..."
+                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] resize-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -1620,15 +1639,15 @@ export default function MerchantProductsTab({
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Nome do Produto *
+                        Nome do Produto <span className="text-[#FB6600]">*</span>
                       </label>
                       <input
                         type="text"
                         required
                         value={formName}
                         onChange={(e) => setFormName(e.target.value)}
-                        placeholder="Ex.: Camisa Slim Fit Algodão..."
-                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold"
+                        placeholder="Ex.: Camisa Slim Fit Algodão Pima..."
+                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold transition-all shadow-2xs"
                       />
                     </div>
 
@@ -1642,107 +1661,114 @@ export default function MerchantProductsTab({
                           value={formSku}
                           onChange={(e) => setFormSku(e.target.value)}
                           placeholder="Ex.: CAM-SLIM-01"
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-mono"
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-mono font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Status
+                          Status na Vitrine
                         </label>
-                        <label className="flex items-center gap-2.5 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-md bg-neutral-50 text-sm">
+                        <label className="flex items-center gap-3 cursor-pointer h-11 px-3.5 border border-neutral-300 rounded-xl bg-neutral-50/80 hover:bg-neutral-100/60 transition-colors shadow-2xs">
                           <input
                             type="checkbox"
                             checked={formIsActive}
                             onChange={(e) => setFormIsActive(e.target.checked)}
-                            className="w-4 h-4 text-[#FB6600] rounded"
+                            className="w-4 h-4 text-[#FB6600] rounded accent-[#FB6600] cursor-pointer"
                           />
-                          <span className="font-semibold text-neutral-800">
-                            {formIsActive ? 'Ativo na vitrine' : 'Inativo (oculto)'}
+                          <span className="font-bold text-xs sm:text-sm text-neutral-800">
+                            {formIsActive ? '🟢 Ativo na vitrine' : '⚪ Inativo (oculto)'}
                           </span>
                         </label>
                       </div>
                     </div>
 
-                    {/* Medidas, Peso, Volume e Unidade de Venda (Kilo, Litro, Gramas, etc.) */}
-                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-3">
+                    {/* Sub-card: Medidas, Peso, Volume e Unidade de Venda */}
+                    <div className="p-4 bg-gradient-to-br from-neutral-50 to-white border border-neutral-200/90 rounded-xl space-y-3 shadow-2xs">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
-                          📦 Medida, Peso ou Volume (Ex.: 1kg de café, 500g, 750ml, 1 par de sapatos...)
-                        </label>
-                        <span className="text-[11px] text-neutral-500 font-medium">
-                          Para alimentos, bebidas, calçados, moda e produtos gerais
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">📦</span>
+                          <label className="block text-xs sm:text-[13px] font-black text-neutral-900">
+                            Medida, Peso ou Volume
+                          </label>
+                        </div>
+                        <span className="text-[11px] text-neutral-500 font-semibold bg-neutral-100 px-2 py-0.5 rounded-full border border-neutral-200/60">
+                          Ex.: 1kg de café, 500g, 750ml, 1 par de sapatos
                         </span>
                       </div>
 
-                      {/* Atalhos Rápidos */}
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[11px] font-bold text-neutral-600">Atalhos rápidos:</span>
-                        {[
-                          { val: '1', type: 'kg', label: '1kg' },
-                          { val: '500', type: 'g', label: '500g' },
-                          { val: '250', type: 'g', label: '250g' },
-                          { val: '100', type: 'g', label: '100g' },
-                          { val: '1', type: 'L', label: '1L' },
-                          { val: '750', type: 'ml', label: '750ml' },
-                          { val: '500', type: 'ml', label: '500ml' },
-                          { val: '350', type: 'ml', label: '350ml' },
-                          { val: '1', type: 'un', label: '1 un' },
-                          { val: '1', type: 'par', label: '1 par' },
-                          { val: '1', type: 'kit', label: '1 kit' },
-                          { val: '1', type: 'cx', label: '1 cx' },
-                        ].map((preset) => {
-                          const isSelected = formUnitValue === preset.val && formUnitType === preset.type
-                          return (
-                            <button
-                              key={preset.label}
-                              type="button"
-                              onClick={() => {
-                                setFormUnitValue(preset.val)
-                                setFormUnitType(preset.type)
-                              }}
-                              className={`px-2 py-0.5 text-xs font-bold rounded border transition-colors cursor-pointer ${
-                                isSelected
-                                  ? 'bg-[#FB6600] text-white border-[#FB6600]'
-                                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-black'
-                              }`}
-                            >
-                              {preset.label}
-                            </button>
-                          )
-                        })}
+                      {/* Atalhos Rápidos Pro Max */}
+                      <div>
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-600 mb-1.5">
+                          Atalhos Rápidos de 1 Clique:
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {[
+                            { val: '1', type: 'kg', label: '1kg' },
+                            { val: '500', type: 'g', label: '500g' },
+                            { val: '250', type: 'g', label: '250g' },
+                            { val: '100', type: 'g', label: '100g' },
+                            { val: '1', type: 'L', label: '1L' },
+                            { val: '750', type: 'ml', label: '750ml' },
+                            { val: '500', type: 'ml', label: '500ml' },
+                            { val: '350', type: 'ml', label: '350ml' },
+                            { val: '1', type: 'un', label: '1 un' },
+                            { val: '1', type: 'par', label: '1 par' },
+                            { val: '1', type: 'kit', label: '1 kit' },
+                            { val: '1', type: 'cx', label: '1 cx' },
+                          ].map((preset) => {
+                            const isSelected = formUnitValue === preset.val && formUnitType === preset.type
+                            return (
+                              <button
+                                key={preset.label}
+                                type="button"
+                                onClick={() => {
+                                  setFormUnitValue(preset.val)
+                                  setFormUnitType(preset.type)
+                                }}
+                                className={`px-2.5 py-1 text-xs font-black rounded-lg border transition-all cursor-pointer shadow-2xs ${
+                                  isSelected
+                                    ? 'bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white border-[#FB6600] shadow-xs scale-102'
+                                    : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900 hover:text-black'
+                                }`}
+                              >
+                                {preset.label}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
 
                       {/* Campos Quantidade e Unidade */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                         <div>
-                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                            Quantidade / Valor (Ex.: 1, 500, 750, 2)
+                          <label className="block text-xs font-bold text-neutral-700 mb-1">
+                            Quantidade / Valor Numérico
                           </label>
                           <input
                             type="text"
                             value={formUnitValue}
                             onChange={(e) => setFormUnitValue(e.target.value)}
                             placeholder="Ex.: 1 (para 1kg), 500 (para 500g)..."
-                            className="w-full h-10 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-semibold"
+                            className="w-full h-10 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] bg-white font-bold transition-all shadow-2xs"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                          <label className="block text-xs font-bold text-neutral-700 mb-1">
                             Unidade de Medida
                           </label>
                           <select
                             value={formUnitType}
                             onChange={(e) => setFormUnitType(e.target.value)}
-                            className="w-full h-10 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-semibold cursor-pointer"
+                            className="w-full h-10 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] bg-white font-bold cursor-pointer transition-all shadow-2xs"
                           >
-                            <option value="un">un (Unidade)</option>
-                            <option value="kg">kg (Quilograma - Ex.: 1kg de café)</option>
-                            <option value="g">g (Gramas - Ex.: 500g)</option>
+                            <option value="un">un (Unidade padrão)</option>
+                            <option value="kg">kg (Quilograma - Ex.: 1kg de café / carne)</option>
+                            <option value="g">g (Gramas - Ex.: 500g, 250g)</option>
                             <option value="L">L (Litros - Ex.: 1L de azeite / bebida)</option>
                             <option value="ml">ml (Mililitros - Ex.: 350ml, 750ml)</option>
-                            <option value="par">par (Par - Ex.: 1 par de sapatos)</option>
+                            <option value="par">par (Par - Ex.: 1 par de calçados / luvas)</option>
                             <option value="kit">kit (Kit com múltiplos itens)</option>
                             <option value="cx">cx (Caixa fechada)</option>
                             <option value="pct">pct (Pacote)</option>
@@ -1754,17 +1780,20 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
-                    {/* Grade de Tamanhos / Numerações (Calçados e Roupas Infantil ao Adulto) */}
-                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-3">
+                    {/* Sub-card: Grade de Tamanhos e Numerações */}
+                    <div className="p-4 bg-gradient-to-br from-neutral-50 to-white border border-neutral-200/90 rounded-xl space-y-4 shadow-2xs">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
-                          📏 Grade de Tamanhos e Numerações (Calçados e Roupas Infantil ao Adulto)
-                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">📏</span>
+                          <label className="block text-xs sm:text-[13px] font-black text-neutral-900">
+                            Grade de Tamanhos e Numerações
+                          </label>
+                        </div>
                         {formSizes.length > 0 && (
                           <button
                             type="button"
                             onClick={() => setFormSizes([])}
-                            className="text-xs text-rose-600 hover:underline font-bold cursor-pointer"
+                            className="text-xs text-rose-600 hover:text-rose-700 font-bold cursor-pointer underline decoration-dotted"
                           >
                             Limpar selecionados ({formSizes.length})
                           </button>
@@ -1773,8 +1802,9 @@ export default function MerchantProductsTab({
 
                       {/* Roupas Adulto */}
                       <div>
-                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
-                          👕 Roupas Adulto (PP ao XXG e Plus Size):
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                          <span>👕</span>
+                          <span>Roupas Adulto (PP ao XXG e Plus Size):</span>
                         </span>
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {['PP', 'P', 'M', 'G', 'GG', 'XG', 'XXG', 'G1', 'G2', 'G3', 'Único'].map((size) => {
@@ -1788,10 +1818,10 @@ export default function MerchantProductsTab({
                                     isSelected ? prev.filter((s) => s !== size) : [...prev, size]
                                   )
                                 }}
-                                className={`min-w-9 h-8 px-2 text-xs font-bold rounded border transition-all cursor-pointer ${
+                                className={`min-w-10 h-8 px-2 text-xs font-black rounded-lg border transition-all cursor-pointer shadow-2xs ${
                                   isSelected
-                                    ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
-                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                    ? 'bg-neutral-950 text-white border-neutral-950 shadow-xs scale-105'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-neutral-900 hover:text-black'
                                 }`}
                               >
                                 {size}
@@ -1803,8 +1833,9 @@ export default function MerchantProductsTab({
 
                       {/* Calçados / Sapatos: Infantil ao Adulto (18 ao 46) */}
                       <div>
-                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
-                          👟 Calçados (Numeração Infantil ao Adulto - 18 ao 46):
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                          <span>👟</span>
+                          <span>Calçados (Numeração Infantil ao Adulto — 18 ao 46):</span>
                         </span>
                         <div className="flex items-center gap-1 flex-wrap">
                           {[
@@ -1822,10 +1853,10 @@ export default function MerchantProductsTab({
                                     isSelected ? prev.filter((s) => s !== num) : [...prev, num]
                                   )
                                 }}
-                                className={`w-8 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                className={`w-8 h-7 text-[11px] font-black rounded-md border transition-all cursor-pointer shadow-2xs ${
                                   isSelected
-                                    ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs'
-                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                    ? 'bg-[#FB6600] text-white border-[#FB6600] shadow-xs scale-105'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-neutral-900'
                                 }`}
                               >
                                 {num}
@@ -1837,8 +1868,9 @@ export default function MerchantProductsTab({
 
                       {/* Roupas Infantil / Bebê */}
                       <div>
-                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
-                          👶 Roupas Infantil e Bebê:
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                          <span>👶</span>
+                          <span>Roupas Infantil e Bebê:</span>
                         </span>
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {[
@@ -1855,10 +1887,10 @@ export default function MerchantProductsTab({
                                     isSelected ? prev.filter((s) => s !== inf) : [...prev, inf]
                                   )
                                 }}
-                                className={`px-2 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                className={`px-2.5 h-7 text-[11px] font-bold rounded-lg border transition-all cursor-pointer shadow-2xs ${
                                   isSelected
                                     ? 'bg-neutral-800 text-white border-neutral-800 shadow-xs'
-                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-neutral-900'
                                 }`}
                               >
                                 {inf}
@@ -1870,8 +1902,9 @@ export default function MerchantProductsTab({
 
                       {/* Cama, Mesa e Banho */}
                       <div>
-                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5">
-                          🛏️ Cama, Mesa e Banho:
+                        <span className="block text-[11px] font-extrabold uppercase tracking-wide text-neutral-700 mb-1.5 flex items-center gap-1.5">
+                          <span>🛏️</span>
+                          <span>Cama, Mesa e Banho:</span>
                         </span>
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {['Solteiro', 'Casal', 'Queen', 'King', 'Super King'].map((cama) => {
@@ -1885,10 +1918,10 @@ export default function MerchantProductsTab({
                                     isSelected ? prev.filter((s) => s !== cama) : [...prev, cama]
                                   )
                                 }}
-                                className={`px-2.5 h-7 text-[11px] font-bold rounded border transition-all cursor-pointer ${
+                                className={`px-3 h-7 text-[11px] font-bold rounded-lg border transition-all cursor-pointer shadow-2xs ${
                                   isSelected
                                     ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
-                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-black'
+                                    : 'bg-white text-neutral-800 border-neutral-300 hover:border-neutral-900'
                                 }`}
                               >
                                 {cama}
@@ -1899,7 +1932,7 @@ export default function MerchantProductsTab({
                       </div>
 
                       {/* Adicionar Tamanho Personalizado */}
-                      <div className="pt-2 border-t border-neutral-200 flex items-center gap-2">
+                      <div className="pt-2 border-t border-neutral-200/80 flex items-center gap-2">
                         <input
                           type="text"
                           value={customSizeInput}
@@ -1915,7 +1948,7 @@ export default function MerchantProductsTab({
                             }
                           }}
                           placeholder="Outro tamanho (ex.: 48, G4, 120x80cm, Sob Medida...)"
-                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-medium"
+                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] bg-white font-semibold transition-all shadow-2xs"
                         />
                         <button
                           type="button"
@@ -1926,7 +1959,7 @@ export default function MerchantProductsTab({
                               setCustomSizeInput('')
                             }
                           }}
-                          className="h-9 px-3 bg-neutral-900 hover:bg-black text-white text-xs font-bold rounded-md cursor-pointer"
+                          className="h-9 px-3.5 bg-neutral-900 hover:bg-black text-white text-xs font-black rounded-xl cursor-pointer transition-all shadow-xs"
                         >
                           + Adicionar
                         </button>
@@ -1934,18 +1967,18 @@ export default function MerchantProductsTab({
 
                       {/* Tags Selecionadas */}
                       {formSizes.length > 0 && (
-                        <div className="p-2.5 bg-white border border-neutral-200 rounded-md flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-bold text-neutral-700">Tamanhos selecionados:</span>
+                        <div className="p-3 bg-white border border-neutral-200/90 rounded-xl flex items-center gap-1.5 flex-wrap shadow-2xs">
+                          <span className="text-xs font-black text-neutral-700 mr-1">Tamanhos selecionados:</span>
                           {formSizes.map((sz) => (
                             <span
                               key={sz}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-900 text-white rounded text-xs font-bold"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-neutral-900 text-white rounded-lg text-xs font-black shadow-xs"
                             >
-                              {sz}
+                              <span>{sz}</span>
                               <button
                                 type="button"
                                 onClick={() => setFormSizes((prev) => prev.filter((s) => s !== sz))}
-                                className="hover:text-red-300 text-xs cursor-pointer ml-0.5"
+                                className="hover:text-red-300 text-sm cursor-pointer leading-none"
                               >
                                 &times;
                               </button>
@@ -1955,17 +1988,20 @@ export default function MerchantProductsTab({
                       )}
                     </div>
 
-                    {/* Cores Disponíveis (Opcional) */}
-                    <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-2.5">
+                    {/* Sub-card: Cores Disponíveis (Opcional) */}
+                    <div className="p-4 bg-gradient-to-br from-neutral-50 to-white border border-neutral-200/90 rounded-xl space-y-3 shadow-2xs">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-900">
-                          🎨 Cores Disponíveis (Opcional)
-                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">🎨</span>
+                          <label className="block text-xs sm:text-[13px] font-black text-neutral-900">
+                            Cores Disponíveis (Opcional)
+                          </label>
+                        </div>
                         {formColors.length > 0 && (
                           <button
                             type="button"
                             onClick={() => setFormColors([])}
-                            className="text-xs text-rose-600 hover:underline font-bold cursor-pointer"
+                            className="text-xs text-rose-600 hover:text-rose-700 font-bold cursor-pointer underline decoration-dotted"
                           >
                             Limpar cores ({formColors.length})
                           </button>
@@ -1987,10 +2023,10 @@ export default function MerchantProductsTab({
                                   isSelected ? prev.filter((c) => c !== cor) : [...prev, cor]
                                 )
                               }}
-                              className={`px-2.5 py-1 text-xs font-semibold rounded-full border transition-colors cursor-pointer ${
+                              className={`px-3 py-1 text-xs font-bold rounded-full border transition-all cursor-pointer shadow-2xs ${
                                 isSelected
-                                  ? 'bg-neutral-900 text-white border-neutral-900 font-bold'
-                                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-black'
+                                  ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs scale-105'
+                                  : 'bg-white text-neutral-700 border-neutral-300 hover:border-neutral-900 hover:text-black'
                               }`}
                             >
                               {cor}
@@ -2015,7 +2051,7 @@ export default function MerchantProductsTab({
                             }
                           }}
                           placeholder="Outra cor (ex.: Azul Marinho, Estampado, Dourado...)"
-                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white font-medium"
+                          className="flex-1 h-9 px-3 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] bg-white font-medium transition-all shadow-2xs"
                         />
                         <button
                           type="button"
@@ -2026,25 +2062,25 @@ export default function MerchantProductsTab({
                               setCustomColorInput('')
                             }
                           }}
-                          className="h-9 px-3 bg-neutral-900 hover:bg-black text-white text-xs font-bold rounded-md cursor-pointer"
+                          className="h-9 px-3.5 bg-neutral-900 hover:bg-black text-white text-xs font-black rounded-xl cursor-pointer transition-all shadow-xs"
                         >
                           + Adicionar Cor
                         </button>
                       </div>
 
                       {formColors.length > 0 && (
-                        <div className="p-2 bg-white border border-neutral-200 rounded-md flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-bold text-neutral-700">Cores selecionadas:</span>
+                        <div className="p-3 bg-white border border-neutral-200/90 rounded-xl flex items-center gap-1.5 flex-wrap shadow-2xs">
+                          <span className="text-xs font-black text-neutral-700 mr-1">Cores selecionadas:</span>
                           {formColors.map((c) => (
                             <span
                               key={c}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-neutral-900 rounded-full text-xs font-semibold"
+                              className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-neutral-100 border border-neutral-300 text-neutral-900 rounded-full text-xs font-black shadow-2xs"
                             >
-                              {c}
+                              <span>{c}</span>
                               <button
                                 type="button"
                                 onClick={() => setFormColors((prev) => prev.filter((x) => x !== c))}
-                                className="hover:text-red-500 cursor-pointer ml-0.5"
+                                className="hover:text-red-500 cursor-pointer text-sm leading-none"
                               >
                                 &times;
                               </button>
@@ -2056,14 +2092,14 @@ export default function MerchantProductsTab({
 
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Descrição (Opcional)
+                        Descrição do Produto (Opcional)
                       </label>
                       <textarea
                         rows={3}
                         value={formDescription}
                         onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="Material, modelagem, especificações..."
-                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] resize-none"
+                        placeholder="Composição do material, detalhes de modelagem, especificações técnicas, modo de conservação..."
+                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] resize-none transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -2071,19 +2107,25 @@ export default function MerchantProductsTab({
               </div>
 
               {/* Seção 2: Categorias e Subcategorias */}
-              <div>
-                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2 mb-4">
-                  2. Categoria e Subcategoria
-                </h4>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-3">
+                  <span className="w-6 h-6 rounded-lg bg-neutral-900 text-white text-xs font-black inline-flex items-center justify-center shadow-xs">
+                    2
+                  </span>
+                  <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                    Categoria e Subcategoria
+                  </h4>
+                </div>
+
                 {categories.length === 0 ? (
-                  <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-md text-xs sm:text-sm text-amber-900 flex items-center justify-between flex-wrap gap-2">
-                    <span>
+                  <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 flex items-center justify-between flex-wrap gap-2 shadow-2xs">
+                    <span className="font-medium">
                       Nenhuma categoria cadastrada no Tópico 05.
                       {formIsVehicle && ` Será usada "${formVehicleCategory}" por padrão.`}
                     </span>
                     <a
                       href="?topico=5"
-                      className="font-bold underline text-black hover:text-[#FB6600]"
+                      className="font-black underline text-black hover:text-[#FB6600] transition-colors"
                     >
                       Configurar Categorias &rarr;
                     </a>
@@ -2092,17 +2134,17 @@ export default function MerchantProductsTab({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Categoria Principal *
+                        Categoria Principal {!formIsVehicle && <span className="text-[#FB6600]">*</span>}
                       </label>
                       <select
                         required={!formIsVehicle}
                         value={formCategory}
                         onChange={(e) => handleFormCategoryChange(e.target.value)}
-                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-semibold bg-white"
+                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
                       >
                         <option value="">
                           {formIsVehicle
-                            ? `Padrão do veículo (${formVehicleCategory})`
+                            ? `Padrão do veículo (${formVehicleCategory || 'Auto'})`
                             : 'Selecione uma categoria...'}
                         </option>
                         {categories.map((c) => (
@@ -2121,7 +2163,7 @@ export default function MerchantProductsTab({
                         value={formSubcategory}
                         onChange={(e) => setFormSubcategory(e.target.value)}
                         disabled={formAvailableSubcategories.length === 0}
-                        className="w-full h-11 px-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] bg-white disabled:bg-neutral-100 disabled:text-neutral-400"
+                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold bg-white disabled:bg-neutral-100 disabled:text-neutral-400 cursor-pointer transition-all shadow-2xs"
                       >
                         <option value="">
                           {formAvailableSubcategories.length === 0
@@ -2140,18 +2182,23 @@ export default function MerchantProductsTab({
               </div>
 
               {/* Seção 3: Tipo de Promoção */}
-              <div>
-                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3 flex-wrap gap-2">
-                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
-                    3. Tipo de Promoção *
-                  </h4>
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#FB6600] text-white">
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-lg bg-neutral-900 text-white text-xs font-black inline-flex items-center justify-center shadow-xs">
+                      3
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                      Tipo de Promoção <span className="text-[#FB6600]">*</span>
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#FB6600] text-white shadow-2xs">
                     Selo no card
                   </span>
                 </div>
 
                 <div
-                  className={`grid gap-2 ${
+                  className={`grid gap-2.5 ${
                     formIsVehicle ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4'
                   }`}
                 >
@@ -2162,14 +2209,14 @@ export default function MerchantProductsTab({
                         key={promo.id}
                         type="button"
                         onClick={() => setFormPromoType(promo.id)}
-                        className={`h-10 px-3 text-xs sm:text-sm rounded-md border text-left transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
+                        className={`h-11 px-3.5 text-xs sm:text-sm rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs ${
                           isSelected
-                            ? 'bg-[#FB6600] border-[#FB6600] text-white font-bold shadow-xs'
-                            : 'bg-white border-neutral-300 text-neutral-800 hover:border-black font-semibold'
+                            ? 'bg-gradient-to-r from-[#FB6600] to-[#e05b00] border-[#FB6600] text-white font-black shadow-xs scale-101'
+                            : 'bg-white border-neutral-300 text-neutral-800 hover:border-neutral-900 font-bold hover:bg-neutral-50'
                         }`}
                       >
                         <span className="truncate">{promo.label}</span>
-                        {isSelected && <span className="text-xs shrink-0">✓</span>}
+                        {isSelected && <span className="text-sm shrink-0">✓</span>}
                       </button>
                     )
                   })}
@@ -2177,13 +2224,18 @@ export default function MerchantProductsTab({
               </div>
 
               {/* Seção 4: Fotos dos Produtos */}
-              <div>
-                <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-3 flex-wrap gap-2">
-                  <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900">
-                    4. Fotos ({formImages.length}/{MAX_PHOTOS})
-                  </h4>
-                  <span className="text-xs text-neutral-500">
-                    A 1ª imagem é a foto de capa
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center justify-between border-b border-neutral-100 pb-3 flex-wrap gap-2">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-lg bg-neutral-900 text-white text-xs font-black inline-flex items-center justify-center shadow-xs">
+                      4
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                      Galeria de Fotos ({formImages.length}/{MAX_PHOTOS})
+                    </h4>
+                  </div>
+                  <span className="text-xs text-neutral-500 font-semibold">
+                    ⭐ A 1ª foto é a capa da vitrine
                   </span>
                 </div>
 
@@ -2200,7 +2252,7 @@ export default function MerchantProductsTab({
                   {formImages.map((imgUrl, idx) => (
                     <div
                       key={idx}
-                      className="aspect-square bg-neutral-100 border border-neutral-300 rounded-md overflow-hidden relative group shadow-2xs"
+                      className="aspect-square bg-neutral-100 border border-neutral-300/80 rounded-xl overflow-hidden relative group shadow-xs transition-all hover:shadow-md"
                     >
                       <img
                         src={imgUrl}
@@ -2209,26 +2261,26 @@ export default function MerchantProductsTab({
                       />
                       {idx === 0 ? (
                         <>
-                          <span className="absolute top-1.5 left-1.5 bg-[#FB6600] text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded shadow">
+                          <span className="absolute top-2 left-2 bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow-md">
                             {getPromoLabel(formPromoType)}
                           </span>
                           {calculatedDiscount && calculatedDiscount > 0 && (
-                            <span className="absolute bottom-1.5 right-1.5 w-7 h-7 rounded-full bg-yellow-400 text-black font-black text-[10px] flex items-center justify-center shadow border border-yellow-500/40">
+                            <span className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-yellow-400 text-black font-black text-[11px] flex items-center justify-center shadow-md border border-yellow-500/50">
                               -{calculatedDiscount}%
                             </span>
                           )}
                         </>
                       ) : (
-                        <span className="absolute top-1.5 left-1.5 bg-neutral-900/80 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">
+                        <span className="absolute top-2 left-2 bg-neutral-900/85 backdrop-blur-xs text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow">
                           Foto {idx + 1}
                         </span>
                       )}
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-xs">
                         {idx !== 0 && (
                           <button
                             type="button"
                             onClick={() => handleSetCoverImage(idx)}
-                            className="px-2 py-1 bg-white hover:bg-neutral-200 text-black rounded text-xs font-bold cursor-pointer"
+                            className="px-2.5 py-1 bg-white hover:bg-neutral-100 text-black rounded-lg text-xs font-black cursor-pointer shadow-md transition-transform hover:scale-105"
                             title="Tornar foto de capa"
                           >
                             ⭐ Capa
@@ -2237,7 +2289,7 @@ export default function MerchantProductsTab({
                         <button
                           type="button"
                           onClick={() => handleRemoveImage(idx)}
-                          className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-bold cursor-pointer"
+                          className="p-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-black cursor-pointer shadow-md transition-transform hover:scale-105"
                           title="Remover foto"
                         >
                           🗑️
@@ -2256,49 +2308,57 @@ export default function MerchantProductsTab({
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={uploadingImage}
-                        className={`aspect-square border-2 border-dashed rounded-md flex flex-col items-center justify-center p-2 transition-colors cursor-pointer ${
+                        className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-3 transition-all cursor-pointer ${
                           isNextSlot
-                            ? 'border-neutral-400 hover:border-black text-neutral-800 hover:text-black bg-neutral-50'
-                            : 'border-neutral-200 hover:border-neutral-400 text-neutral-500 hover:text-neutral-800 bg-neutral-50/50'
+                            ? 'border-[#FB6600]/60 hover:border-[#FB6600] text-neutral-800 hover:text-black bg-orange-50/20 hover:bg-orange-50/40 shadow-2xs'
+                            : 'border-neutral-200 hover:border-neutral-400 text-neutral-400 hover:text-neutral-700 bg-neutral-50/40'
                         }`}
                       >
-                        <span className="text-2xl mb-1">{uploadingImage && isNextSlot ? '⏳' : '📷'}</span>
-                        <span className="text-xs font-bold text-center">
+                        <span className="text-2xl mb-1.5">{uploadingImage && isNextSlot ? '⏳' : '📷'}</span>
+                        <span className="text-xs font-black text-center">
                           {uploadingImage && isNextSlot ? 'Enviando...' : `Foto ${photoNumber}/${MAX_PHOTOS}`}
                         </span>
+                        {isNextSlot && (
+                          <span className="text-[10px] font-bold text-[#FB6600] mt-0.5">+ Adicionar</span>
+                        )}
                       </button>
                     )
                   })}
                 </div>
 
                 {/* Enquadramento Travado: Veículos sempre horizontal, Produtos sempre vertical */}
-                <div className="pt-4 mt-3 border-t border-neutral-200">
-                  <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-2">
-                    Enquadramento da Foto no Card da Vitrine
-                  </label>
+                <div className="pt-3 border-t border-neutral-100">
                   {formIsVehicle ? (
-                    <div className="p-3 bg-neutral-900 text-white rounded-md flex items-center gap-3 shadow-xs">
-                      <span className="text-xl">🚗</span>
-                      <div>
-                        <span className="text-xs sm:text-sm font-bold block flex items-center gap-1.5">
-                          <span>🔒 Enquadramento Travado: Horizontal (16:9)</span>
-                          <span className="px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded font-bold">Automático</span>
-                        </span>
-                        <span className="text-xs text-neutral-300 block">
-                          Carros e veículos são sempre exibidos em formato horizontal.
+                    <div className="p-3.5 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 text-white rounded-xl flex items-center gap-3.5 shadow-xs border border-neutral-800">
+                      <span className="text-2xl shrink-0">🚗</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs sm:text-sm font-black text-white">
+                            Enquadramento Travado: Horizontal (16:9)
+                          </span>
+                          <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded-full font-black tracking-wide">
+                            Automático
+                          </span>
+                        </div>
+                        <span className="text-xs text-neutral-300 block mt-0.5">
+                          Carros e veículos são padronizados no formato horizontal panorâmico para melhor visualização.
                         </span>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-3 bg-neutral-900 text-white rounded-md flex items-center gap-3 shadow-xs">
-                      <span className="text-xl">🛍️</span>
-                      <div>
-                        <span className="text-xs sm:text-sm font-bold block flex items-center gap-1.5">
-                          <span>🔒 Enquadramento Travado: Vertical (3:4)</span>
-                          <span className="px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded font-bold">Automático</span>
-                        </span>
-                        <span className="text-xs text-neutral-300 block">
-                          Produtos padrão, roupas, calçados e alimentos são sempre exibidos em formato vertical.
+                    <div className="p-3.5 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-950 text-white rounded-xl flex items-center gap-3.5 shadow-xs border border-neutral-800">
+                      <span className="text-2xl shrink-0">🛍️</span>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs sm:text-sm font-black text-white">
+                            Enquadramento Travado: Vertical (3:4)
+                          </span>
+                          <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[10px] uppercase rounded-full font-black tracking-wide">
+                            Automático
+                          </span>
+                        </div>
+                        <span className="text-xs text-neutral-300 block mt-0.5">
+                          Roupas, calçados, bebidas e produtos de catálogo são padronizados no formato vertical estilo e-commerce.
                         </span>
                       </div>
                     </div>
@@ -2307,86 +2367,91 @@ export default function MerchantProductsTab({
               </div>
 
               {/* Seção 5: Preços do Produto */}
-              <div>
-                <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-neutral-900 border-b border-neutral-200 pb-2 mb-4">
-                  5. Preços {formIsVehicle ? 'do Veículo' : 'do Produto'}
-                </h4>
+              <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
+                <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-3">
+                  <span className="w-6 h-6 rounded-lg bg-neutral-900 text-white text-xs font-black inline-flex items-center justify-center shadow-xs">
+                    5
+                  </span>
+                  <h4 className="text-xs sm:text-sm font-black uppercase tracking-wider text-neutral-900">
+                    Preços e Condições Comerciais {formIsVehicle ? '(Veículo)' : '(Produto)'}
+                  </h4>
+                </div>
 
                 {formIsVehicle ? (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {/* Preço de Custo (Interno) */}
-                      <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-md">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <label className="block text-xs font-bold text-neutral-800">
-                            Custo (Interno)
+                      <div className="p-4 bg-amber-50/60 border border-amber-200/90 rounded-xl space-y-2 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-black text-amber-950">
+                            Custo de Aquisição
                           </label>
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
+                          <span className="text-[10px] font-black px-2 py-0.5 bg-amber-200/70 text-amber-950 rounded-full border border-amber-300">
                             🔒 Oculto
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-neutral-400">R$</span>
                           <input
                             type="text"
                             value={formCostPriceInternal}
                             onChange={(e) => setFormCostPriceInternal(e.target.value)}
                             placeholder="0,00"
-                            className="w-full h-11 pl-9 pr-3 text-sm border border-amber-300 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-neutral-800"
+                            className="w-full h-11 pl-10 pr-3.5 text-sm border border-amber-300 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-neutral-900 transition-all shadow-2xs"
                           />
                         </div>
                       </div>
 
                       {/* Preço de Venda (Público) */}
-                      <div className="p-3.5 bg-emerald-50/50 border border-emerald-300 rounded-md">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <label className="block text-xs font-bold text-neutral-900">
-                            Preço Venda *
+                      <div className="p-4 bg-emerald-50/60 border border-emerald-300 rounded-xl space-y-2 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-black text-emerald-950">
+                            Preço de Venda <span className="text-[#FB6600]">*</span>
                           </label>
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-emerald-600 text-white rounded">
+                          <span className="text-[10px] font-black px-2 py-0.5 bg-emerald-600 text-white rounded-full shadow-xs">
                             Público
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-500">R$</span>
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-emerald-700">R$</span>
                           <input
                             type="text"
                             required
                             value={formPrice}
                             onChange={(e) => setFormPrice(e.target.value)}
                             placeholder="118.900,00"
-                            className="w-full h-11 pl-9 pr-3 text-sm border border-emerald-400 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold text-neutral-900"
+                            className="w-full h-11 pl-10 pr-3.5 text-sm border border-emerald-400 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-black text-neutral-950 transition-all shadow-2xs"
                           />
                         </div>
                       </div>
 
                       {/* Preço FIPE (Interno) */}
-                      <div className="p-3.5 bg-amber-50/50 border border-amber-200 rounded-md">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <label className="block text-xs font-bold text-neutral-800">
-                            FIPE (Interno)
+                      <div className="p-4 bg-amber-50/60 border border-amber-200/90 rounded-xl space-y-2 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-black text-amber-950">
+                            Valor Tabela FIPE
                           </label>
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">
+                          <span className="text-[10px] font-black px-2 py-0.5 bg-amber-200/70 text-amber-950 rounded-full border border-amber-300">
                             🔒 Oculto
                           </span>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-neutral-400">R$</span>
                           <input
                             type="text"
                             value={formFipePriceInternal}
                             onChange={(e) => setFormFipePriceInternal(e.target.value)}
                             placeholder="122.400,00"
-                            className="w-full h-11 pl-9 pr-3 text-sm border border-amber-300 bg-white rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-neutral-800"
+                            className="w-full h-11 pl-10 pr-3.5 text-sm border border-amber-300 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 font-bold text-neutral-900 transition-all shadow-2xs"
                           />
                         </div>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-amber-50 border border-amber-300 rounded-md text-xs text-amber-950 flex items-center gap-2.5">
+                    <div className="p-3.5 bg-amber-50/80 border border-amber-200/90 rounded-xl text-xs text-amber-950 flex items-center gap-2.5 shadow-2xs">
                       <span className="text-base shrink-0">🔒</span>
                       <span>
-                        <strong>Dados internos (Custo, FIPE e Placa):</strong> ficam visíveis apenas neste painel; visitantes veem somente o Preço de Venda.
+                        <strong>Privacidade dos Dados Internos (Custo, FIPE e Placa):</strong> visíveis somente neste painel gerencial; clientes e visitantes veem estritamente o Preço de Venda público.
                       </span>
                     </div>
 
@@ -2397,19 +2462,19 @@ export default function MerchantProductsTab({
                           Preço Promocional (Opcional)
                         </label>
                         {calculatedDiscount && (
-                          <span className="text-xs font-bold text-black bg-yellow-400 px-2.5 py-0.5 rounded-full">
+                          <span className="text-xs font-black text-black bg-yellow-400 px-2.5 py-0.5 rounded-full shadow-2xs border border-yellow-500/40">
                             Desconto: {calculatedDiscount}%
                           </span>
                         )}
                       </div>
                       <div className="relative max-w-xs">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-neutral-400">R$</span>
                         <input
                           type="text"
                           value={formPromoPrice}
                           onChange={(e) => setFormPromoPrice(e.target.value)}
                           placeholder="Opcional"
-                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-bold text-[#FB6600]"
+                          className="w-full h-11 pl-10 pr-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-black text-[#FB6600] transition-all shadow-2xs"
                         />
                       </div>
                     </div>
@@ -2418,17 +2483,17 @@ export default function MerchantProductsTab({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Preço Regular (R$) *
+                        Preço Regular (R$) <span className="text-[#FB6600]">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-neutral-400">R$</span>
                         <input
                           type="text"
                           required
                           value={formPrice}
                           onChange={(e) => setFormPrice(e.target.value)}
                           placeholder="0,00"
-                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold"
+                          className="w-full h-11 pl-10 pr-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-black text-neutral-900 transition-all shadow-2xs"
                         />
                       </div>
                     </div>
@@ -2439,19 +2504,19 @@ export default function MerchantProductsTab({
                           Preço Promocional (Opcional)
                         </label>
                         {calculatedDiscount && (
-                          <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                          <span className="text-xs font-black text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300/70 shadow-2xs">
                             {calculatedDiscount}% OFF
                           </span>
                         )}
                       </div>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-neutral-400">R$</span>
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-neutral-400">R$</span>
                         <input
                           type="text"
                           value={formPromoPrice}
                           onChange={(e) => setFormPromoPrice(e.target.value)}
                           placeholder="Ex.: 89,90"
-                          className="w-full h-11 pl-9 pr-3 text-sm border border-neutral-300 rounded-md focus:outline-none focus:border-[#FB6600] font-extrabold text-[#FB6600]"
+                          className="w-full h-11 pl-10 pr-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-black text-[#FB6600] transition-all shadow-2xs"
                         />
                       </div>
                     </div>
@@ -2459,33 +2524,51 @@ export default function MerchantProductsTab({
                 )}
               </div>
 
-              {/* Botões do Modal */}
-              <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setIsFormModalOpen(false)}
-                  className="h-10 px-4 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-semibold rounded-md hover:bg-neutral-50 cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleSaveProduct()
-                  }}
-                  disabled={submitting}
-                  className="h-10 px-6 bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-semibold rounded-md cursor-pointer disabled:opacity-50"
-                >
-                  {submitting
-                    ? 'Salvando...'
-                    : editingProduct
-                    ? 'Salvar Alterações'
-                    : formIsVehicle
-                    ? 'Cadastrar Veículo'
-                    : 'Cadastrar Produto'}
-                </button>
+              {/* Rodapé Fixo / Sticky Pro Max */}
+              <div className="pt-4 border-t border-neutral-200/90 flex items-center justify-between gap-3 flex-wrap">
+                <div className="text-xs font-bold text-neutral-500 hidden sm:flex items-center gap-2">
+                  <span>{formIsVehicle ? '🚗 Modo Veículo' : '🛍️ Modo Produto Padrão'}</span>
+                  <span>&bull;</span>
+                  <span>{formImages.length} {formImages.length === 1 ? 'foto' : 'fotos'}</span>
+                </div>
+
+                <div className="flex items-center gap-2.5 ml-auto">
+                  <button
+                    type="button"
+                    onClick={() => setIsFormModalOpen(false)}
+                    className="h-11 px-5 border border-neutral-300 text-neutral-700 text-xs sm:text-sm font-bold rounded-xl hover:bg-neutral-100 transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleSaveProduct()
+                    }}
+                    disabled={submitting}
+                    className="h-11 px-6 bg-gradient-to-r from-[#FB6600] to-[#e05b00] hover:from-[#e05b00] hover:to-[#c44e00] text-white text-xs sm:text-sm font-black rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 active:scale-98"
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="animate-spin text-sm">⏳</span>
+                        <span>Salvando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>💾</span>
+                        <span>
+                          {editingProduct
+                            ? 'Salvar Alterações'
+                            : formIsVehicle
+                            ? 'Cadastrar Veículo'
+                            : 'Cadastrar Produto'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
