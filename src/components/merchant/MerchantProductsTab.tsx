@@ -1071,10 +1071,10 @@ export default function MerchantProductsTab({
                     </button>
                   </div>
 
-                  {/* Coluna B: Dividida em B1 e B2 */}
-                  <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 items-center">
-                    {/* B1: Tipo de promoção, nome do veículo, categoria, subcategoria, SKU */}
-                    <div className="min-w-0 space-y-1">
+                  {/* Coluna B: B1 à esquerda e B2 à direita aproveitando todo o espaço */}
+                  <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
+                    {/* B1 (Esquerda): Tipo de promoção, nome do veículo, categoria, subcategoria, SKU */}
+                    <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
                           {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
@@ -1086,7 +1086,7 @@ export default function MerchantProductsTab({
                         )}
                       </div>
 
-                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
+                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2 break-words" title={prod.name}>
                         {prod.name}
                       </h4>
 
@@ -1107,54 +1107,50 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
-                    {/* B2: Ano, KM, Câmbio, Tração/Combustível */}
-                    <div className="min-w-0 space-y-1 text-xs sm:text-sm text-neutral-600">
+                    {/* B2 (Direita): Ano, KM, Câmbio, Tração */}
+                    <div className="min-w-0 sm:text-right flex flex-col sm:items-end gap-0.5 text-xs sm:text-sm text-neutral-600 shrink-0">
                       {prod.is_vehicle ? (
                         <>
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            {(prod.vehicle_year_model || prod.vehicle_year_fab) && (
-                              <span>
-                                <strong className="text-neutral-800">Ano:</strong>{' '}
-                                {prod.vehicle_year_model || prod.vehicle_year_fab}
-                              </span>
-                            )}
-                            {prod.vehicle_km && (
-                              <span>
-                                <strong className="text-neutral-800">KM:</strong>{' '}
-                                {String(prod.vehicle_km).toLowerCase().includes('km')
-                                  ? prod.vehicle_km
-                                  : `${prod.vehicle_km} km`}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            {prod.vehicle_transmission && (
-                              <span>
-                                <strong className="text-neutral-800">Câmbio:</strong> {prod.vehicle_transmission}
-                              </span>
-                            )}
-                            {prod.vehicle_traction && (
-                              <span>
-                                <strong className="text-neutral-800">Tração:</strong> {prod.vehicle_traction}
-                              </span>
-                            )}
-                          </div>
+                          {(prod.vehicle_year_model || prod.vehicle_year_fab) && (
+                            <span className="whitespace-nowrap">
+                              <strong className="text-neutral-800">Ano:</strong>{' '}
+                              {prod.vehicle_year_model || prod.vehicle_year_fab}
+                            </span>
+                          )}
+                          {prod.vehicle_km && (
+                            <span className="whitespace-nowrap">
+                              <strong className="text-neutral-800">KM:</strong>{' '}
+                              {String(prod.vehicle_km).toLowerCase().includes('km')
+                                ? prod.vehicle_km
+                                : `${prod.vehicle_km} km`}
+                            </span>
+                          )}
+                          {prod.vehicle_transmission && (
+                            <span className="whitespace-nowrap">
+                              <strong className="text-neutral-800">Câmbio:</strong> {prod.vehicle_transmission}
+                            </span>
+                          )}
+                          {prod.vehicle_traction && (
+                            <span className="whitespace-nowrap">
+                              <strong className="text-neutral-800">Tração:</strong> {prod.vehicle_traction}
+                            </span>
+                          )}
                           {prod.vehicle_plate_internal && (
-                            <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-[11px] rounded">
+                            <span className="inline-block mt-0.5 px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-[11px] rounded whitespace-nowrap">
                               🔒 Placa: {prod.vehicle_plate_internal}
                             </span>
                           )}
                         </>
                       ) : (
                         prod.description && (
-                          <p className="text-xs text-neutral-500 line-clamp-3">{prod.description}</p>
+                          <p className="text-xs text-neutral-500 line-clamp-3 max-w-xs sm:text-right">{prod.description}</p>
                         )
                       )}
                     </div>
                   </div>
 
                   {/* Coluna C: Preço de venda, FIPE/preço riscado e percentual + 2 colunas de botões (C1 e C2) */}
-                  <div className="lg:w-64 shrink-0 pt-2.5 lg:pt-0 lg:pl-4 border-t lg:border-t-0 lg:border-l border-neutral-100 flex flex-col justify-between gap-2.5">
+                  <div className="lg:w-44 shrink-0 pt-2.5 lg:pt-0 lg:pl-4 border-t lg:border-t-0 lg:border-l border-neutral-100 flex flex-col justify-between gap-2">
                     {/* Preços */}
                     <div className="flex flex-col lg:items-end gap-0.5">
                       <span className={`text-lg font-extrabold leading-tight whitespace-nowrap ${hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'}`}>
