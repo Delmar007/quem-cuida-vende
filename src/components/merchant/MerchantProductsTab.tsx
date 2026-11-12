@@ -1034,9 +1034,9 @@ export default function MerchantProductsTab({
                   !prod.is_active ? 'opacity-70 bg-neutral-50/40' : ''
                 }`}
               >
-                <div className="p-4 sm:p-5 flex flex-col md:flex-row gap-4 sm:gap-5 md:items-center">
+                <div className="p-3 sm:p-3.5 flex flex-col md:flex-row gap-3 sm:gap-4 md:items-center">
                   {/* Coluna 1 (Esquerda): Foto do Produto (tamanho mantido) */}
-                  <div className="shrink-0 flex items-start">
+                  <div className="shrink-0 flex items-center">
                     <button
                       type="button"
                       onClick={() => setPreviewProduct(prod)}
@@ -1060,93 +1060,103 @@ export default function MerchantProductsTab({
                     </button>
                   </div>
 
-                  {/* Coluna 2 (Meio): Tipo de promoção, modelo, SKU, ano, km, câmbio */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-center">
-                    <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                      <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
-                        {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
-                      </span>
-                      {prod.is_vehicle && prod.vehicle_category && (
-                        <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
-                          {prod.vehicle_category}
+                  {/* Coluna 2 (Meio): Dividida em 2 colunas para distribuir melhor as informações */}
+                  <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4 items-center">
+                    {/* Subcoluna 2A: Tipo de promoção e Modelo */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        <span className="px-2 py-0.5 bg-[#FB6600] text-white text-[11px] font-bold uppercase tracking-wide rounded">
+                          {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
                         </span>
-                      )}
-                    </div>
-
-                    <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
-                      {prod.name}
-                    </h4>
-
-                    <div className="mt-1 text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
-                      <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
-                      {prod.subcategory && (
-                        <>
-                          <span className="text-neutral-300">&bull;</span>
-                          <span>{prod.subcategory}</span>
-                        </>
-                      )}
-                      {prod.sku && (
-                        <>
-                          <span className="text-neutral-300">&bull;</span>
-                          <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
-                        </>
-                      )}
-                    </div>
-
-                    {prod.is_vehicle && (
-                      <div className="mt-1.5 space-y-1">
-                        <span className="text-xs sm:text-sm text-neutral-600 block">
-                          {[
-                            prod.vehicle_year_model || prod.vehicle_year_fab,
-                            prod.vehicle_km ? `${prod.vehicle_km} km` : null,
-                            prod.vehicle_transmission,
-                            prod.vehicle_traction,
-                          ]
-                            .filter(Boolean)
-                            .join(' • ')}
-                        </span>
-                        {prod.vehicle_plate_internal && (
-                          <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-xs rounded">
-                            🔒 Placa: {prod.vehicle_plate_internal}
+                        {prod.is_vehicle && prod.vehicle_category && (
+                          <span className="px-2 py-0.5 bg-neutral-900 text-white text-[11px] font-bold uppercase rounded">
+                            {prod.vehicle_category}
                           </span>
                         )}
                       </div>
-                    )}
+
+                      <h4 className="text-base sm:text-[17px] font-extrabold text-neutral-900 leading-snug line-clamp-2" title={prod.name}>
+                        {prod.name}
+                      </h4>
+                    </div>
+
+                    {/* Subcoluna 2B: Categoria, SKU, Ano, KM, Câmbio e Placa */}
+                    <div className="min-w-0 space-y-1">
+                      <div className="text-xs sm:text-sm text-neutral-600 flex items-center gap-1.5 flex-wrap">
+                        <span className="font-semibold text-neutral-800 capitalize">{prod.category}</span>
+                        {prod.subcategory && (
+                          <>
+                            <span className="text-neutral-300">&bull;</span>
+                            <span>{prod.subcategory}</span>
+                          </>
+                        )}
+                        {prod.sku && (
+                          <>
+                            <span className="text-neutral-300">&bull;</span>
+                            <span className="font-mono text-xs text-neutral-500">SKU: {prod.sku}</span>
+                          </>
+                        )}
+                      </div>
+
+                      {prod.is_vehicle && (
+                        <div className="space-y-1">
+                          <span className="text-xs sm:text-sm text-neutral-600 block">
+                            {[
+                              prod.vehicle_year_model || prod.vehicle_year_fab,
+                              prod.vehicle_km
+                                ? String(prod.vehicle_km).toLowerCase().includes('km')
+                                  ? prod.vehicle_km
+                                  : `${prod.vehicle_km} km`
+                                : null,
+                              prod.vehicle_transmission,
+                              prod.vehicle_traction,
+                            ]
+                              .filter(Boolean)
+                              .join(' • ')}
+                          </span>
+                          {prod.vehicle_plate_internal && (
+                            <span className="inline-block px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-900 font-mono text-[11px] rounded">
+                              🔒 Placa: {prod.vehicle_plate_internal}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Coluna 3 (Direita): Preços e Botões (Ativo na vitrine, Prévia, Editar, Excluir) */}
-                  <div className="md:w-72 lg:w-80 shrink-0 pt-3 md:pt-0 md:pl-5 border-t md:border-t-0 md:border-l border-neutral-100 flex flex-col justify-between gap-3 md:items-end">
-                    {/* Bloco de Preços */}
-                    <div className="flex flex-col md:items-end gap-1">
-                      <div className="flex items-baseline gap-2.5 flex-wrap md:justify-end">
-                        {hasPromo ? (
-                          <>
-                            <span className="text-lg sm:text-xl font-extrabold text-[#FB6600]">
-                              R$ {formatCurrencyBRL(prod.promotional_price)}
-                            </span>
-                            <span className="line-through text-neutral-400 text-xs sm:text-sm font-medium">
+                  {/* Coluna 3 (Direita): Preços e Botões na vertical */}
+                  <div className="shrink-0 pt-2.5 md:pt-0 md:pl-4 border-t md:border-t-0 md:border-l border-neutral-100 flex items-center justify-between md:justify-end gap-4">
+                    {/* Preços na vertical */}
+                    <div className="flex flex-col md:items-end gap-0.5">
+                      {hasPromo ? (
+                        <>
+                          <span className="text-base sm:text-lg font-extrabold text-[#FB6600] leading-tight whitespace-nowrap">
+                            R$ {formatCurrencyBRL(prod.promotional_price)}
+                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap md:justify-end">
+                            <span className="line-through text-neutral-400 text-xs font-medium whitespace-nowrap">
                               R$ {formatCurrencyBRL(prod.price)}
                             </span>
-                            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">
                               -{discountPercent}%
                             </span>
-                          </>
-                        ) : (
-                          <span className="text-lg sm:text-xl font-extrabold text-neutral-900">
-                            R$ {formatCurrencyBRL(prod.price)}
-                          </span>
-                        )}
-                      </div>
+                          </div>
+                        </>
+                      ) : (
+                        <span className="text-base sm:text-lg font-extrabold text-neutral-900 leading-tight whitespace-nowrap">
+                          R$ {formatCurrencyBRL(prod.price)}
+                        </span>
+                      )}
 
                       {(prod.cost_price_internal || prod.fipe_price_internal) && (
-                        <div className="flex items-center gap-2 flex-wrap md:justify-end mt-0.5">
+                        <div className="flex flex-col md:items-end gap-1 mt-1">
                           {prod.cost_price_internal && (
-                            <span className="text-xs font-semibold text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded">
+                            <span className="text-[11px] font-semibold text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔒 Custo: R$ {formatCurrencyBRL(prod.cost_price_internal)}
                             </span>
                           )}
                           {prod.fipe_price_internal && (
-                            <span className="text-xs font-semibold text-amber-900 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                            <span className="text-[11px] font-semibold text-amber-900 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded whitespace-nowrap">
                               🔒 FIPE: R$ {formatCurrencyBRL(prod.fipe_price_internal)}
                             </span>
                           )}
@@ -1154,12 +1164,12 @@ export default function MerchantProductsTab({
                       )}
                     </div>
 
-                    {/* Botões de Status e Ações */}
-                    <div className="flex flex-col md:items-end gap-2">
+                    {/* Botões na vertical (mesma altura da foto) */}
+                    <div className="flex flex-col gap-1 w-32 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleToggleActive(prod)}
-                        className={`h-8 px-3 text-xs font-bold rounded-md transition-colors cursor-pointer border self-start md:self-end ${
+                        className={`h-7 px-2.5 text-[11px] font-bold rounded-md transition-colors cursor-pointer border text-center whitespace-nowrap ${
                           prod.is_active
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                             : 'bg-white text-neutral-600 border-neutral-300 hover:bg-neutral-100'
@@ -1168,30 +1178,27 @@ export default function MerchantProductsTab({
                       >
                         {prod.is_active ? '✓ Ativo na Vitrine' : '✕ Inativo'}
                       </button>
-
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewProduct(prod)}
-                          className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                        >
-                          Prévia
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditModal(prod)}
-                          className="h-8 px-3 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteConfirmation(prod)}
-                          className="h-8 px-3 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-xs font-semibold rounded-md cursor-pointer transition-colors"
-                        >
-                          Excluir
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewProduct(prod)}
+                        className="h-7 px-2.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                      >
+                        Prévia
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(prod)}
+                        className="h-7 px-2.5 bg-white hover:bg-neutral-100 text-neutral-900 border border-neutral-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeleteConfirmation(prod)}
+                        className="h-7 px-2.5 bg-white hover:bg-rose-50 text-rose-600 border border-neutral-300 hover:border-rose-300 text-[11px] font-semibold rounded-md cursor-pointer transition-colors"
+                      >
+                        Excluir
+                      </button>
                     </div>
                   </div>
                 </div>
