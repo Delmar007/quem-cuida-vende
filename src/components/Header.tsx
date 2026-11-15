@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import AuthModal from '@/components/AuthModal'
 import PlansModal from '@/components/PlansModal'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
@@ -12,10 +12,12 @@ import { getCommercialStreetsByLetterAction } from '@/app/actions/streets'
 
 export default function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [isAuthOpen, setIsAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [user, setUser] = useState<any>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [unreadFeedPromosCount, setUnreadFeedPromosCount] = useState(0)
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
@@ -245,6 +247,57 @@ export default function Header() {
       window.removeEventListener('kittanda:store-saved', fetchSession)
     }
   }, [searchParams.toString()])
+
+  const markFeedAsSeen = () => {
+    setUnreadFeedPromosCount(0)
+    try {
+      localStorage.setItem('kittanda_feed_last_seen_at', new Date().toISOString())
+    } catch {
+      // ignore
+    }
+  }
+
+  useEffect(() => {
+    const isInsideFeed =
+      pathname === '/feed' ||
+      (pathname === '/perfil' && searchParams.get('aba') === 'feed')
+
+    if (isInsideFeed) {
+      markFeedAsSeen()
+      return
+    }
+
+    if (!user) {
+      setUnreadFeedPromosCount(0)
+      return
+    }
+
+    let active = true
+    fetch('/api/feed?limit=50')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data || !Array.isArray(data.promotions)) return
+        let lastSeenMs = 0
+        try {
+          const saved = localStorage.getItem('kittanda_feed_last_seen_at')
+          if (saved) lastSeenMs = new Date(saved).getTime() || 0
+        } catch {
+          // ignore
+        }
+        const count =
+          lastSeenMs > 0
+            ? data.promotions.filter(
+                (p: any) => new Date(p.created_at || 0).getTime() > lastSeenMs
+              ).length
+            : data.promotions.length
+        setUnreadFeedPromosCount(count)
+      })
+      .catch(() => {})
+
+    return () => {
+      active = false
+    }
+  }, [user, pathname, searchParams])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -507,11 +560,16 @@ export default function Header() {
               )}
               <button
                 type="button"
-                onClick={() => router.push('/perfil?aba=feed')}
-                className="inline-flex items-center gap-1 text-gray-600 hover:text-[#FB6600] font-medium transition-colors cursor-pointer whitespace-nowrap"
+                aria-label="Feed que sigo"
+                title="Abrir Feed que sigo"
+                onClick={() => {
+                  markFeedAsSeen()
+                  router.push('/perfil?aba=feed')
+                }}
+                className="relative inline-flex items-center justify-center text-gray-600 hover:text-[#FB6600] transition-colors cursor-pointer p-0.5"
               >
                 <svg
-                  className="w-[17px] h-[17px] stroke-[1.7]"
+                  className="w-[19px] h-[19px] stroke-[1.7]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -522,7 +580,11 @@ export default function Header() {
                     d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
                   />
                 </svg>
-                <span>Feed que sigo</span>
+                {unreadFeedPromosCount > 0 && (
+                  <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] px-[3px] bg-red-600 text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums">
+                    {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
+                  </span>
+                )}
               </button>
               <button
                 type="button"
