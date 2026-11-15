@@ -528,26 +528,18 @@ export default function Header() {
           </div>
         </div>
 
-        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (Minha Loja, Meu Perfil, Bolsa, Planos, Sair) */}
+        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (MINHA LOJA, Bolsa, PLANOS, Sair) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
           <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center justify-between gap-2 text-[16px] text-gray-600 flex-wrap">
             {user ? (
-              <>
-                {Boolean(user.hasStore) && (
-                  <Link
-                    href="/painel/loja"
-                    className="text-neutral-900 hover:text-[#FB6600] font-bold transition-colors whitespace-nowrap"
-                  >
-                    Minha Loja
-                  </Link>
-                )}
+              Boolean(user.hasStore) && (
                 <Link
-                  href="/perfil"
-                  className="text-gray-600 hover:text-[#FB6600] font-medium transition-colors whitespace-nowrap"
+                  href="/painel/loja"
+                  className="text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
                 >
-                  Meu Perfil
+                  MINHA LOJA
                 </Link>
-              </>
+              )
             ) : (
               <button
                 type="button"
@@ -590,7 +582,7 @@ export default function Header() {
               onClick={() => setIsPlansOpen(true)}
               className="text-[14.5px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
             >
-              Planos
+              PLANOS
             </button>
             {user && (
               <button
