@@ -317,7 +317,8 @@ export default function Header() {
             </button>
           </form>
 
-          <div className="flex items-center gap-2.5 md:gap-3 text-[13px] text-gray-500 font-normal">
+          {/* AÇÕES DO TOPO - DESKTOP */}
+          <div className="hidden sm:flex items-center gap-2.5 md:gap-3 text-[13px] text-gray-500 font-normal">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -388,11 +389,11 @@ export default function Header() {
                 >
                   Entrar
                 </button>
-                <span className="hidden sm:inline text-gray-300 text-xs font-light">|</span>
+                <span className="text-gray-300 text-xs font-light">|</span>
                 <button 
                   type="button"
                   onClick={openRegister}
-                  className="hidden sm:inline hover:text-black transition-colors cursor-pointer"
+                  className="hover:text-black transition-colors cursor-pointer"
                 >
                   Crie uma conta
                 </button>
@@ -419,14 +420,134 @@ export default function Header() {
                 />
               </svg>
             </button>
-            <span className="text-gray-300 text-xs font-light hidden sm:inline">|</span>
+            <span className="text-gray-300 text-xs font-light">|</span>
             <button
               type="button"
               onClick={() => setIsPlansOpen(true)}
-              className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer hidden sm:inline-flex items-center gap-1"
+              className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center gap-1"
             >
               <span>Planos</span>
             </button>
+          </div>
+
+          {/* AÇÕES DO TOPO - MOBILE (Linha 1: apenas Avatar + Nome ou Entrar) */}
+          <div className="flex sm:hidden items-center gap-2 text-[13px] text-gray-500 font-normal shrink-0">
+            <div 
+              onClick={() => {
+                router.push('/perfil');
+              }}
+              className="w-7 h-7 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
+              title={user ? (user.user_metadata?.full_name || user.email) : 'Meu Perfil'}
+            >
+              {avatarUrl ? (
+                <img 
+                  src={avatarUrl} 
+                  alt="Foto do perfil" 
+                  className="w-full h-full object-cover rounded-full"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <svg 
+                  className="w-4 h-4 text-gray-400 fill-current" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              )}
+            </div>
+            {user ? (
+              <Link
+                href="/perfil"
+                className="text-black hover:text-[#FB6600] font-semibold truncate max-w-[100px] transition-colors cursor-pointer"
+                title="Acessar Meu Perfil"
+              >
+                {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+              </Link>
+            ) : (
+              <button 
+                type="button"
+                onClick={openLogin}
+                className="text-black font-semibold hover:text-[#FB6600] transition-colors cursor-pointer"
+              >
+                Entrar
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (Minha Loja, Feed que sigo, Planos, Sair) */}
+        <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
+          <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-between gap-2 text-xs text-gray-600 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {user ? (
+                <>
+                  {Boolean(user.hasStore) && (
+                    <Link
+                      href="/painel/loja"
+                      className="text-neutral-900 hover:text-[#FB6600] font-bold transition-colors whitespace-nowrap"
+                    >
+                      Minha Loja
+                    </Link>
+                  )}
+                  <Link
+                    href="/perfil"
+                    className="text-gray-600 hover:text-[#FB6600] font-medium transition-colors whitespace-nowrap"
+                  >
+                    Meu Perfil
+                  </Link>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={openRegister}
+                  className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  Crie uma conta
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => router.push('/perfil?aba=feed')}
+                className="inline-flex items-center gap-1 text-gray-600 hover:text-[#FB6600] font-medium transition-colors cursor-pointer whitespace-nowrap"
+              >
+                <svg
+                  className="w-3.5 h-3.5 stroke-[1.7]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
+                </svg>
+                <span>Feed que sigo</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPlansOpen(true)}
+                className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+              >
+                Planos
+              </button>
+            </div>
+
+            {user && (
+              <button
+                type="button"
+                onClick={async () => {
+                  await logoutAction()
+                  setUser(null)
+                  setAvatarUrl(null)
+                  router.push('/')
+                  router.refresh()
+                }}
+                className="text-red-600 hover:text-red-700 font-semibold transition-colors cursor-pointer whitespace-nowrap"
+              >
+                Sair
+              </button>
+            )}
           </div>
         </div>
       </div>
