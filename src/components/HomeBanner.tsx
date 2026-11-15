@@ -7,7 +7,7 @@ import {
   BannerDirection,
   DEFAULT_ADMIN_BANNER_CONFIG,
   normalizeBannerConfig,
-} from '@/lib/admin-banners-storage'
+} from '@/lib/admin-banners-types'
 
 export interface HomeBannerGoldStore {
   id: string

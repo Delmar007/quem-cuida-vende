@@ -10,7 +10,7 @@ import {
   SiteBannerFrequency,
   SiteBannerItem,
   normalizeBannerConfig,
-} from '@/lib/admin-banners-storage'
+} from '@/lib/admin-banners-types'
 import {
   saveAdminBannerConfigAction,
   verifyAdminPasswordAction,

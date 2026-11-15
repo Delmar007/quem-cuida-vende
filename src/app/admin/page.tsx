@@ -7,6 +7,8 @@ import AdminDashboardClient, {
   AdminGoldStoreSummary,
 } from '@/components/admin/AdminDashboardClient'
 
+export const instant = false
+
 export default async function AdminPage() {
   await connection()
 
