@@ -8,6 +8,7 @@ import { getLocalProducts } from "@/lib/products-storage";
 import { getFollowedStoreIdsFromServer } from "@/app/actions/user-office";
 import { getAllPromoTimersServer } from "@/lib/promo-timer-storage";
 import { streetsMatch } from "@/lib/streets";
+import { toTitleCase } from "@/lib/textFormat";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -1356,16 +1357,16 @@ export default async function Home({ searchParams }: HomeProps) {
             Produtos
           </span>
           <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-black text-white tracking-widest rounded-none">
-            {categoriaAtual}
+            {toTitleCase(categoriaAtual)}
           </span>
           {rua && (
             <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
-              {rua}
+              {toTitleCase(rua)}
             </span>
           )}
           {subcat && (
             <span className="text-[10px] uppercase font-bold px-2 py-0.5 border border-[#FB6600] text-[#FB6600] tracking-widest rounded-none">
-              {subcat}
+              {toTitleCase(subcat)}
             </span>
           )}
           <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-gray-100 text-gray-800 tracking-widest rounded-none">
@@ -1479,10 +1480,10 @@ export default async function Home({ searchParams }: HomeProps) {
                   {/* Imagem do Produto/Veículo com Setas Laterais + Tag de Tipo de Promoção + Círculo de Desconto */}
                   <ProductCardImageCarousel
                     images={cardImages}
-                    alt={produto.name}
+                    alt={toTitleCase(produto.name)}
                     photoOrientation={cardOrientation}
                     promoBadgeLabel={promoBadgeLabel}
-                    subcategory={produto.subcategory}
+                    subcategory={toTitleCase(produto.subcategory)}
                     hasDiscount={hasDiscount}
                     discountPercent={discountPercent}
                   />
@@ -1525,7 +1526,7 @@ export default async function Home({ searchParams }: HomeProps) {
                         {dataFormatada && <span className="text-[11px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
                       </div>
                       <h3 className="font-heading text-[15px] text-gray-900 font-semibold leading-snug tracking-tight mb-1.5 line-clamp-2">
-                        {produto.name}
+                        {toTitleCase(produto.name)}
                       </h3>
 
                       {isVehicleCard ? (
@@ -1535,7 +1536,7 @@ export default async function Home({ searchParams }: HomeProps) {
                               Versão
                             </span>
                             <span className="text-[11px] font-semibold text-gray-800 block leading-snug line-clamp-1">
-                              {produto.vehicle_version || produto.description || "Versão Completa"}
+                              {toTitleCase(produto.vehicle_version || produto.description || "Versão Completa")}
                             </span>
                           </div>
 

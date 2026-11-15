@@ -18,10 +18,11 @@ import { getPlan, PlanId } from '@/lib/plans'
 import { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog'
 import ProductCardImageCarousel from '@/components/ProductCardImageCarousel'
 import { FIPE_MARCAS } from '@/lib/fipeMarcas'
+import { CURATED_BRANDS, toTitleCase } from '@/lib/textFormat'
 
 // Marcas FIPE únicas ordenadas alfabeticamente
 const FIPE_VEHICLE_BRANDS: string[] = Array.from(
-  new Set(FIPE_MARCAS.map((m: any) => m.nome.trim()))
+  new Set(FIPE_MARCAS.map((m: any) => toTitleCase(m.nome.trim())))
 ).sort((a: string, b: string) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
 
 interface MerchantProductsTabProps {
@@ -121,6 +122,7 @@ export default function MerchantProductsTab({
   // Estados do formulário de produto (Padrão + Veículos)
   const [formIsVehicle, setFormIsVehicle] = useState<boolean>(isVehicleSegmentStore)
   const [formName, setFormName] = useState('')
+  const [formBrand, setFormBrand] = useState('')
   const [formDescription, setFormDescription] = useState('')
   const [formSku, setFormSku] = useState('')
   const [formPrice, setFormPrice] = useState('')
@@ -339,6 +341,7 @@ export default function MerchantProductsTab({
     setEditingProduct(null)
     setFormIsVehicle(useVehicleMode)
     setFormName('')
+    setFormBrand('')
     setFormDescription('')
     setFormSku('')
     setFormPrice('')
@@ -510,16 +513,22 @@ export default function MerchantProductsTab({
     }
 
     // No modo veículo, compõe o título automaticamente a partir de Marca + Modelo + Versão caso formName esteja vazio
-    let finalTitle = formName.trim()
+    let finalTitle = toTitleCase(formName)
+    if (!formIsVehicle && formBrand.trim()) {
+      const formattedBrand = toTitleCase(formBrand)
+      if (!finalTitle.toLowerCase().includes(formattedBrand.toLowerCase())) {
+        finalTitle = finalTitle ? `${finalTitle} - ${formattedBrand}` : formattedBrand
+      }
+    }
     if (formIsVehicle) {
       if (!formVehicleBrand.trim() || !formVehicleModel.trim()) {
         setFeedback({ type: 'error', message: 'Informe pelo menos a Marca e o Modelo do veículo.' })
         return
       }
       const composedVehicleTitle = [
-        formVehicleBrand.trim(),
-        formVehicleModel.trim(),
-        formVehicleVersion.trim(),
+        toTitleCase(formVehicleBrand),
+        toTitleCase(formVehicleModel),
+        toTitleCase(formVehicleVersion),
         formVehicleYearModel.trim() || formVehicleYearFab.trim(),
       ]
         .filter(Boolean)
@@ -1471,6 +1480,7 @@ export default function MerchantProductsTab({
                           required
                           value={formVehicleModel}
                           onChange={(e) => setFormVehicleModel(e.target.value)}
+                          onBlur={() => setFormVehicleModel((prev) => toTitleCase(prev))}
                           placeholder="Ex.: Corolla, Hilux, Gol..."
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
@@ -1484,6 +1494,7 @@ export default function MerchantProductsTab({
                           type="text"
                           value={formVehicleVersion}
                           onChange={(e) => setFormVehicleVersion(e.target.value)}
+                          onBlur={() => setFormVehicleVersion((prev) => toTitleCase(prev))}
                           placeholder="Ex.: 2.0 XEi Flex Aut."
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
@@ -1637,18 +1648,40 @@ export default function MerchantProductsTab({
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Nome do Produto <span className="text-[#FB6600]">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formName}
-                        onChange={(e) => setFormName(e.target.value)}
-                        placeholder="Ex.: Camisa Slim Fit Algodão Pima..."
-                        className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold transition-all shadow-2xs"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Nome do Produto <span className="text-[#FB6600]">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formName}
+                          onChange={(e) => setFormName(e.target.value)}
+                          onBlur={() => setFormName((prev) => toTitleCase(prev))}
+                          placeholder="Ex.: Camisa Slim Fit Algodão Pima..."
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold transition-all shadow-2xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                          Marca (Autocomplete)
+                        </label>
+                        <input
+                          type="text"
+                          list="curated-brands-list"
+                          value={formBrand}
+                          onChange={(e) => setFormBrand(e.target.value)}
+                          onBlur={() => setFormBrand((prev) => toTitleCase(prev))}
+                          placeholder="Ex.: Nike, Samsung..."
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
+                        />
+                        <datalist id="curated-brands-list">
+                          {CURATED_BRANDS.map((brand) => (
+                            <option key={brand} value={brand} />
+                          ))}
+                        </datalist>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

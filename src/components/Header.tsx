@@ -1005,7 +1005,7 @@ export default function Header() {
         ) : (
           currentCategory && SUBCATEGORIAS_POR_CATEGORIA[currentCategory] && (
             <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200">
-              <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center gap-4 sm:gap-6 overflow-x-auto no-scrollbar text-[12.5px] sm:text-[13px]">
+              <div className="mx-auto max-w-[940px] px-4 py-2.5 md:py-2 flex items-center gap-5 md:gap-6 overflow-x-auto no-scrollbar text-[16px] md:text-[13px]">
                 {SUBCATEGORIAS_POR_CATEGORIA[currentCategory].map((sub) => {
                   const isSelected = currentSubcat.toLowerCase() === sub.toLowerCase()
                   const targetSubcat = isSelected ? '' : sub.toLowerCase()

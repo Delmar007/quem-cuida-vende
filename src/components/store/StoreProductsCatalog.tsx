@@ -6,6 +6,7 @@ import ProductCardImageCarousel from '@/components/ProductCardImageCarousel'
 import FollowStoreButton from '@/components/FollowStoreButton'
 import FavoriteProductButton from '@/components/FavoriteProductButton'
 import PromoThermometerBar from '@/components/PromoThermometerBar'
+import { toTitleCase } from '@/lib/textFormat'
 
 export interface ProductItem {
   id: string
@@ -98,9 +99,10 @@ function formatStoreCategorySubcategory(category?: string | null, subcategory?: 
   const catKey = (category || '').toLowerCase()
   const catLabel =
     STORE_CATEGORY_MAP[catKey] ||
-    (category ? category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() : '')
+    (category ? toTitleCase(category) : '')
   if (!subcategory) return catLabel
-  return catLabel ? `${catLabel} / ${subcategory}` : subcategory
+  const subLabel = toTitleCase(subcategory)
+  return catLabel ? `${catLabel} / ${subLabel}` : subLabel
 }
 
 interface StoreProductsCatalogProps {
@@ -949,10 +951,10 @@ export default function StoreProductsCatalog({
                       {/* Imagem do Produto/Veículo com Setas Laterais + Tags */}
                       <ProductCardImageCarousel
                         images={cardImages}
-                        alt={produto.name}
+                        alt={toTitleCase(produto.name)}
                         photoOrientation={produto.photo_orientation || (isVehicleCard ? 'horizontal' : 'vertical')}
                         promoBadgeLabel={getCardPromoLabel(produto)}
-                        subcategory={produto.subcategory}
+                        subcategory={toTitleCase(produto.subcategory)}
                         hasDiscount={hasPromo}
                         discountPercent={discountPercent}
                         onImageClick={() => handleOpenDetailModal(produto)}
@@ -966,7 +968,7 @@ export default function StoreProductsCatalog({
                             {storeName}
                           </span>
                           <h3 className="text-xs text-gray-900 font-semibold leading-tight line-clamp-1 mb-1 group-hover:text-[#FB6600] transition-colors">
-                            {produto.name}
+                            {toTitleCase(produto.name)}
                           </h3>
 
                           {isVehicleCard && (
@@ -1466,10 +1468,10 @@ export default function StoreProductsCatalog({
                       {/* Imagem do Produto/Veículo com Setas Laterais + Tags de Modalidade */}
                       <ProductCardImageCarousel
                         images={cardImages}
-                        alt={produto.name}
+                        alt={toTitleCase(produto.name)}
                         photoOrientation={produto.photo_orientation || (isVehicleCard ? 'horizontal' : 'vertical')}
                         promoBadgeLabel={getCardPromoLabel(produto)}
-                        subcategory={produto.subcategory}
+                        subcategory={toTitleCase(produto.subcategory)}
                         hasDiscount={hasPromo}
                         discountPercent={discountPercent}
                         onImageClick={() => handleOpenDetailModal(produto)}
@@ -1497,7 +1499,7 @@ export default function StoreProductsCatalog({
                               isVehicleCard ? 'line-clamp-1' : 'line-clamp-2'
                             }`}
                           >
-                            {produto.name}
+                            {toTitleCase(produto.name)}
                           </h3>
 
                           {isVehicleCard ? (
@@ -1682,11 +1684,11 @@ export default function StoreProductsCatalog({
                   {/* Informações detalhadas */}
                   <div className="flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1 capitalize">
-                        {prod.category} {prod.subcategory ? `› ${prod.subcategory}` : ''}
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mb-1">
+                        {toTitleCase(prod.category)} {prod.subcategory ? `› ${toTitleCase(prod.subcategory)}` : ''}
                       </span>
                       <h3 className="text-base font-black text-neutral-900 leading-tight mb-2">
-                        {prod.name}
+                        {toTitleCase(prod.name)}
                       </h3>
                       {prod.sku && (
                         <span className="text-[10px] font-mono text-neutral-400 block mb-3">
@@ -1700,14 +1702,14 @@ export default function StoreProductsCatalog({
                             <div>
                               <span className="text-neutral-400 uppercase font-bold text-[9px] block">Marca / Modelo</span>
                               <span className="font-bold text-neutral-900">
-                                {prod.vehicle_brand} {prod.vehicle_model}
+                                {toTitleCase(prod.vehicle_brand)} {toTitleCase(prod.vehicle_model)}
                               </span>
                             </div>
                           )}
                           {prod.vehicle_version && (
                             <div>
                               <span className="text-neutral-400 uppercase font-bold text-[9px] block">Versão</span>
-                              <span className="font-semibold text-neutral-800">{prod.vehicle_version}</span>
+                              <span className="font-semibold text-neutral-800">{toTitleCase(prod.vehicle_version)}</span>
                             </div>
                           )}
                           {(prod.vehicle_year_fab || prod.vehicle_year_model) && (
