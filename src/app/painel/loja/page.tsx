@@ -783,6 +783,46 @@ function MerchantStoreAdminContent() {
   const isBronze = (activeStore?.effective_plan || activeStore?.plan || 'bronze') === 'bronze'
   const activeTopic = TOPICOS.find((t) => t.id === currentTopic) || TOPICOS[0]
 
+  // Verifica se cada um dos 12 tópicos está preenchido para manter o botão laranja ou sem cor
+  const isTopicComplete = (topicId: number): boolean => {
+    switch (topicId) {
+      case 1:
+        return Boolean(
+          name.trim() &&
+            responsibleName.trim() &&
+            phone.trim() &&
+            cnpjCpf.trim() &&
+            (currentLogoUrl || logoPreview) &&
+            cep.trim() &&
+            street.trim() &&
+            number.trim() &&
+            neighborhood.trim() &&
+            city.trim() &&
+            state.trim()
+        )
+      case 2:
+        return Boolean(category.trim() && subcategories.length > 0)
+      case 3:
+        return Boolean(currentLargeBannerUrl || largeBannerPreview)
+      case 4:
+        return Boolean(currentSmallBannerUrl || smallBannerPreview)
+      case 5:
+        return Boolean(subcategories.length > 0 && productsCount > 0)
+      case 6:
+        return productsCount > 0
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 12:
+        return Boolean(activeStore?.id && name.trim())
+      case 11:
+        return Boolean(activeStore?.effective_plan || activeStore?.plan)
+      default:
+        return false
+    }
+  }
+
   return (
     <div className="w-full pb-20">
       {/* Topo Geral da Área do Lojista */}
@@ -975,6 +1015,7 @@ function MerchantStoreAdminContent() {
             <div className="divide-y divide-neutral-100 bg-white rounded-md border border-neutral-200 overflow-hidden">
               {TOPICOS.map((topico) => {
                 const isActive = currentTopic === topico.id
+                const isComplete = isTopicComplete(topico.id)
                 return (
                   <button
                     key={topico.id}
@@ -984,20 +1025,24 @@ function MerchantStoreAdminContent() {
                       setIsMobileMenuOpen(false)
                     }}
                     className={`w-full p-3.5 flex items-center justify-between text-left transition-colors cursor-pointer text-sm ${
-                      isActive
-                        ? 'bg-orange-50/70 text-[#FB6600] font-bold border-l-[3px] border-[#FB6600]'
-                        : 'text-neutral-800 hover:bg-neutral-50 font-medium'
+                      isComplete
+                        ? isActive
+                          ? 'bg-[#FB6600] text-white font-bold border-l-[4px] border-black'
+                          : 'bg-[#FB6600] text-white font-bold hover:bg-[#e05b00]'
+                        : isActive
+                        ? 'bg-neutral-100 text-neutral-900 font-bold border-l-[3px] border-neutral-400'
+                        : 'bg-white text-neutral-700 hover:bg-neutral-50 font-medium'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className={`font-mono text-xs shrink-0 ${isActive ? 'text-[#FB6600] font-bold' : 'text-neutral-400'}`}>
+                      <span className={`font-mono text-xs shrink-0 ${isComplete ? 'text-white font-bold' : isActive ? 'text-neutral-900 font-bold' : 'text-neutral-400'}`}>
                         {topico.numero}
                       </span>
                       <span className="block truncate">{topico.titulo}</span>
                     </div>
 
-                    {isActive ? (
-                      <span className="text-xs text-[#FB6600] font-bold shrink-0 ml-2">✓</span>
+                    {isComplete ? (
+                      <span className="text-xs text-white font-bold shrink-0 ml-2">✓</span>
                     ) : (
                       <span className="text-sm text-neutral-400 shrink-0 ml-2">›</span>
                     )}
@@ -1067,28 +1112,36 @@ function MerchantStoreAdminContent() {
           </div>
 
           {/* Navegação Vertical das 12 Etapas */}
-          <nav className="p-2 flex flex-col gap-0.5">
+          <nav className="p-2 flex flex-col gap-1">
             {TOPICOS.map((topico) => {
               const isActive = currentTopic === topico.id
+              const isComplete = isTopicComplete(topico.id)
               return (
                 <button
                   key={topico.id}
                   type="button"
                   onClick={() => setCurrentTopic(topico.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[4px] text-left transition-colors cursor-pointer text-[13.5px] ${
-                    isActive
-                      ? 'bg-orange-50/80 text-[#FB6600] font-bold border-l-[3px] border-[#FB6600]'
-                      : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
+                    isComplete
+                      ? isActive
+                        ? 'bg-[#FB6600] text-white font-bold border-l-[4px] border-black shadow-xs'
+                        : 'bg-[#FB6600] text-white font-bold hover:bg-[#e05b00]'
+                      : isActive
+                      ? 'bg-neutral-100 text-neutral-900 font-bold border-l-[3px] border-neutral-400'
+                      : 'bg-white text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 font-medium'
                   }`}
                 >
                   <span
                     className={`font-mono text-xs shrink-0 ${
-                      isActive ? 'text-[#FB6600] font-bold' : 'text-neutral-400'
+                      isComplete ? 'text-white font-bold' : isActive ? 'text-neutral-900 font-bold' : 'text-neutral-400'
                     }`}
                   >
                     {topico.numero}
                   </span>
                   <span className="truncate flex-1">{topico.titulo}</span>
+                  {isComplete && (
+                    <span className="text-[11px] font-bold text-white shrink-0">✓</span>
+                  )}
                 </button>
               )
             })}
