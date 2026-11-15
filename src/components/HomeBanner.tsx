@@ -23,6 +23,7 @@ export interface HomeBannerGoldStore {
 interface HomeBannerProps {
   goldStores?: HomeBannerGoldStore[]
   initialConfig?: AdminBannerConfig
+  hasCategoryFilter?: boolean
 }
 
 interface ResolvedSlide {
@@ -82,6 +83,7 @@ const DIRECTION_KEYFRAME: Record<BannerDirection, string> = {
 export default function HomeBanner({
   goldStores = [],
   initialConfig,
+  hasCategoryFilter = false,
 }: HomeBannerProps) {
   const [config, setConfig] = useState<AdminBannerConfig>(() =>
     normalizeBannerConfig(initialConfig || DEFAULT_ADMIN_BANNER_CONFIG)
@@ -151,7 +153,7 @@ export default function HomeBanner({
     const every10 = activeSiteBanners.filter((b) => b.frequency === 10)
 
     if (goldSlides.length === 0 && activeSiteBanners.length === 0) {
-      return FALLBACK_SLIDES
+      return hasCategoryFilter ? [] : FALLBACK_SLIDES
     }
 
     if (goldSlides.length === 0) {
@@ -235,7 +237,11 @@ export default function HomeBanner({
     }
 
     return combined
-  }, [goldStores, config.goldOrderMode, config.siteBanners, randomSeed])
+  }, [goldStores, config.goldOrderMode, config.siteBanners, randomSeed, hasCategoryFilter])
+
+  useEffect(() => {
+    setCurrentSlide(0)
+  }, [goldStores])
 
   // Garante índice válido se a lista mudar
   const safeIndex = slides.length > 0 ? currentSlide % slides.length : 0
@@ -261,6 +267,10 @@ export default function HomeBanner({
     e.preventDefault()
     e.stopPropagation()
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+  }
+
+  if (!active || slides.length === 0) {
+    return null
   }
 
   return (

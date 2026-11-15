@@ -13,6 +13,7 @@ export interface StoredStore {
   street: string | null
   number: string | null
   neighborhood: string | null
+  reference_point?: string | null
   city: string | null
   state: string | null
   category: string

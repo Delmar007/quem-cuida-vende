@@ -271,6 +271,7 @@ function MerchantStoreAdminContent() {
   const [street, setStreet] = useState('')
   const [number, setNumber] = useState('')
   const [neighborhood, setNeighborhood] = useState('')
+  const [referencePoint, setReferencePoint] = useState('')
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [loadingCep, setLoadingCep] = useState(false)
@@ -331,6 +332,7 @@ function MerchantStoreAdminContent() {
     setStreet(store.street || '')
     setNumber(store.number || '')
     setNeighborhood(store.neighborhood || '')
+    setReferencePoint(store.reference_point || '')
     setCity(store.city || '')
     setState(store.state || '')
     setPhone(store.phone ? formatPhone(store.phone) : '')
@@ -677,6 +679,7 @@ function MerchantStoreAdminContent() {
       formData.append('street', street.trim())
       formData.append('number', number.trim())
       formData.append('neighborhood', neighborhood.trim())
+      formData.append('reference_point', referencePoint.trim())
       formData.append('city', city.trim())
       formData.append('state', state.trim().toUpperCase())
       formData.append('phone', phone)
@@ -1447,6 +1450,22 @@ function MerchantStoreAdminContent() {
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div className="sm:col-span-12">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Ponto de Referência / Shopping (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        value={referencePoint}
+                        onChange={(e) => {
+                          setReferencePoint(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="Ex.: Shopping Campo Grande, em frente à Praça..."
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
                     </div>
                   </div>
                 </div>

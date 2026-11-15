@@ -16,6 +16,7 @@ export interface StoreAdminData {
   street: string | null
   number: string | null
   neighborhood: string | null
+  reference_point?: string | null
   city: string | null
   state: string | null
   category: string
@@ -249,6 +250,7 @@ export async function updateStoreAction(
   const street = (formData.get('street') as string)?.trim() || null
   const number = (formData.get('number') as string)?.trim() || null
   const neighborhood = (formData.get('neighborhood') as string)?.trim() || null
+  const referencePoint = (formData.get('reference_point') as string)?.trim() || null
   const city = (formData.get('city') as string)?.trim() || null
   const state = (formData.get('state') as string)?.trim().toUpperCase() || null
   const phone = (formData.get('phone') as string)?.replace(/\D/g, '') || null
@@ -297,6 +299,7 @@ export async function updateStoreAction(
     street,
     number,
     neighborhood,
+    reference_point: referencePoint,
     city,
     state,
     phone,
@@ -349,9 +352,27 @@ export async function updateStoreAction(
       .single()
 
     if (!updateError && updatedStore) {
-      finalStore = updatedStore
+      finalStore = { ...updatedStore, reference_point: (updatedStore as any).reference_point ?? referencePoint }
     } else if (updateError) {
-      console.warn('Supabase update warning, falling back to local storage:', updateError.message)
+      // Caso a coluna reference_point ainda não exista no Supabase, tenta upsert sem ela
+      if (updateError.message?.toLowerCase().includes('reference_point')) {
+        const { reference_point: _omit, ...payloadWithoutRef } = updatePayload
+        const { data: retryStore } = await supabase
+          .from('stores')
+          .upsert({
+            id: storeId,
+            owner_id: user.id,
+            slug: resolvedSlug,
+            ...payloadWithoutRef,
+          }, { onConflict: 'id' })
+          .select()
+          .single()
+        if (retryStore) {
+          finalStore = { ...retryStore, reference_point: referencePoint }
+        }
+      } else {
+        console.warn('Supabase update warning, falling back to local storage:', updateError.message)
+      }
     }
   } catch (err: any) {
     console.warn('Supabase update exception, falling back to local storage:', err.message)

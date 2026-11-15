@@ -41,6 +41,8 @@ export interface StoreItem {
   logo_url?: string | null;
   phone?: string | null;
   street?: string | null;
+  neighborhood?: string | null;
+  reference_point?: string | null;
   description?: string | null;
   plan?: string;
   is_active: boolean;
@@ -54,6 +56,8 @@ export interface ProductItem {
   store_logo_url?: string | null;
   store_phone?: string | null;
   store_slug?: string | null;
+  store_neighborhood?: string | null;
+  store_reference_point?: string | null;
   name: string;
   description?: string | null;
   price: string;
@@ -856,6 +860,8 @@ export default async function Home({ searchParams }: HomeProps) {
         logo_url: s.logo_url,
         phone: s.phone || null,
         street: s.street || null,
+        neighborhood: s.neighborhood || null,
+        reference_point: s.reference_point || null,
         description: s.description,
         plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
         is_active: Boolean(s.is_active),
@@ -865,7 +871,7 @@ export default async function Home({ searchParams }: HomeProps) {
     // Consulta de Produtos
     const { data: productsData } = await supabase
       .from("products")
-      .select("*, stores(name, logo_url, phone, slug)")
+      .select("*, stores(name, logo_url, phone, slug, neighborhood, reference_point)")
       .eq("is_active", true);
 
     if (productsData && productsData.length > 0) {
@@ -880,6 +886,8 @@ export default async function Home({ searchParams }: HomeProps) {
           store_logo_url: p.stores?.logo_url || null,
           store_phone: p.stores?.phone || null,
           store_slug: p.stores?.slug || null,
+          store_neighborhood: p.stores?.neighborhood || null,
+          store_reference_point: p.stores?.reference_point || null,
           name: p.name,
           description: p.description,
           price: typeof displayPrice === "number" ? `R$ ${formatCurrencyBRL(displayPrice)}` : String(p.price || "R$ 0,00"),
@@ -924,6 +932,8 @@ export default async function Home({ searchParams }: HomeProps) {
     logo_url: s.logo_url,
     phone: s.phone || null,
     street: s.street || null,
+    neighborhood: s.neighborhood || null,
+    reference_point: s.reference_point || null,
     description: s.description,
     plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
     is_active: Boolean(s.is_active),
@@ -972,6 +982,8 @@ export default async function Home({ searchParams }: HomeProps) {
         store_logo_url: storeObj?.logo_url || null,
         store_phone: storeObj?.phone || null,
         store_slug: storeObj?.slug || null,
+        store_neighborhood: storeObj?.neighborhood || null,
+        store_reference_point: storeObj?.reference_point || null,
         name: lp.name,
         description: lp.description,
         price: `R$ ${formatCurrencyBRL(effectivePrice)}`,
@@ -1140,6 +1152,32 @@ export default async function Home({ searchParams }: HomeProps) {
       ? modalidadesSelecionadas.map((m) => nomesPromocoes[m] || m).join(" • ")
       : "Todas as Promoções";
 
+  const hasCategoryFilter = Boolean((cat && cat !== "por_rua") || subcat || rua);
+  const adminBannerConfig = getAdminBannerConfigServer();
+  const bannerGoldStores = allStores
+    .filter((s) => {
+      if (!s.is_active) return false;
+      if (!["ouro", "auto_100"].includes((s.plan || "").toLowerCase())) return false;
+      if (cat && cat !== "por_rua" && s.category !== cat) return false;
+      if (
+        subcat &&
+        !s.subcategories?.some((sub) => sub.toLowerCase().trim() === subcat.toLowerCase().trim())
+      ) {
+        return false;
+      }
+      if (rua && !streetsMatch(s.street, rua)) return false;
+      return true;
+    })
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      slug: s.slug,
+      description: s.description,
+      large_banner_url: s.large_banner_url,
+      small_banner_url: s.small_banner_url,
+      created_at: s.created_at,
+    }));
+
   // =========================================================================
   // RENDERIZAÇÃO 1: ÁREA LOJAS (PADRÃO DE LINHAS: 1 BANNER SINGLE + 1 BANNER DUPLO, EM SEGUIDA 1 BANNER TRIPLO)
   // =========================================================================
@@ -1240,6 +1278,13 @@ export default async function Home({ searchParams }: HomeProps) {
 
     return (
       <div className="w-full">
+        {/* Banner principal das lojas Ouro (filtrado por categoria/subcategoria quando ativo) */}
+        <HomeBanner
+          goldStores={bannerGoldStores}
+          initialConfig={adminBannerConfig}
+          hasCategoryFilter={hasCategoryFilter}
+        />
+
         {/* Barra Informativa de Filtros Ativos (Sem título grande repetitivo e sem contador de lojas elegíveis) */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2 flex-wrap">
@@ -1325,9 +1370,14 @@ export default async function Home({ searchParams }: HomeProps) {
 
                     {/* Rodapé do Card de Loja */}
                     <div className="relative z-10">
-                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-heading font-extrabold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1`}>
+                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-heading font-extrabold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-0.5`}>
                         {loja.name}
                       </h3>
+                      {(loja.reference_point || loja.neighborhood) && (
+                        <p className="text-[11px] font-semibold text-orange-300 drop-shadow-sm mb-1 line-clamp-1">
+                          📍 {[loja.neighborhood, loja.reference_point].filter(Boolean).join(" • ")}
+                        </p>
+                      )}
                       {loja.description && (
                         <p className="text-xs sm:text-[13px] text-gray-100 leading-relaxed line-clamp-1 drop-shadow-md max-w-2xl">
                           {loja.description}
@@ -1360,23 +1410,12 @@ export default async function Home({ searchParams }: HomeProps) {
   // =========================================================================
   return (
     <div className="w-full">
-      {/* O banner institucional só aparece na página inicial geral sem filtros restritivos */}
-      {isHomePage && (
-        <HomeBanner
-          goldStores={allStores
-            .filter((s) => ["ouro", "auto_100"].includes((s.plan || "").toLowerCase()))
-            .map((s) => ({
-              id: s.id,
-              name: s.name,
-              slug: s.slug,
-              description: s.description,
-              large_banner_url: s.large_banner_url,
-              small_banner_url: s.small_banner_url,
-              created_at: s.created_at,
-            }))}
-          initialConfig={getAdminBannerConfigServer()}
-        />
-      )}
+      {/* Banner principal das lojas Ouro (geral ou filtrado por categoria/subcategoria) */}
+      <HomeBanner
+        goldStores={bannerGoldStores}
+        initialConfig={adminBannerConfig}
+        hasCategoryFilter={hasCategoryFilter}
+      />
 
       {/* Barra Informativa de Filtros Ativos (Sem título grande repetitivo e sem contador de produtos recentes) */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
@@ -1547,9 +1586,27 @@ export default async function Home({ searchParams }: HomeProps) {
                               </span>
                             )}
                           </div>
-                          <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1">
-                            {produto.store_name}
-                          </span>
+                          <div className="min-w-0">
+                            <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1 block">
+                              {produto.store_name}
+                            </span>
+                            {(() => {
+                              const storeMatch = allStores.find(
+                                (s) => s.id === produto.store_id || s.name === produto.store_name
+                              );
+                              const locText = [
+                                produto.store_neighborhood || storeMatch?.neighborhood,
+                                produto.store_reference_point || storeMatch?.reference_point,
+                              ]
+                                .filter(Boolean)
+                                .join(" • ");
+                              return locText ? (
+                                <span className="text-[10px] font-medium text-gray-500 line-clamp-1 block">
+                                  📍 {locText}
+                                </span>
+                              ) : null;
+                            })()}
+                          </div>
                         </div>
                         {dataFormatada && <span className="text-[11px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
                       </div>
