@@ -11,6 +11,7 @@ import { getStorePromoTimerServer } from '@/lib/promo-timer-storage';
 import PromoThermometerBar from '@/components/PromoThermometerBar';
 import StoreProductsCatalog, { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog';
 import { SEED_STORES } from '@/lib/demo-stores';
+import { toStoreSlug } from '@/lib/store-slug';
 import { connection } from 'next/server';
 
 export const instant = false;
@@ -39,19 +40,44 @@ interface StorePageProps {
 
 export default async function StoreDetailPage({ params }: StorePageProps) {
   await connection();
-  const { id } = await params;
+  const { id: rawParam } = await params;
+  const id = decodeURIComponent(rawParam);
+  const hyphenVariant = id.replace(/_/g, '-');
+  const underscoreVariant = id.replace(/-/g, '_');
   const supabase = await createClient();
 
-  // Buscar loja pelo ID ou pelo Slug no Supabase
+  // Buscar loja pelo ID ou pelo Slug no Supabase (aceitando _ ou -)
   let store: any = null;
   try {
+    const slugCandidates = Array.from(new Set([id, hyphenVariant, underscoreVariant]));
+    const orFilters = [
+      `id.eq.${id}`,
+      ...slugCandidates.map((s) => `slug.eq.${s}`),
+    ].join(',');
     const { data: storeData } = await supabase
       .from('stores')
       .select('*')
-      .or(`id.eq.${id},slug.eq.${id}`)
-      .single();
+      .or(orFilters)
+      .limit(1)
+      .maybeSingle();
     if (storeData) {
       store = storeData;
+    }
+
+    // Fallback: se ainda não achou pelo slug, tenta corresponder pelo nome convertido em slug
+    if (!store) {
+      const { data: allStores } = await supabase
+        .from('stores')
+        .select('*');
+      if (allStores && allStores.length > 0) {
+        const targetNorm = toStoreSlug(id);
+        store =
+          allStores.find(
+            (s: any) =>
+              s.slug === id ||
+              toStoreSlug(s.name || '') === targetNorm
+          ) || null;
+      }
     }
   } catch (err: any) {
     console.warn('Supabase store detail query exception:', err.message);
@@ -59,12 +85,22 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
 
   // Fallback para storage local caso a tabela ou loja não esteja no Supabase
   if (!store) {
-    store = getLocalStoreById(id);
+    store =
+      getLocalStoreById(id) ||
+      getLocalStoreById(hyphenVariant) ||
+      getLocalStoreById(underscoreVariant);
   }
 
   // Fallback para lojas de demonstração (seed)
   if (!store) {
-    const seed = SEED_STORES.find((s) => s.id === id || s.slug === id);
+    const targetNorm = toStoreSlug(id);
+    const seed = SEED_STORES.find(
+      (s) =>
+        s.id === id ||
+        s.slug === id ||
+        s.slug === hyphenVariant ||
+        toStoreSlug(s.name) === targetNorm
+    );
     if (seed) {
       store = seed;
     }

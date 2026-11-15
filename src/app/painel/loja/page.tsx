@@ -12,6 +12,7 @@ import BannerAdjustModal from '@/components/merchant/BannerAdjustModal'
 import SmallBannerAdjustModal from '@/components/merchant/SmallBannerAdjustModal'
 import { getPlan } from '@/lib/plans'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
+import { getStorePublicPath, toStoreSlug } from '@/lib/store-slug'
 
 // Módulos Expandidos da Área do Lojista
 import MerchantCategoriesTab from '@/components/merchant/MerchantCategoriesTab'
@@ -372,7 +373,7 @@ function MerchantStoreAdminContent() {
         const defaultStore: StoreAdminData = {
           id: `store-${Date.now()}`,
           name: '',
-          slug: `loja-${Math.floor(1000 + Math.random() * 9000)}`,
+          slug: `loja_${Math.floor(1000 + Math.random() * 9000)}`,
           responsible_name: '',
           phone: '',
           cep: '',
@@ -863,7 +864,7 @@ function MerchantStoreAdminContent() {
                   const newStoreDraft: StoreAdminData = {
                     id: `store-${Date.now()}`,
                     name: '',
-                    slug: `loja-${Math.floor(1000 + Math.random() * 9000)}`,
+                    slug: `loja_${Math.floor(1000 + Math.random() * 9000)}`,
                     responsible_name: '',
                     phone: '',
                     cep: '',
@@ -921,7 +922,7 @@ function MerchantStoreAdminContent() {
           {/* Botão Secundário: Ver loja */}
           {activeStore && (
             <Link
-              href={`/loja/${activeStore.slug || activeStore.id}`}
+              href={getStorePublicPath(activeStore)}
               target="_blank"
               rel="noopener noreferrer"
               className="h-10 px-4 bg-white hover:bg-neutral-50 text-neutral-800 hover:text-black border border-neutral-300 text-xs sm:text-sm font-semibold rounded-md transition-colors flex items-center justify-center gap-1.5 flex-1 sm:flex-none"
@@ -1257,6 +1258,12 @@ function MerchantStoreAdminContent() {
                         placeholder="Ex.: Elegance Moda & Outlet"
                         className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
                       />
+                      <p className="mt-1.5 text-[11px] text-neutral-500">
+                        Endereço da sua loja:{' '}
+                        <span className="font-bold text-neutral-800">
+                          kittanda.com.br/{name.trim() ? toStoreSlug(name) : (activeStore?.slug || 'nome_da_loja')}
+                        </span>
+                      </p>
                     </div>
 
                     <div>

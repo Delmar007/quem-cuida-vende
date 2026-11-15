@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { toStoreSlug } from '@/lib/store-slug'
 
 export interface StoreAdminData {
   id: string
@@ -197,12 +198,7 @@ export async function updateStoreAction(
   // Se a loja ainda não foi registrada (ex: primeiro acesso direto no painel com loja inicial)
   if (!currentStore) {
     const rawName = (formData.get('name') as string)?.trim() || 'Minha Loja'
-    const slug = rawName
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') + '-' + Math.floor(1000 + Math.random() * 9000)
+    const slug = toStoreSlug(rawName)
 
     currentStore = {
       id: storeId,
@@ -311,9 +307,32 @@ export async function updateStoreAction(
     updated_at: new Date().toISOString(),
   }
 
+  // Gerar slug limpo com underscore baseado no nome da loja (ex.: loja_de_roupas)
+  const baseSlug = toStoreSlug(name)
+  let resolvedSlug = baseSlug
+  try {
+    const { data: conflictingStores } = await supabase
+      .from('stores')
+      .select('id, slug')
+      .neq('id', storeId)
+      .ilike('slug', `${baseSlug}%`)
+
+    if (conflictingStores && conflictingStores.length > 0) {
+      const taken = new Set(conflictingStores.map((s: any) => s.slug))
+      let suffix = 2
+      while (taken.has(resolvedSlug)) {
+        resolvedSlug = `${baseSlug}_${suffix}`
+        suffix += 1
+      }
+    }
+  } catch {
+    // fallback silencioso
+  }
+
   // 5. Atualizar no Supabase e/ou storage local
   let finalStore: any = {
     ...currentStore,
+    slug: resolvedSlug,
     ...updatePayload,
   }
 
@@ -323,7 +342,7 @@ export async function updateStoreAction(
       .upsert({
         id: storeId,
         owner_id: user.id,
-        slug: currentStore.slug,
+        slug: resolvedSlug,
         ...updatePayload,
       }, { onConflict: 'id' })
       .select()
@@ -394,6 +413,7 @@ export async function updateStoreAction(
   revalidatePath('/', 'layout')
   revalidatePath(`/loja/${storeId}`)
   if (finalStore.slug) {
+    revalidatePath(`/${finalStore.slug}`)
     revalidatePath(`/loja/${finalStore.slug}`)
   }
   revalidatePath('/painel/loja')

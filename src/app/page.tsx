@@ -10,6 +10,7 @@ import { getAllPromoTimersServer } from "@/lib/promo-timer-storage";
 import { streetsMatch } from "@/lib/streets";
 import { toTitleCase } from "@/lib/textFormat";
 import { getAdminBannerConfigServer } from "@/lib/admin-banners-storage";
+import { getStorePublicPath } from "@/lib/store-slug";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -1299,7 +1300,7 @@ export default async function Home({ searchParams }: HomeProps) {
                   className={`flex flex-col w-full max-w-full shadow-sm hover:shadow-md transition-all duration-300 rounded-t-none rounded-b-[16px] overflow-hidden ${colSpanOnly}`}
                 >
                   <Link
-                    href={`/loja/${loja.slug || loja.id}`}
+                    href={getStorePublicPath(loja)}
                     className={`group relative overflow-hidden bg-neutral-100 border-t border-x border-gray-200 rounded-none cursor-pointer w-full max-w-full flex flex-col justify-between p-4 ${heightClass}`}
                   >
                     <img

@@ -8,6 +8,7 @@ import {
   DEFAULT_ADMIN_BANNER_CONFIG,
   normalizeBannerConfig,
 } from '@/lib/admin-banners-types'
+import { getStorePublicPath } from '@/lib/store-slug'
 
 export interface HomeBannerGoldStore {
   id: string
@@ -142,7 +143,7 @@ export default function HomeBanner({
         store.large_banner_url ||
         store.small_banner_url ||
         'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
-      href: `/loja/${store.slug || store.id}`,
+      href: getStorePublicPath(store),
     }))
 
     const activeSiteBanners = config.siteBanners.filter((b) => b.isActive)
