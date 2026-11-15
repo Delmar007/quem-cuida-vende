@@ -135,6 +135,7 @@ export default function MerchantProductsTab({
   const [formPromoType, setFormPromoType] = useState<string>('outlet')
   const [formHighlight, setFormHighlight] = useState<'none' | 'novidade' | 'outlet'>('novidade')
   const [formIsActive, setFormIsActive] = useState(true)
+  const [formDeliveryMode, setFormDeliveryMode] = useState<'retirada' | 'entrega' | 'ambos'>('ambos')
 
   // Estados para Unidades, Pesos e Medidas (Produtos Gerais Pro Max)
   const [formUnitValue, setFormUnitValue] = useState('')
@@ -351,6 +352,7 @@ export default function MerchantProductsTab({
     setFormPromoType(useVehicleMode ? 'seminovo' === 'seminovo' ? 'semi_novo' : 'usado' : 'outlet')
     setFormHighlight(useVehicleMode ? 'novidade' : 'outlet')
     setFormIsActive(true)
+    setFormDeliveryMode('ambos')
     setFormImages([])
     setFormPhotoOrientation(useVehicleMode ? 'horizontal' : 'vertical')
 
@@ -428,6 +430,7 @@ export default function MerchantProductsTab({
     // Tipo de promoção salvo no produto
     const savedPromo = (prod.promo_type || (isVeh ? 'semi_novo' : prod.is_outlet ? 'outlet' : 'lancamento')).toLowerCase()
     setFormPromoType(savedPromo)
+    setFormDeliveryMode(prod.delivery_mode || 'ambos')
     if (savedPromo === 'outlet') {
       setFormHighlight('outlet')
     } else {
@@ -624,6 +627,7 @@ export default function MerchantProductsTab({
           unitValue: !formIsVehicle ? formUnitValue : undefined,
           sizes: !formIsVehicle && formSizes.length > 0 ? formSizes : undefined,
           colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
+          deliveryMode: formDeliveryMode,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
           isActive: formIsActive,
@@ -668,6 +672,7 @@ export default function MerchantProductsTab({
           unitValue: !formIsVehicle ? formUnitValue : undefined,
           sizes: !formIsVehicle && formSizes.length > 0 ? formSizes : undefined,
           colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
+          deliveryMode: formDeliveryMode,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
           isActive: formIsActive,
@@ -1632,6 +1637,62 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
+                    {/* Menu Vertical: Entrega ou Retirada (O2O) */}
+                    <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-2">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
+                        Opção de Entrega ou Retirada (O2O)
+                      </label>
+                      <div className="flex flex-col divide-y divide-neutral-200 bg-white border border-neutral-200 rounded-lg overflow-hidden">
+                        {[
+                          {
+                            id: 'retirada' as const,
+                            label: 'Retirada rápida na loja',
+                            desc: 'Cliente retira direto no balcão da loja física',
+                          },
+                          {
+                            id: 'entrega' as const,
+                            label: 'Entrega local na cidade',
+                            desc: 'Combinar envio local via WhatsApp',
+                          },
+                          {
+                            id: 'ambos' as const,
+                            label: 'Retirada na loja ou Entrega local',
+                            desc: 'Cliente escolhe retirar na loja ou receber na cidade',
+                          },
+                        ].map((opt) => {
+                          const isSelected = formDeliveryMode === opt.id
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setFormDeliveryMode(opt.id)}
+                              className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3 transition-colors cursor-pointer ${
+                                isSelected
+                                  ? 'bg-orange-50/80 text-[#FB6600]'
+                                  : 'bg-white text-neutral-800 hover:bg-neutral-50'
+                              }`}
+                            >
+                              <div>
+                                <span className={`block text-xs sm:text-[13px] ${isSelected ? 'font-bold text-[#FB6600]' : 'font-semibold text-neutral-900'}`}>
+                                  {opt.label}
+                                </span>
+                                <span className="block text-[11px] text-neutral-500">
+                                  {opt.desc}
+                                </span>
+                              </div>
+                              <span
+                                className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                  isSelected ? 'border-[#FB6600] bg-[#FB6600]' : 'border-neutral-300 bg-white'
+                                }`}
+                              >
+                                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
                     {/* Descrição Detalhada (Opcional) */}
                     <div>
                       <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
@@ -1713,6 +1774,62 @@ export default function MerchantProductsTab({
                             {formIsActive ? '🟢 Ativo na vitrine' : '⚪ Inativo (oculto)'}
                           </span>
                         </label>
+                      </div>
+                    </div>
+
+                    {/* Menu Vertical: Entrega ou Retirada (O2O) */}
+                    <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-2">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
+                        Opção de Entrega ou Retirada (O2O)
+                      </label>
+                      <div className="flex flex-col divide-y divide-neutral-200 bg-white border border-neutral-200 rounded-lg overflow-hidden">
+                        {[
+                          {
+                            id: 'retirada' as const,
+                            label: 'Retirada rápida na loja',
+                            desc: 'Cliente retira direto no balcão da loja física',
+                          },
+                          {
+                            id: 'entrega' as const,
+                            label: 'Entrega local na cidade',
+                            desc: 'Combinar envio local via WhatsApp',
+                          },
+                          {
+                            id: 'ambos' as const,
+                            label: 'Retirada na loja ou Entrega local',
+                            desc: 'Cliente escolhe retirar na loja ou receber na cidade',
+                          },
+                        ].map((opt) => {
+                          const isSelected = formDeliveryMode === opt.id
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setFormDeliveryMode(opt.id)}
+                              className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3 transition-colors cursor-pointer ${
+                                isSelected
+                                  ? 'bg-orange-50/80 text-[#FB6600]'
+                                  : 'bg-white text-neutral-800 hover:bg-neutral-50'
+                              }`}
+                            >
+                              <div>
+                                <span className={`block text-xs sm:text-[13px] ${isSelected ? 'font-bold text-[#FB6600]' : 'font-semibold text-neutral-900'}`}>
+                                  {opt.label}
+                                </span>
+                                <span className="block text-[11px] text-neutral-500">
+                                  {opt.desc}
+                                </span>
+                              </div>
+                              <span
+                                className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                  isSelected ? 'border-[#FB6600] bg-[#FB6600]' : 'border-neutral-300 bg-white'
+                                }`}
+                              >
+                                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                              </span>
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
 

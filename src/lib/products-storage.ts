@@ -32,6 +32,7 @@ export interface StoredProduct {
   unit_value?: string | null
   sizes?: string[] | null
   colors?: string[] | null
+  delivery_mode?: 'retirada' | 'entrega' | 'ambos' | null
   is_outlet: boolean
   is_novidade: boolean
   is_active: boolean
