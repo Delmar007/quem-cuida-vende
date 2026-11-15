@@ -48,7 +48,6 @@ export interface CreateProductInput {
   unitValue?: string
   sizes?: string[]
   colors?: string[]
-  deliveryMode?: 'retirada' | 'entrega' | 'ambos'
   isOutlet?: boolean
   isNovidade?: boolean
   isActive?: boolean
@@ -85,7 +84,6 @@ export interface UpdateProductInput {
   unitValue?: string
   sizes?: string[]
   colors?: string[]
-  deliveryMode?: 'retirada' | 'entrega' | 'ambos'
   isOutlet?: boolean
   isNovidade?: boolean
   isActive?: boolean
@@ -267,7 +265,6 @@ export async function createProductAction(data: CreateProductInput): Promise<{
     unit_value: data.unitValue?.trim() || null,
     sizes: data.sizes && data.sizes.length > 0 ? data.sizes : null,
     colors: data.colors && data.colors.length > 0 ? data.colors : null,
-    delivery_mode: data.deliveryMode || 'ambos',
     is_outlet: isOutlet,
     is_novidade: isNovidade,
     is_active: data.isActive ?? true,
@@ -452,7 +449,6 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     colors: data.colors !== undefined ? (data.colors.length > 0 ? data.colors : null) : (existing as any).colors,
     is_outlet: isOutlet,
     is_novidade: isNovidade,
-    delivery_mode: data.deliveryMode !== undefined ? data.deliveryMode : (existing.delivery_mode || 'ambos'),
     is_active: data.isActive !== undefined ? Boolean(data.isActive) : existing.is_active,
     updated_at: now,
   }
