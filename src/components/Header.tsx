@@ -1133,7 +1133,7 @@ export default function Header() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between gap-1 flex-wrap sm:flex-nowrap overflow-x-auto no-scrollbar pb-0.5">
+              <div className="grid grid-cols-9 sm:flex sm:items-center sm:justify-between gap-1 sm:flex-wrap pb-0.5">
                 {ALPHABET.map((letter) => {
                   const isLetterOpen = selectedLetter === letter
                   const isActiveStreetLetter =
@@ -1146,7 +1146,7 @@ export default function Header() {
                       type="button"
                       onClick={() => setSelectedLetter((prev) => (prev === letter ? null : letter))}
                       title={count > 0 ? `${count} rua(s) com a letra ${letter}` : `Letra ${letter}`}
-                      className={`min-w-[26px] h-7 px-1 text-[12px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
+                      className={`min-w-[28px] h-8 px-1 text-[15.5px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
                         isLetterOpen
                           ? 'bg-[#FB6600] text-white shadow-xs'
                           : isActiveStreetLetter
@@ -1183,7 +1183,7 @@ export default function Header() {
                     </div>
 
                     {(streetsByLetter[selectedLetter] || []).length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 max-h-64 overflow-y-auto pr-1">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 max-h-[126px] overflow-y-auto overscroll-contain pr-1">
                         {(streetsByLetter[selectedLetter] || []).map((street) => {
                           const isSelectedStreet = streetsMatch(street, currentRua)
                           return (
@@ -1191,7 +1191,7 @@ export default function Header() {
                               key={street}
                               href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: street })}
                               onClick={() => setSelectedLetter(null)}
-                              className={`px-2.5 py-2 text-[12.5px] rounded-[2px] transition-colors flex items-center justify-between gap-2 ${
+                              className={`px-2.5 py-2 text-[15px] leading-tight rounded-[2px] transition-colors flex items-center justify-between gap-2 ${
                                 isSelectedStreet
                                   ? 'bg-[#FB6600] text-white font-bold'
                                   : 'text-gray-800 hover:bg-orange-50 hover:text-[#FB6600] font-medium'
