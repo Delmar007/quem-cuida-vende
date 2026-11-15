@@ -493,7 +493,7 @@ export default function Header() {
                     key={cat.id}
                     href={targetUrl}
                     onClick={() => setIsPromoMenuOpen(false)}
-                    className={`py-3.5 whitespace-nowrap transition-colors duration-200 relative shrink-0 ${
+                    className={`py-3.5 whitespace-nowrap uppercase transition-colors duration-200 relative shrink-0 ${
                       isCatActive
                         ? 'text-[#FB6600] font-bold ' + lineStyle
                         : cat.isOrange
@@ -830,7 +830,7 @@ export default function Header() {
                           e.stopPropagation()
                           setIsMobileCatOpen(false)
                         }}
-                        className={`flex items-center justify-between px-3 h-9 text-xs tracking-wide transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase tracking-wide transition-colors ${
                           isCatActive
                             ? 'text-[#FB6600] font-bold bg-orange-50/50'
                             : cat.isOrange
@@ -867,7 +867,7 @@ export default function Header() {
                           e.stopPropagation()
                           setIsMobileCatOpen(false)
                         }}
-                        className={`flex items-center justify-between px-3 h-9 text-xs tracking-wide transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase tracking-wide transition-colors ${
                           isPorRuaActive
                             ? 'text-[#FB6600] font-bold bg-orange-50/50'
                             : 'text-[#FB6600] font-bold hover:bg-orange-50/40'
@@ -1056,7 +1056,7 @@ export default function Header() {
                     <Link
                       key={sub}
                       href={targetUrl}
-                      className={`whitespace-nowrap transition-colors duration-150 py-1 font-medium ${
+                      className={`whitespace-nowrap uppercase transition-colors duration-150 py-1 font-medium ${
                         isSelected
                           ? 'text-[#FB6600] font-bold border-b-2 border-[#FB6600]'
                           : 'text-gray-700 hover:text-[#FB6600]'

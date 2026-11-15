@@ -97,11 +97,12 @@ const STORE_CATEGORY_MAP: Record<string, string> = {
 
 function formatStoreCategorySubcategory(category?: string | null, subcategory?: string | null): string {
   const catKey = (category || '').toLowerCase()
-  const catLabel =
+  const catLabel = (
     STORE_CATEGORY_MAP[catKey] ||
     (category ? toTitleCase(category) : '')
+  ).toUpperCase()
   if (!subcategory) return catLabel
-  const subLabel = toTitleCase(subcategory)
+  const subLabel = toTitleCase(subcategory).toUpperCase()
   return catLabel ? `${catLabel} / ${subLabel}` : subLabel
 }
 
@@ -731,7 +732,7 @@ export default function StoreProductsCatalog({
                           onClick={() => handleCategoryClick(cat)}
                           className="w-full flex items-center justify-between text-left cursor-pointer group"
                         >
-                          <span className={`text-[13px] text-black transition-colors ${
+                          <span className={`text-[13px] text-black uppercase transition-colors ${
                             isCatSelected ? 'font-bold' : 'font-normal group-hover:font-medium'
                           }`}>
                             {cat.name}
@@ -760,7 +761,7 @@ export default function StoreProductsCatalog({
                                   <button
                                     type="button"
                                     onClick={() => handleSubcategoryClick(cat.name, sub.name)}
-                                    className={`text-xs block text-left cursor-pointer transition-colors text-black ${
+                                    className={`text-xs block text-left uppercase cursor-pointer transition-colors text-black ${
                                       isSubSelected
                                         ? 'font-bold'
                                         : 'font-normal hover:font-medium'
@@ -782,7 +783,7 @@ export default function StoreProductsCatalog({
                           setSelectedSubcategory('all')
                           setExpandedCategoryId(null)
                         }}
-                        className={`w-full text-left text-[13px] cursor-pointer transition-colors text-black ${
+                        className={`w-full text-left text-[13px] uppercase cursor-pointer transition-colors text-black ${
                           isCatSelected
                             ? 'font-bold'
                             : 'font-normal hover:font-medium'
@@ -1226,7 +1227,7 @@ export default function StoreProductsCatalog({
                         onClick={() => handleCategoryClick(cat)}
                         className="w-full flex items-center justify-between text-left cursor-pointer group"
                       >
-                        <span className={`text-[13px] sm:text-[13.5px] text-black transition-colors ${
+                        <span className={`text-[13px] sm:text-[13.5px] text-black uppercase transition-colors ${
                           isCatSelected ? 'font-bold' : 'font-normal group-hover:font-medium'
                         }`}>
                           {cat.name}
@@ -1256,7 +1257,7 @@ export default function StoreProductsCatalog({
                                 <button
                                   type="button"
                                   onClick={() => handleSubcategoryClick(cat.name, sub.name)}
-                                  className={`text-xs block text-left cursor-pointer transition-colors text-black ${
+                                  className={`text-xs block text-left uppercase cursor-pointer transition-colors text-black ${
                                     isSubSelected
                                       ? 'font-bold'
                                       : 'font-normal hover:font-medium'
@@ -1279,7 +1280,7 @@ export default function StoreProductsCatalog({
                         setSelectedSubcategory('all')
                         setExpandedCategoryId(null)
                       }}
-                      className={`w-full text-left text-[13px] sm:text-[13.5px] cursor-pointer transition-colors text-black ${
+                      className={`w-full text-left text-[13px] sm:text-[13.5px] uppercase cursor-pointer transition-colors text-black ${
                         isCatSelected
                           ? 'font-bold'
                           : 'font-normal hover:font-medium'
