@@ -94,16 +94,10 @@ export default function MerchantProductsTab({
   const [categories, setCategories] = useState<StoreCategoryWithSubcategories[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Detecta automaticamente se a loja pertence ao segmento Carro -> Usados / Concessionária
+  // Detecta automaticamente se a loja pertence à categoria Carro
   const isVehicleSegmentStore = useMemo(() => {
-    const cat = (storeCategory || '').toLowerCase().trim()
-    if (cat !== 'carro') return false
-    if (!storeSubcategories || storeSubcategories.length === 0) return true
-    return storeSubcategories.some((sub) => {
-      const s = sub.toLowerCase().trim()
-      return s === 'usados' || s === 'concessionária' || s === 'concessionaria'
-    })
-  }, [storeCategory, storeSubcategories])
+    return (storeCategory || '').toLowerCase().trim() === 'carro'
+  }, [storeCategory])
 
   // Filtros e busca
   const [searchTerm, setSearchTerm] = useState('')
@@ -392,7 +386,7 @@ export default function MerchantProductsTab({
 
   // Abrir Modal de Edição
   const handleOpenEditModal = (prod: StoredProduct) => {
-    const isVeh = Boolean(prod.is_vehicle) || isVehicleSegmentStore
+    const isVeh = isVehicleSegmentStore
     const maxLimit = isVeh ? 12 : 6
     setEditingProduct(prod)
     setFormIsVehicle(isVeh)
@@ -1354,21 +1348,26 @@ export default function MerchantProductsTab({
               </div>
 
               <div className="flex items-center gap-2.5">
-                {/* Seletor de Modo: Produto Padrão vs Veículo (Segmented Control Pro) */}
+                {/* Seletor de Modo: Produto Padrão vs Veículo (travado conforme categoria da loja) */}
                 <div className="flex items-center bg-neutral-800/90 p-1 rounded-xl border border-neutral-700/80 shadow-inner">
                   <button
                     type="button"
+                    disabled={isVehicleSegmentStore}
                     onClick={() => {
+                      if (isVehicleSegmentStore) return
                       setFormIsVehicle(false)
                       if (['novo', 'usado', 'semi_novo'].includes(formPromoType)) {
                         setFormPromoType('outlet')
                       }
                       setFormImages((prev) => prev.slice(0, 6))
                     }}
-                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                      !formIsVehicle
-                        ? 'bg-white text-neutral-950 shadow-sm'
-                        : 'text-neutral-300 hover:text-white'
+                    title={isVehicleSegmentStore ? 'Indisponível para lojas da categoria Carro' : 'Modo Produto Padrão'}
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 flex items-center gap-1.5 ${
+                      isVehicleSegmentStore
+                        ? 'text-neutral-500 opacity-35 cursor-not-allowed'
+                        : !formIsVehicle
+                        ? 'bg-white text-neutral-950 shadow-sm cursor-pointer'
+                        : 'text-neutral-300 hover:text-white cursor-pointer'
                     }`}
                   >
                     <span>🛍️</span>
@@ -1376,17 +1375,22 @@ export default function MerchantProductsTab({
                   </button>
                   <button
                     type="button"
+                    disabled={!isVehicleSegmentStore}
                     onClick={() => {
+                      if (!isVehicleSegmentStore) return
                       setFormIsVehicle(true)
                       setFormPhotoOrientation('horizontal')
                       if (!['novo', 'usado', 'semi_novo'].includes(formPromoType)) {
                         setFormPromoType('semi_novo')
                       }
                     }}
-                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
-                      formIsVehicle
-                        ? 'bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white shadow-sm'
-                        : 'text-neutral-300 hover:text-white'
+                    title={!isVehicleSegmentStore ? 'Disponível apenas para lojas da categoria Carro' : 'Modo Veículo'}
+                    className={`px-3.5 py-1.5 text-xs font-black rounded-lg transition-all duration-150 flex items-center gap-1.5 ${
+                      !isVehicleSegmentStore
+                        ? 'text-neutral-500 opacity-35 cursor-not-allowed'
+                        : formIsVehicle
+                        ? 'bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white shadow-sm cursor-pointer'
+                        : 'text-neutral-300 hover:text-white cursor-pointer'
                     }`}
                   >
                     <span>🚗</span>
