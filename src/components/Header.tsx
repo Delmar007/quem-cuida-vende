@@ -106,11 +106,10 @@ export default function Header() {
     'Pneus',
     'Rodas',
     'Acessórios',
-    'Som Automotivo',
+    'Som',
     'Óleos',
     'Baterias',
     'Estética',
-    'Picapes',
     'Motos',
   ]
 

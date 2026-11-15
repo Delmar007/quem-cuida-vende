@@ -79,11 +79,10 @@ const SUBCATEGORIAS_POR_CATEGORIA: Record<string, string[]> = {
     'Pneus',
     'Rodas',
     'Acessórios',
-    'Som Automotivo',
+    'Som',
     'Óleos',
     'Baterias',
     'Estética',
-    'Picapes',
     'Motos',
   ],
   escritorio: [

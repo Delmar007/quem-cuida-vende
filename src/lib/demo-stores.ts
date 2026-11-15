@@ -130,7 +130,7 @@ export const SEED_STORES: DemoStoreItem[] = [
     name: "Zeta Outlet Automotivo",
     slug: "zeta-outlet-automotivo",
     category: "carro",
-    subcategories: ["Peças", "Acessórios", "Pneus", "Som Automotivo"],
+    subcategories: ["Peças", "Acessórios", "Pneus", "Som"],
     large_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=400&q=80",
     description: "Peças automotivas, som e acessórios com preços de outlet.",
