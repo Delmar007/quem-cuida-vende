@@ -528,73 +528,70 @@ export default function Header() {
           </div>
         </div>
 
-        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (Minha Loja, Feed que sigo, Planos, Sair) */}
+        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (Minha Loja, Meu Perfil, Bolsa, Planos, Sair) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
-          <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center justify-between gap-2.5 text-[14.5px] text-gray-600 flex-wrap">
-            <div className="flex items-center gap-3 flex-wrap">
-              {user ? (
-                <>
-                  {Boolean(user.hasStore) && (
-                    <Link
-                      href="/painel/loja"
-                      className="text-neutral-900 hover:text-[#FB6600] font-bold transition-colors whitespace-nowrap"
-                    >
-                      Minha Loja
-                    </Link>
-                  )}
+          <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center justify-between gap-2 text-[16px] text-gray-600 flex-wrap">
+            {user ? (
+              <>
+                {Boolean(user.hasStore) && (
                   <Link
-                    href="/perfil"
-                    className="text-gray-600 hover:text-[#FB6600] font-medium transition-colors whitespace-nowrap"
+                    href="/painel/loja"
+                    className="text-neutral-900 hover:text-[#FB6600] font-bold transition-colors whitespace-nowrap"
                   >
-                    Meu Perfil
+                    Minha Loja
                   </Link>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  onClick={openRegister}
-                  className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  Crie uma conta
-                </button>
-              )}
-              <button
-                type="button"
-                aria-label="Feed que sigo"
-                title="Abrir Feed que sigo"
-                onClick={() => {
-                  markFeedAsSeen()
-                  router.push('/perfil?aba=feed')
-                }}
-                className="relative inline-flex items-center justify-center text-gray-600 hover:text-[#FB6600] transition-colors cursor-pointer p-0.5"
-              >
-                <svg
-                  className="w-[19px] h-[19px] stroke-[1.7]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                  />
-                </svg>
-                {unreadFeedPromosCount > 0 && (
-                  <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] px-[3px] bg-red-600 text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums">
-                    {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
-                  </span>
                 )}
-              </button>
+                <Link
+                  href="/perfil"
+                  className="text-gray-600 hover:text-[#FB6600] font-medium transition-colors whitespace-nowrap"
+                >
+                  Meu Perfil
+                </Link>
+              </>
+            ) : (
               <button
                 type="button"
-                onClick={() => setIsPlansOpen(true)}
-                className="text-[13px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+                onClick={openRegister}
+                className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
               >
-                Planos
+                Crie uma conta
               </button>
-            </div>
-
+            )}
+            <button
+              type="button"
+              aria-label="Feed que sigo"
+              title="Abrir Feed que sigo"
+              onClick={() => {
+                markFeedAsSeen()
+                router.push('/perfil?aba=feed')
+              }}
+              className="relative inline-flex items-center justify-center text-gray-600 hover:text-[#FB6600] transition-colors cursor-pointer p-0.5 shrink-0"
+            >
+              <svg
+                className="w-[21px] h-[21px] stroke-[1.7]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              {unreadFeedPromosCount > 0 && (
+                <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] px-[3px] bg-red-600 text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums">
+                  {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPlansOpen(true)}
+              className="text-[14.5px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+            >
+              Planos
+            </button>
             {user && (
               <button
                 type="button"
