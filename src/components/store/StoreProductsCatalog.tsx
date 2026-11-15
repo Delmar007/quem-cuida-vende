@@ -640,18 +640,37 @@ export default function StoreProductsCatalog({
               )}
 
               {/* 5. Categoria / Subcategoria */}
-              {(storeSubcategories && storeSubcategories.length > 0) ? (
-                <div className="mt-2.5 flex items-center justify-center gap-1.5 flex-wrap">
-                  {storeSubcategories.map((sub) => (
-                    <span
-                      key={sub}
-                      className="text-[10.5px] bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-[2px] font-semibold"
-                    >
-                      {formatStoreCategorySubcategory(storeCategory, sub)}
-                    </span>
-                  ))}
-                </div>
-              ) : storeCategory ? (
+              {(storeSubcategories && storeSubcategories.length > 0) ? (() => {
+                const mid = Math.ceil(storeSubcategories.length / 2)
+                const leftSubs = storeSubcategories.slice(0, mid)
+                const rightSubs = storeSubcategories.slice(mid)
+                return (
+                  <div className="mt-2.5 w-full grid grid-cols-2 gap-x-2 gap-y-1.5 text-left">
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                      {leftSubs.map((sub) => (
+                        <span
+                          key={sub}
+                          className="text-[10.5px] bg-neutral-100 text-neutral-800 px-2 py-1 rounded-[2px] font-semibold text-left truncate"
+                          title={formatStoreCategorySubcategory(storeCategory, sub)}
+                        >
+                          {formatStoreCategorySubcategory(storeCategory, sub)}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                      {rightSubs.map((sub) => (
+                        <span
+                          key={sub}
+                          className="text-[10.5px] bg-neutral-100 text-neutral-800 px-2 py-1 rounded-[2px] font-semibold text-left truncate"
+                          title={formatStoreCategorySubcategory(storeCategory, sub)}
+                        >
+                          {formatStoreCategorySubcategory(storeCategory, sub)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })() : storeCategory ? (
                 <div className="mt-2.5 flex items-center justify-center">
                   <span className="text-[10.5px] bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-[2px] font-semibold">
                     {formatStoreCategorySubcategory(storeCategory, null)}
@@ -1113,18 +1132,37 @@ export default function StoreProductsCatalog({
             )}
 
             {/* 5. Categoria / Subcategoria */}
-            {(storeSubcategories && storeSubcategories.length > 0) ? (
-              <div className="mt-3 flex items-center justify-center gap-1.5 flex-wrap">
-                {storeSubcategories.map((sub) => (
-                  <span
-                    key={sub}
-                    className="text-[11px] bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-[2px] font-semibold"
-                  >
-                    {formatStoreCategorySubcategory(storeCategory, sub)}
-                  </span>
-                ))}
-              </div>
-            ) : storeCategory ? (
+            {(storeSubcategories && storeSubcategories.length > 0) ? (() => {
+              const mid = Math.ceil(storeSubcategories.length / 2)
+              const leftSubs = storeSubcategories.slice(0, mid)
+              const rightSubs = storeSubcategories.slice(mid)
+              return (
+                <div className="mt-3 w-full grid grid-cols-2 gap-x-2 gap-y-1.5 text-left">
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    {leftSubs.map((sub) => (
+                      <span
+                        key={sub}
+                        className="text-[11px] bg-neutral-100 text-neutral-800 px-2 py-1 rounded-[2px] font-semibold text-left truncate"
+                        title={formatStoreCategorySubcategory(storeCategory, sub)}
+                      >
+                        {formatStoreCategorySubcategory(storeCategory, sub)}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    {rightSubs.map((sub) => (
+                      <span
+                        key={sub}
+                        className="text-[11px] bg-neutral-100 text-neutral-800 px-2 py-1 rounded-[2px] font-semibold text-left truncate"
+                        title={formatStoreCategorySubcategory(storeCategory, sub)}
+                      >
+                        {formatStoreCategorySubcategory(storeCategory, sub)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )
+            })() : storeCategory ? (
               <div className="mt-3 flex items-center justify-center">
                 <span className="text-[11px] bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-[2px] font-semibold">
                   {formatStoreCategorySubcategory(storeCategory, null)}
