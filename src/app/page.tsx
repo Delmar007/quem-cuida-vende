@@ -9,6 +9,7 @@ import { getFollowedStoreIdsFromServer } from "@/app/actions/user-office";
 import { getAllPromoTimersServer } from "@/lib/promo-timer-storage";
 import { streetsMatch } from "@/lib/streets";
 import { toTitleCase } from "@/lib/textFormat";
+import { getAdminBannerConfigServer } from "@/lib/admin-banners-storage";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -40,6 +41,7 @@ export interface StoreItem {
   description?: string | null;
   plan?: string;
   is_active: boolean;
+  created_at?: string;
 }
 
 export interface ProductItem {
@@ -1348,7 +1350,22 @@ export default async function Home({ searchParams }: HomeProps) {
   return (
     <div className="w-full">
       {/* O banner institucional só aparece na página inicial geral sem filtros restritivos */}
-      {isHomePage && <HomeBanner />}
+      {isHomePage && (
+        <HomeBanner
+          goldStores={allStores
+            .filter((s) => ["ouro", "auto_100"].includes((s.plan || "").toLowerCase()))
+            .map((s) => ({
+              id: s.id,
+              name: s.name,
+              slug: s.slug,
+              description: s.description,
+              large_banner_url: s.large_banner_url,
+              small_banner_url: s.small_banner_url,
+              created_at: s.created_at,
+            }))}
+          initialConfig={getAdminBannerConfigServer()}
+        />
+      )}
 
       {/* Barra Informativa de Filtros Ativos (Sem título grande repetitivo e sem contador de produtos recentes) */}
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">

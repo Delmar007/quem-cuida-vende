@@ -520,6 +520,24 @@ export default function Header() {
                 <span>Limpa</span>
                 <span>Filtro</span>
               </Link>
+
+              {/* ENGRENAGEM ADMIN DO SITE */}
+              <Link
+                href="/admin"
+                onClick={() => setIsPromoMenuOpen(false)}
+                title="Administração do Site"
+                aria-label="Administração do Site"
+                className="inline-flex items-center justify-center w-6 h-6 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
+              >
+                <svg className="w-4 h-4 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </Link>
             </div>
 
             {/* BOTÃO "TIPO DE PROMOÇÃO" COM MENU VERTICAL DROPDOWN */}
@@ -876,20 +894,41 @@ export default function Header() {
                   >
                     <span>Limpar categoria</span>
                   </Link>
-                  <Link
-                    href="/"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setIsMobileCatOpen(false)
-                      setSelectedLetter(null)
-                      setSearchTerm('')
-                    }}
-                    title="Limpar todos os filtros"
-                    className="inline-flex flex-col items-center justify-center px-[12.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.75px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 scale-[1.03]"
-                  >
-                    <span>Limpa</span>
-                    <span>Filtro</span>
-                  </Link>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Link
+                      href="/"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setIsMobileCatOpen(false)
+                        setSelectedLetter(null)
+                        setSearchTerm('')
+                      }}
+                      title="Limpar todos os filtros"
+                      className="inline-flex flex-col items-center justify-center px-[12.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.75px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 scale-[1.03]"
+                    >
+                      <span>Limpa</span>
+                      <span>Filtro</span>
+                    </Link>
+                    <Link
+                      href="/admin"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setIsMobileCatOpen(false)
+                      }}
+                      title="Administração do Site"
+                      aria-label="Administração do Site"
+                      className="inline-flex items-center justify-center w-7 h-7 rounded-full border border-neutral-200 text-neutral-700 hover:text-[#FB6600] hover:border-[#FB6600] transition-colors shrink-0"
+                    >
+                      <svg className="w-4 h-4 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
