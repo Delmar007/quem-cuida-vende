@@ -431,12 +431,12 @@ export default function Header() {
           </div>
 
           {/* AÇÕES DO TOPO - MOBILE (Linha 1: apenas Avatar + Nome ou Entrar) */}
-          <div className="flex sm:hidden items-center gap-2 text-[13px] text-gray-500 font-normal shrink-0">
+          <div className="flex sm:hidden items-center gap-2 text-[15.5px] text-gray-500 font-normal shrink-0">
             <div 
               onClick={() => {
                 router.push('/perfil');
               }}
-              className="w-7 h-7 rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
+              className="w-[34px] h-[34px] rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
               title={user ? (user.user_metadata?.full_name || user.email) : 'Meu Perfil'}
             >
               {avatarUrl ? (
@@ -477,8 +477,8 @@ export default function Header() {
 
         {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (Minha Loja, Feed que sigo, Planos, Sair) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
-          <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-between gap-2 text-xs text-gray-600 flex-wrap">
-            <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center justify-between gap-2.5 text-[14.5px] text-gray-600 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap">
               {user ? (
                 <>
                   {Boolean(user.hasStore) && (
@@ -511,7 +511,7 @@ export default function Header() {
                 className="inline-flex items-center gap-1 text-gray-600 hover:text-[#FB6600] font-medium transition-colors cursor-pointer whitespace-nowrap"
               >
                 <svg
-                  className="w-3.5 h-3.5 stroke-[1.7]"
+                  className="w-[17px] h-[17px] stroke-[1.7]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -527,7 +527,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setIsPlansOpen(true)}
-                className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+                className="text-[13px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
               >
                 Planos
               </button>
