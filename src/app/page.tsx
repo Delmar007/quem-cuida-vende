@@ -791,8 +791,8 @@ export default async function Home({ searchParams }: HomeProps) {
     semi_novo: "Semi-novo",
     seminovo: "Semi-novo",
     "semi-novo": "Semi-novo",
-    feed_que_sigo: "Feed que sigo",
-    feed_seguindo: "Feed que sigo",
+    feed_que_sigo: "Produtos de Lojas que Sigo",
+    feed_seguindo: "Produtos de Lojas que Sigo",
   };
 
   const categoriaAtual = cat ? (nomesCategorias[cat] || cat.toUpperCase()) : "Todas as Categorias";

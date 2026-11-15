@@ -55,7 +55,7 @@ export default function Header() {
     { id: 'artezanal', label: 'Artezanal' },
     { id: 'novo', label: 'Novo' },
     { id: 'usado', label: 'Usado' },
-    { id: 'feed_que_sigo', label: 'Feed que sigo', isOrange: true },
+    { id: 'feed_que_sigo', label: 'Produtos de Lojas que Sigo', isOrange: true },
   ]
 
   const activePromoObj = tiposPromocao.find((p) => p.id === currentFiltro.toLowerCase())
@@ -401,7 +401,7 @@ export default function Header() {
               <>
                 <Link
                   href="/perfil"
-                  className="text-black hover:text-[#FB6600] font-medium truncate max-w-[100px] md:max-w-[130px] transition-colors cursor-pointer"
+                  className="text-black hover:text-[#FB6600] font-medium uppercase truncate max-w-[100px] md:max-w-[130px] transition-colors cursor-pointer"
                   title="Acessar Meu Perfil (Dados, Foto, WhatsApp, Endereço, Favoritos, Seguindo e Feed que sigo)"
                 >
                   {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
@@ -411,10 +411,10 @@ export default function Header() {
                     <span className="text-gray-300 text-xs font-light">|</span>
                     <Link
                       href="/painel/loja"
-                      className="hover:text-[#FB6600] text-neutral-800 font-semibold transition-colors cursor-pointer text-xs whitespace-nowrap"
+                      className="hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer text-xs whitespace-nowrap"
                       title="Acessar painel da minha loja"
                     >
-                      Minha Loja
+                      MINHA LOJA
                     </Link>
                   </>
                 )}
@@ -428,9 +428,9 @@ export default function Header() {
                     router.push('/')
                     router.refresh()
                   }}
-                  className="hover:text-black transition-colors cursor-pointer text-gray-500"
+                  className="hover:text-black uppercase transition-colors cursor-pointer text-gray-500"
                 >
-                  Sair
+                  SAIR
                 </button>
               </>
             ) : (
@@ -479,7 +479,7 @@ export default function Header() {
               onClick={() => setIsPlansOpen(true)}
               className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center gap-1"
             >
-              <span>Planos</span>
+              <span>PLANOS</span>
             </button>
           </div>
 
@@ -594,9 +594,9 @@ export default function Header() {
                   router.push('/')
                   router.refresh()
                 }}
-                className="text-red-600 hover:text-red-700 font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                className="text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
               >
-                Sair
+                SAIR
               </button>
             )}
           </div>
@@ -639,7 +639,7 @@ export default function Header() {
                   <rect x="14" y="14" width="7" height="7" rx="1" />
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span>Lojas</span>
+                <span className="uppercase">LOJAS</span>
               </Link>
 
               {/* Linha vertical divisória entre Lojas e Categorias */}
@@ -774,7 +774,7 @@ export default function Header() {
                             key={promo.id}
                             href={targetHref}
                             onClick={() => setIsPromoMenuOpen(false)}
-                            className={`flex items-center justify-between px-3.5 py-2.5 text-xs transition-colors ${
+                            className={`flex items-center justify-between px-3.5 py-2.5 text-xs uppercase transition-colors ${
                               isPromoSelected
                                 ? 'bg-orange-50/70 text-[#FB6600] font-bold'
                                 : promo.isOrange
@@ -820,7 +820,7 @@ export default function Header() {
                   <rect x="14" y="14" width="7" height="7" rx="1" />
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span>Produtos</span>
+                <span className="uppercase">PRODUTOS</span>
               </Link>
             </div>
           </div>
@@ -853,7 +853,7 @@ export default function Header() {
                 <rect x="14" y="14" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" />
               </svg>
-              <span>Lojas</span>
+              <span className="uppercase">LOJAS</span>
             </Link>
 
             {/* MEIO: Botão Categorias que abre o Menu Vertical */}
@@ -906,7 +906,7 @@ export default function Header() {
                 <rect x="14" y="14" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" />
               </svg>
-              <span>Produtos</span>
+              <span className="uppercase">PRODUTOS</span>
             </Link>
           </div>
         </div>
@@ -960,7 +960,7 @@ export default function Header() {
                         key={promo.id}
                         href={targetHref}
                         onClick={() => setIsMobileCatOpen(false)}
-                        className={`flex items-center justify-between px-3 h-9 text-xs transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase transition-colors ${
                           isPromoSelected
                             ? 'bg-orange-50/70 text-[#FB6600] font-bold'
                             : promo.isOrange
