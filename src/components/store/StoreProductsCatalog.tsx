@@ -1661,7 +1661,7 @@ export default function StoreProductsCatalog({
                           )}
                         </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(122px,auto)_1fr] items-center gap-2">
+                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(138px,auto)_1fr] items-center gap-2">
                           <div>
                             <WhatsappAvailabilityButton
                               phone={storePhone}

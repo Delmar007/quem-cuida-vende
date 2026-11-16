@@ -1722,7 +1722,7 @@ export default async function Home({ searchParams }: HomeProps) {
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(122px,auto)_1fr] items-center gap-2">
+                    <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(138px,auto)_1fr] items-center gap-2">
                       {/* Coluna esquerda (+30px): Botão WhatsApp VER DISPONIBILIDADE (2 linhas) */}
                       <div>
                         <WhatsappAvailabilityButton
