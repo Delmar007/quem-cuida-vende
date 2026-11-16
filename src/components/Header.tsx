@@ -527,7 +527,7 @@ export default function Header() {
           </Link>
 
           {/* CAIXA DE BUSCA RETANGULAR COM ÍCONE DE LUPA PRETA */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-[420px] mx-4 hidden sm:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white">
+          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden sm:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white">
             <input 
               type="text"
               value={searchTerm}
@@ -553,7 +553,7 @@ export default function Header() {
           </form>
 
           {/* AÇÕES DO TOPO - DESKTOP */}
-          <div className="hidden sm:flex items-center gap-2 md:gap-2.5 text-[13px] font-heading tracking-tight text-gray-500 font-normal">
+          <div className="hidden sm:flex items-center gap-1.5 md:gap-2 text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -994,7 +994,7 @@ export default function Header() {
               </button>
             </form>
 
-            <div className="shrink-0 flex items-center gap-2">
+            <div className="shrink-0 flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => setIsPlansOpen(true)}
