@@ -8,6 +8,7 @@ import FavoriteProductButton from '@/components/FavoriteProductButton'
 import PromoThermometerBar from '@/components/PromoThermometerBar'
 import { toTitleCase } from '@/lib/textFormat'
 import { buildWhatsappAvailabilityUrl } from '@/lib/whatsapp-availability'
+import DefaultStoreAvatar from '@/components/DefaultStoreAvatar'
 
 export interface ProductItem {
   id: string
@@ -604,9 +605,7 @@ export default function StoreProductsCatalog({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-2xl font-black uppercase text-gray-500">
-                      {(storeName || 'L')[0]}
-                    </span>
+                    <DefaultStoreAvatar size="md" />
                   )}
                 </div>
                 {onOpenLogoAdjust && (
@@ -1096,9 +1095,7 @@ export default function StoreProductsCatalog({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-3xl font-black uppercase text-gray-500">
-                    {(storeName || 'L')[0]}
-                  </span>
+                  <DefaultStoreAvatar size="lg" />
                 )}
               </div>
               {onOpenLogoAdjust && (

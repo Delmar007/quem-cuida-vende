@@ -12,6 +12,7 @@ import { toTitleCase } from "@/lib/textFormat";
 import { getAdminBannerConfigServer } from "@/lib/admin-banners-storage";
 import { getStorePublicPath } from "@/lib/store-slug";
 import { buildWhatsappAvailabilityUrl } from "@/lib/whatsapp-availability";
+import DefaultStoreAvatar from "@/components/DefaultStoreAvatar";
 import { connection } from "next/server";
 
 function formatCurrencyBRL(value: number | string | null | undefined): string {
@@ -1615,9 +1616,7 @@ export default async function Home({ searchParams }: HomeProps) {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="font-heading text-[10px] font-bold text-gray-600 leading-none select-none">
-                                {produto.store_name.charAt(0).toUpperCase()}
-                              </span>
+                              <DefaultStoreAvatar size="sm" />
                             )}
                           </div>
                           <div className="min-w-0">
