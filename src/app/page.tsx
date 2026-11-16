@@ -1337,7 +1337,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 w-full max-w-full">
-            {orderedFeedStores.map(({ loja, bannerType, renderKey }) => {
+            {orderedFeedStores.map(({ loja, bannerType, renderKey }, index) => {
               // Regra dos Banners no Feed de Lojas:
               // - Plano Bronze (single): o Banner Grande/Triplo (large_banner_url) fica somente dentro da loja e NÃO aparece no filtro Lojas; usa apenas small_banner_url.
               // - Planos Bronze Plus e Prata (double): têm Triplo (dentro da loja) e Duplo (small_banner_url), porém em Lojas só aparece o Duplo.
@@ -1375,6 +1375,8 @@ export default async function Home({ searchParams }: HomeProps) {
                     <img
                       src={bgImg}
                       alt={loja.name}
+                      loading={index >= 4 ? "lazy" : "eager"}
+                      decoding="async"
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 via-black/35 to-transparent group-hover:from-black/90 transition-colors" />
@@ -1494,7 +1496,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 w-full max-w-full">
-          {produtosFiltrados.map((produto) => {
+          {produtosFiltrados.map((produto, index) => {
             const dataPublicacao = new Date(produto.published_at);
             const dataFormatada = !isNaN(dataPublicacao.getTime())
               ? dataPublicacao.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
@@ -1567,6 +1569,7 @@ export default async function Home({ searchParams }: HomeProps) {
                     subcategory={toTitleCase(produto.subcategory)}
                     hasDiscount={hasDiscount}
                     discountPercent={discountPercent}
+                    lazy={index >= 4}
                   />
 
                   {/* Cronômetro de Promoção + Termômetro Temporal + Coração de Favorito */}
@@ -1592,6 +1595,8 @@ export default async function Home({ searchParams }: HomeProps) {
                               <img
                                 src={storeLogoUrl}
                                 alt={produto.store_name}
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover"
                               />
                             ) : (

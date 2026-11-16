@@ -12,6 +12,7 @@ interface ProductCardImageCarouselProps {
   discountPercent?: number | null
   onImageClick?: () => void
   compact?: boolean
+  lazy?: boolean
 }
 
 export default function ProductCardImageCarousel({
@@ -24,6 +25,7 @@ export default function ProductCardImageCarousel({
   discountPercent = null,
   onImageClick,
   compact = false,
+  lazy = true,
 }: ProductCardImageCarouselProps) {
   const validImages = images.filter(Boolean)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -58,6 +60,8 @@ export default function ProductCardImageCarousel({
         <img
           src={currentSrc}
           alt={alt}
+          loading={lazy ? 'lazy' : 'eager'}
+          decoding="async"
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
       ) : (

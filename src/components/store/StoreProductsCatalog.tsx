@@ -1450,7 +1450,7 @@ export default function StoreProductsCatalog({
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
-              {filteredProducts.map((produto) => {
+              {filteredProducts.map((produto, idx) => {
                 const priceFinal = produto.promotional_price && produto.promotional_price < produto.price
                   ? produto.promotional_price
                   : produto.price
@@ -1515,6 +1515,7 @@ export default function StoreProductsCatalog({
                         hasDiscount={hasPromo}
                         discountPercent={discountPercent}
                         onImageClick={() => handleOpenDetailModal(produto)}
+                        lazy={idx >= 4}
                       />
 
                       {/* Termômetro Temporal na página de produtos */}
