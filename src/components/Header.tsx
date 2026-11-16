@@ -7,8 +7,18 @@ import AuthModal from '@/components/AuthModal'
 import PlansModal from '@/components/PlansModal'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 import { logoutAction, getSessionUserAction } from '@/app/login/actions'
-import { ALPHABET, getStreetInitialLetter, mergeAndGroupStreetsByLetter, streetsMatch } from '@/lib/streets'
-import { getCommercialStreetsByLetterAction } from '@/app/actions/streets'
+import {
+  ALPHABET,
+  getStreetInitialLetter,
+  getShoppingInitialLetter,
+  mergeAndGroupStreetsByLetter,
+  mergeAndGroupShoppingsByLetter,
+  streetsMatch,
+} from '@/lib/streets'
+import {
+  getCommercialStreetsByLetterAction,
+  getCommercialShoppingsByLetterAction,
+} from '@/app/actions/streets'
 import {
   BRAZIL_STATES,
   CAMPO_GRANDE_MS_BAIRROS,
@@ -36,8 +46,12 @@ export default function Header() {
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
+  const [porRuaMode, setPorRuaMode] = useState<'rua' | 'shopping'>('rua')
   const [streetsByLetter, setStreetsByLetter] = useState<Record<string, string[]>>(() =>
     mergeAndGroupStreetsByLetter()
+  )
+  const [shoppingsByLetter, setShoppingsByLetter] = useState<Record<string, string[]>>(() =>
+    mergeAndGroupShoppingsByLetter()
   )
   
   const searchParams = useSearchParams()
@@ -221,11 +235,14 @@ export default function Header() {
       return
     }
     let active = true
-    getCommercialStreetsByLetterAction()
-      .then((grouped) => {
-        if (active && grouped) {
-          setStreetsByLetter(grouped)
-        }
+    Promise.all([
+      getCommercialStreetsByLetterAction(),
+      getCommercialShoppingsByLetterAction(),
+    ])
+      .then(([groupedStreets, groupedShoppings]) => {
+        if (!active) return
+        if (groupedStreets) setStreetsByLetter(groupedStreets)
+        if (groupedShoppings) setShoppingsByLetter(groupedShoppings)
       })
       .catch(() => {})
     return () => {
@@ -386,13 +403,11 @@ export default function Header() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-white">
-              <span>Estado (UF): {selectedLocation.state}</span>
-              <span aria-hidden="true">•</span>
-              <span>Cidade: {selectedLocation.city || 'Todas'}</span>
-              <span aria-hidden="true">•</span>
-              <span>Bairro: {selectedLocation.neighborhood || 'Todos'}</span>
-            </div>
+            <span className="text-white uppercase truncate">
+              {[selectedLocation.state, selectedLocation.city, selectedLocation.neighborhood]
+                .filter(Boolean)
+                .join(' - ')}
+            </span>
           </div>
 
           <button
@@ -1487,16 +1502,45 @@ export default function Header() {
           <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200 relative">
             <div className="mx-auto max-w-[940px] px-4 py-2 flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#FB6600]">
-                  Escolha a inicial da rua comercial:
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    aria-pressed={porRuaMode === 'rua'}
+                    onClick={() => {
+                      setPorRuaMode('rua')
+                      setSelectedLetter(null)
+                    }}
+                    className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
+                      porRuaMode === 'rua'
+                        ? 'bg-[#FB6600] text-white border-[#FB6600]'
+                        : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
+                    }`}
+                  >
+                    Escolha a inicial da rua comercial
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={porRuaMode === 'shopping'}
+                    onClick={() => {
+                      setPorRuaMode('shopping')
+                      setSelectedLetter(null)
+                    }}
+                    className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
+                      porRuaMode === 'shopping'
+                        ? 'bg-[#FB6600] text-white border-[#FB6600]'
+                        : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
+                    }`}
+                  >
+                    Escolha a inicial do Shopping e Galeria
+                  </button>
+                </div>
                 {currentRua && (
                   <div className="flex items-center gap-1.5 text-[11px] bg-orange-50 border border-orange-200 text-[#FB6600] font-bold px-2.5 py-0.5 rounded-[2px]">
-                    <span>Rua selecionada: {currentRua}</span>
+                    <span>Selecionado: {currentRua}</span>
                     <Link
                       href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: '' })}
                       className="text-gray-500 hover:text-black ml-1"
-                      title="Limpar rua selecionada"
+                      title="Limpar filtro selecionado"
                     >
                       ×
                     </Link>
@@ -1506,17 +1550,25 @@ export default function Header() {
 
               <div className="grid grid-cols-9 sm:flex sm:items-center sm:justify-between gap-1 sm:flex-wrap pb-0.5">
                 {ALPHABET.map((letter) => {
+                  const activeByLetter = porRuaMode === 'shopping' ? shoppingsByLetter : streetsByLetter
                   const isLetterOpen = selectedLetter === letter
                   const isActiveStreetLetter =
-                    Boolean(currentRua) && getStreetInitialLetter(currentRua) === letter
-                  const count = (streetsByLetter[letter] || []).length
+                    Boolean(currentRua) &&
+                    (porRuaMode === 'shopping'
+                      ? getShoppingInitialLetter(currentRua) === letter
+                      : getStreetInitialLetter(currentRua) === letter)
+                  const count = (activeByLetter[letter] || []).length
 
                   return (
                     <button
                       key={letter}
                       type="button"
                       onClick={() => setSelectedLetter((prev) => (prev === letter ? null : letter))}
-                      title={count > 0 ? `${count} rua(s) com a letra ${letter}` : `Letra ${letter}`}
+                      title={
+                        count > 0
+                          ? `${count} ${porRuaMode === 'shopping' ? 'shopping(s)/galeria(s)' : 'rua(s)'} com a letra ${letter}`
+                          : `Letra ${letter}`
+                      }
                       className={`min-w-[28px] h-8 px-1 text-[15.5px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
                         isLetterOpen
                           ? 'bg-[#FB6600] text-white shadow-xs'
@@ -1542,7 +1594,9 @@ export default function Header() {
                   <div className="w-full bg-white border border-orange-200 shadow-xl rounded-[2px] p-4 mb-3 animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-3">
                       <span className="text-[11px] font-bold uppercase tracking-widest text-[#FB6600]">
-                        Principais ruas comerciais — Letra {selectedLetter} (ordem alfabética)
+                        {porRuaMode === 'shopping'
+                          ? `Shoppings e Galerias — Letra ${selectedLetter} (ordem alfabética)`
+                          : `Principais ruas comerciais — Letra ${selectedLetter} (ordem alfabética)`}
                       </span>
                       <button
                         type="button"
@@ -1553,9 +1607,9 @@ export default function Header() {
                       </button>
                     </div>
 
-                    {(streetsByLetter[selectedLetter] || []).length > 0 ? (
+                    {((porRuaMode === 'shopping' ? shoppingsByLetter : streetsByLetter)[selectedLetter] || []).length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 max-h-[126px] overflow-y-auto overscroll-contain pr-1">
-                        {(streetsByLetter[selectedLetter] || []).map((street) => {
+                        {((porRuaMode === 'shopping' ? shoppingsByLetter : streetsByLetter)[selectedLetter] || []).map((street) => {
                           const isSelectedStreet = streetsMatch(street, currentRua)
                           return (
                             <Link

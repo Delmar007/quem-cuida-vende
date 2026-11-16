@@ -15,7 +15,7 @@ export const KITTANDA_LOCATION_EVENT = 'kittanda:location-changed'
 export const DEFAULT_KITTANDA_LOCATION: KittandaLocation = {
   state: 'MS',
   city: 'Campo Grande',
-  neighborhood: '',
+  neighborhood: 'Centro',
 }
 
 export const BRAZIL_STATES: BrazilState[] = [

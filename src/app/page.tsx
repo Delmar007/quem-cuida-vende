@@ -1081,7 +1081,7 @@ export default async function Home({ searchParams }: HomeProps) {
       const storeObj = allStores.find(
         (s) => s.id === prod.store_id || s.name === prod.store_name
       );
-      if (!streetsMatch(storeObj?.street, rua)) {
+      if (!streetsMatch(storeObj?.street, rua) && !streetsMatch(storeObj?.reference_point, rua)) {
         return false;
       }
     }
@@ -1129,8 +1129,8 @@ export default async function Home({ searchParams }: HomeProps) {
   // para a subcategoria e modalidade selecionadas."
   // =========================================================================
   const lojasFiltradas = allStores.filter((store) => {
-    // Filtro Por Rua
-    if (rua && !streetsMatch(store.street, rua)) {
+    // Filtro Por Rua / Shopping e Galeria
+    if (rua && !streetsMatch(store.street, rua) && !streetsMatch(store.reference_point, rua)) {
       return false;
     }
 
@@ -1206,7 +1206,7 @@ export default async function Home({ searchParams }: HomeProps) {
       ) {
         return false;
       }
-      if (rua && !streetsMatch(s.street, rua)) return false;
+      if (rua && !streetsMatch(s.street, rua) && !streetsMatch(s.reference_point, rua)) return false;
       return true;
     })
     .map((s) => ({

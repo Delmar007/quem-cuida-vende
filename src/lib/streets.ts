@@ -144,3 +144,70 @@ export function mergeAndGroupStreetsByLetter(extraStreets: string[] = []): Recor
 
   return grouped
 }
+
+export const SHOPPINGS_GALERIAS: string[] = [
+  'Shopping Campo Grande',
+  'Shopping Bosque dos Ipês',
+  'Norte Sul Plaza',
+  'Pátio Central Shopping',
+  'Galeria Afonso Pena',
+  'Galeria Central',
+  'Galeria Dona Neta',
+  'Galeria Maracaju',
+  'Galeria São José',
+  'Camelódromo Central',
+  'Mercadão Municipal',
+  'Feira Central',
+  'Boulevard Shopping',
+  'Centro Comercial Dom Bosco',
+  'Estação Shopping',
+  'Galeria 14 de Julho',
+]
+
+export function getShoppingInitialLetter(name: string): string {
+  const clean = (name || '')
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+  const first = clean.charAt(0)
+  return /^[A-Z]$/.test(first) ? first : '#'
+}
+
+export function mergeAndGroupShoppingsByLetter(extraShoppings: string[] = []): Record<string, string[]> {
+  const uniqueMap = new Map<string, string>()
+
+  for (const item of [...extraShoppings, ...SHOPPINGS_GALERIAS]) {
+    const trimmed = (item || '').trim()
+    if (!trimmed) continue
+    const norm = trimmed
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+    if (!norm) continue
+    if (!uniqueMap.has(norm)) {
+      uniqueMap.set(norm, trimmed)
+    }
+  }
+
+  const grouped: Record<string, string[]> = {}
+  for (const letter of ALPHABET) {
+    grouped[letter] = []
+  }
+
+  for (const name of uniqueMap.values()) {
+    const letter = getShoppingInitialLetter(name)
+    if (grouped[letter]) {
+      grouped[letter].push(name)
+    }
+  }
+
+  for (const letter of ALPHABET) {
+    grouped[letter].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
+  }
+
+  return grouped
+}
