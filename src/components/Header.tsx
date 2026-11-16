@@ -1002,7 +1002,7 @@ export default function Header() {
           <div className="hidden md:flex items-center justify-between gap-2 px-3">
             
             {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
-            <div className="flex items-center gap-2 lg:gap-2.5 font-heading text-[11.5px] font-semibold tracking-[-0.04em] overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 lg:gap-2 font-heading text-[13px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
               {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
               <Link
