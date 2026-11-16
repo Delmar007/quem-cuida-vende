@@ -21,6 +21,54 @@ import { FIPE_MARCAS } from '@/lib/fipeMarcas'
 import { CURATED_BRANDS, toTitleCase } from '@/lib/textFormat'
 
 // Marcas FIPE únicas ordenadas alfabeticamente
+const VEHICLE_OPTIONALS_40: string[] = [
+  'Vidro Elétrico',
+  'Trava Elétrica',
+  'Ar-condicionado',
+  'Ar-condicionado Digital',
+  'Direção Hidráulica',
+  'Direção Elétrica',
+  'Alarme',
+  'Multimídia / Tela Touch',
+  'Apple CarPlay / Android Auto',
+  'Sensor de Ré',
+  'Sensor de Estacionamento Dianteiro',
+  'Câmera de Ré',
+  'Câmera 360°',
+  'Banco de Couro',
+  'Banco do Motorista Elétrico',
+  'Volante Multifuncional',
+  'Piloto Automático',
+  'Computador de Bordo',
+  'Freios ABS',
+  'Airbags Frontais',
+  'Airbags Laterais e Cortina',
+  'Controle de Tração e Estabilidade',
+  'Assistente de Partida em Rampa',
+  'Rodas de Liga Leve',
+  'Faróis de Neblina',
+  'Faróis em LED',
+  'Retrovisores Elétricos',
+  'Retrovisor Fotocrômico',
+  'Chave Presencial (Keyless)',
+  'Partida por Botão (Start/Stop)',
+  'Teto Solar',
+  'Teto Panorâmico',
+  'Sensor de Chuva',
+  'Acendimento Automático dos Faróis',
+  'Carregador por Indução',
+  'Bluetooth / USB',
+  'Engate de Reboque',
+  'Capota Marítima',
+  'Protetor de Caçamba',
+  'Rack de Teto',
+]
+
+const FALLBACK_VEHICLE_YEARS: string[] = Array.from(
+  { length: 47 },
+  (_, i) => String(new Date().getFullYear() + 1 - i)
+)
+
 const FIPE_VEHICLE_BRANDS: string[] = Array.from(
   new Set(FIPE_MARCAS.map((m: any) => toTitleCase(m.nome.trim())))
 ).sort((a: string, b: string) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
@@ -146,14 +194,134 @@ export default function MerchantProductsTab({
   const [formVehicleVersion, setFormVehicleVersion] = useState('')
   const [formVehicleYearFab, setFormVehicleYearFab] = useState('')
   const [formVehicleYearModel, setFormVehicleYearModel] = useState('')
+  const [formVehicleEngine, setFormVehicleEngine] = useState('')
   const [formVehicleKm, setFormVehicleKm] = useState('')
   const [formVehicleTransmission, setFormVehicleTransmission] = useState('Automático')
   const [formVehicleTraction, setFormVehicleTraction] = useState('4x2')
   const [formVehiclePlateInternal, setFormVehiclePlateInternal] = useState('')
 
+  // Estados da API FIPE (Marcas, Modelos/Versões e Anos fabricados)
+  const [fipeBrands, setFipeBrands] = useState<{ codigo: string; nome: string }[]>([])
+  const [fipeModels, setFipeModels] = useState<{ codigo: number; nome: string }[]>([])
+  const [fipeSelectedModelCode, setFipeSelectedModelCode] = useState<string>('')
+  const [fipeYears, setFipeYears] = useState<string[]>([])
+  const [loadingFipeModels, setLoadingFipeModels] = useState(false)
+  const [loadingFipeYears, setLoadingFipeYears] = useState(false)
+
   useEffect(() => {
     setFormIsVehicle(isVehicleSegmentStore)
   }, [isVehicleSegmentStore])
+
+  const fipeVehicleType = useMemo(() => {
+    if (formVehicleCategory === 'Motos') return 'motos'
+    if (formVehicleCategory === 'Caminhões') return 'caminhoes'
+    return 'carros'
+  }, [formVehicleCategory])
+
+  // 1. Carregar marcas da API FIPE quando estiver no modo veículo
+  useEffect(() => {
+    if (!isFormModalOpen || !formIsVehicle) return
+    let active = true
+    fetch(`https://parallelum.com.br/fipe/api/v1/${fipeVehicleType}/marcas`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (active && Array.isArray(data)) {
+          setFipeBrands(data)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [isFormModalOpen, formIsVehicle, fipeVehicleType])
+
+  // 2. Carregar modelos/versões da marca selecionada na API FIPE
+  useEffect(() => {
+    if (!isFormModalOpen || !formIsVehicle || !formVehicleBrand.trim()) {
+      setFipeModels([])
+      setFipeSelectedModelCode('')
+      setFipeYears([])
+      return
+    }
+    const normalizedBrand = formVehicleBrand.toLowerCase().trim()
+    const matchedBrand = fipeBrands.find((b) => {
+      const bn = b.nome.toLowerCase().trim()
+      return bn === normalizedBrand || bn.includes(normalizedBrand) || normalizedBrand.includes(bn)
+    })
+    if (!matchedBrand) {
+      setFipeModels([])
+      return
+    }
+    let active = true
+    setLoadingFipeModels(true)
+    fetch(`https://parallelum.com.br/fipe/api/v1/${fipeVehicleType}/marcas/${matchedBrand.codigo}/modelos`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active) return
+        if (data && Array.isArray(data.modelos)) {
+          setFipeModels(data.modelos)
+        } else {
+          setFipeModels([])
+        }
+      })
+      .catch(() => {
+        if (active) setFipeModels([])
+      })
+      .finally(() => {
+        if (active) setLoadingFipeModels(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [isFormModalOpen, formIsVehicle, formVehicleBrand, fipeBrands, fipeVehicleType])
+
+  // 3. Carregar anos em que o modelo/versão selecionado foi fabricado segundo a API FIPE
+  useEffect(() => {
+    if (!isFormModalOpen || !formIsVehicle || !formVehicleBrand.trim() || !fipeSelectedModelCode) {
+      setFipeYears([])
+      return
+    }
+    const normalizedBrand = formVehicleBrand.toLowerCase().trim()
+    const matchedBrand = fipeBrands.find((b) => {
+      const bn = b.nome.toLowerCase().trim()
+      return bn === normalizedBrand || bn.includes(normalizedBrand) || normalizedBrand.includes(bn)
+    })
+    if (!matchedBrand) return
+    let active = true
+    setLoadingFipeYears(true)
+    fetch(
+      `https://parallelum.com.br/fipe/api/v1/${fipeVehicleType}/marcas/${matchedBrand.codigo}/modelos/${fipeSelectedModelCode}/anos`
+    )
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!active || !Array.isArray(data)) return
+        const currentYear = new Date().getFullYear()
+        const years = Array.from(
+          new Set(
+            data
+              .map((item: { codigo?: string; nome?: string }) => {
+                const rawCode = String(item.codigo || '')
+                const yearPart = rawCode.split('-')[0]
+                if (yearPart === '32000') return `${currentYear} (Zero KM)`
+                if (/^\d{4}$/.test(yearPart)) return yearPart
+                const nameYear = String(item.nome || '').match(/\b(19\d{2}|20\d{2})\b/)
+                return nameYear ? nameYear[1] : ''
+              })
+              .filter(Boolean)
+          )
+        ).sort((a, b) => parseInt(b, 10) - parseInt(a, 10))
+        setFipeYears(years)
+      })
+      .catch(() => {
+        if (active) setFipeYears([])
+      })
+      .finally(() => {
+        if (active) setLoadingFipeYears(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [isFormModalOpen, formIsVehicle, formVehicleBrand, fipeBrands, fipeSelectedModelCode, fipeVehicleType])
 
   // Limite de fotos: 12 fotos no cadastro de veículos (Carro / Usados e Concessionária) e 6 fotos no padrão
   const MAX_PHOTOS = formIsVehicle ? 12 : 6
@@ -365,6 +533,9 @@ export default function MerchantProductsTab({
     setFormVehicleVersion('')
     setFormVehicleYearFab('')
     setFormVehicleYearModel('')
+    setFormVehicleEngine('')
+    setFipeSelectedModelCode('')
+    setFipeYears([])
     setFormVehicleKm('')
     setFormVehicleTransmission('Automático')
     setFormVehicleTraction('4x2')
@@ -416,6 +587,8 @@ export default function MerchantProductsTab({
     setFormVehicleVersion(prod.vehicle_version || '')
     setFormVehicleYearFab(prod.vehicle_year_fab || '')
     setFormVehicleYearModel(prod.vehicle_year_model || '')
+    setFormVehicleEngine(prod.vehicle_engine || '')
+    setFipeSelectedModelCode('')
     setFormVehicleKm(prod.vehicle_km || '')
     setFormVehicleTransmission(prod.vehicle_transmission || 'Automático')
     setFormVehicleTraction(prod.vehicle_traction || '4x2')
@@ -613,6 +786,7 @@ export default function MerchantProductsTab({
           vehicleVersion: formIsVehicle ? formVehicleVersion : undefined,
           vehicleYearFab: formIsVehicle ? formVehicleYearFab : undefined,
           vehicleYearModel: formIsVehicle ? formVehicleYearModel : undefined,
+          vehicleEngine: formIsVehicle ? formVehicleEngine : undefined,
           vehicleKm: formIsVehicle ? formVehicleKm : undefined,
           vehicleTransmission: formIsVehicle ? formVehicleTransmission : undefined,
           vehicleTraction: formIsVehicle ? formVehicleTraction : undefined,
@@ -658,6 +832,7 @@ export default function MerchantProductsTab({
           vehicleVersion: formIsVehicle ? formVehicleVersion : undefined,
           vehicleYearFab: formIsVehicle ? formVehicleYearFab : undefined,
           vehicleYearModel: formIsVehicle ? formVehicleYearModel : undefined,
+          vehicleEngine: formIsVehicle ? formVehicleEngine : undefined,
           vehicleKm: formIsVehicle ? formVehicleKm : undefined,
           vehicleTransmission: formIsVehicle ? formVehicleTransmission : undefined,
           vehicleTraction: formIsVehicle ? formVehicleTraction : undefined,
@@ -1482,7 +1657,11 @@ export default function MerchantProductsTab({
                         <select
                           required={formIsVehicle}
                           value={formVehicleBrand}
-                          onChange={(e) => setFormVehicleBrand(e.target.value)}
+                          onChange={(e) => {
+                            setFormVehicleBrand(e.target.value)
+                            setFipeSelectedModelCode('')
+                            setFipeYears([])
+                          }}
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
                         >
                           <option value="">____SELECIONE A MARCA FIPE____</option>
@@ -1496,22 +1675,52 @@ export default function MerchantProductsTab({
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Modelo <span className="text-[#FB6600]">*</span>
+                          Modelo (API FIPE) <span className="text-[#FB6600]">*</span>
                         </label>
+                        {fipeModels.length > 0 ? (
+                          <select
+                            value={fipeSelectedModelCode}
+                            onChange={(e) => {
+                              const code = e.target.value
+                              setFipeSelectedModelCode(code)
+                              const found = fipeModels.find((m) => String(m.codigo) === code)
+                              if (found) {
+                                const fullName = toTitleCase(found.nome)
+                                const parts = fullName.split(/\s+/)
+                                setFormVehicleModel(parts[0] || fullName)
+                                setFormVehicleVersion(fullName)
+                                const engineMatch = found.nome.match(/\b(\d\.\d(?:\s*(?:Turbo|TSI|TDI|Flex|V6|V8|16V|8V))?|El[eé]trico|H[ií]brido)\b/i)
+                                if (engineMatch) {
+                                  setFormVehicleEngine(toTitleCase(engineMatch[0]))
+                                }
+                              }
+                            }}
+                            className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold bg-white cursor-pointer transition-all shadow-2xs mb-1.5"
+                          >
+                            <option value="">
+                              {loadingFipeModels ? 'Carregando modelos FIPE...' : 'Selecione na API FIPE...'}
+                            </option>
+                            {fipeModels.map((m) => (
+                              <option key={m.codigo} value={String(m.codigo)}>
+                                {m.nome}
+                              </option>
+                            ))}
+                          </select>
+                        ) : null}
                         <input
                           type="text"
                           required
                           value={formVehicleModel}
                           onChange={(e) => setFormVehicleModel(e.target.value)}
                           onBlur={() => setFormVehicleModel((prev) => toTitleCase(prev))}
-                          placeholder="Ex.: Corolla, Hilux, Gol..."
+                          placeholder={loadingFipeModels ? 'Buscando modelos FIPE...' : 'Ex.: Corolla, Hilux, Gol...'}
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Versão
+                          Versão (API FIPE)
                         </label>
                         <input
                           type="text"
@@ -1524,32 +1733,45 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
-                    {/* Ano, Ano/Modelo, KM, Câmbio, Tração e Placa (Interno) */}
+                    {/* Ano (Menu Vertical FIPE), Motorização, KM, Câmbio, Tração e Placa (Interno) */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Ano (Fab.)
+                          Ano {fipeYears.length > 0 ? '(Fabricação FIPE)' : ''}
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={formVehicleYearFab}
                           onChange={(e) => setFormVehicleYearFab(e.target.value)}
-                          placeholder="Ex.: 2023"
-                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
-                        />
+                          className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold bg-white cursor-pointer transition-all shadow-2xs"
+                        >
+                          <option value="">
+                            {loadingFipeYears ? 'Carregando anos...' : 'Selecione o ano...'}
+                          </option>
+                          {(fipeYears.length > 0 ? fipeYears : FALLBACK_VEHICLE_YEARS).map((yr) => (
+                            <option key={yr} value={yr}>
+                              {yr}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       <div>
                         <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                          Ano / Modelo
+                          Motorização
                         </label>
                         <input
                           type="text"
-                          value={formVehicleYearModel}
-                          onChange={(e) => setFormVehicleYearModel(e.target.value)}
-                          placeholder="Ex.: 2023/2024"
+                          list="vehicle-engines-list"
+                          value={formVehicleEngine}
+                          onChange={(e) => setFormVehicleEngine(e.target.value)}
+                          placeholder="Ex.: 2.0, 1.0 Turbo, 2.8 Diesel..."
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
+                        <datalist id="vehicle-engines-list">
+                          {['1.0', '1.0 Turbo', '1.3', '1.4', '1.5', '1.6', '1.8', '2.0', '2.0 Turbo', '2.4', '2.8 Diesel', '3.0 V6', 'Elétrico', 'Híbrido'].map((eng) => (
+                            <option key={eng} value={eng} />
+                          ))}
+                        </datalist>
                       </div>
 
                       <div>
@@ -1655,18 +1877,60 @@ export default function MerchantProductsTab({
                       </div>
                     </div>
 
-                    {/* Descrição Detalhada (Opcional) */}
-                    <div>
-                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
-                        Descrição e Opcionais (Opcional)
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={formDescription}
-                        onChange={(e) => setFormDescription(e.target.value)}
-                        placeholder="Opcionais do veículo, revisões feitas na concessionária, manual, chave reserva, garantia..."
-                        className="w-full px-3.5 py-2.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] resize-none transition-all shadow-2xs"
-                      />
+                    {/* 40 Opcionais do Veículo */}
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <label className="block text-xs sm:text-[13px] font-bold text-neutral-800">
+                          Opcionais do Veículo (40 itens disponíveis)
+                        </label>
+                        <span className="text-[11px] font-bold text-[#FB6600]">
+                          {
+                            VEHICLE_OPTIONALS_40.filter((opt) =>
+                              formDescription
+                                .split('•')
+                                .map((s) => s.trim().toLowerCase())
+                                .includes(opt.toLowerCase())
+                            ).length
+                          }{' '}
+                          selecionado(s)
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-3 border border-neutral-200 rounded-xl bg-neutral-50/70">
+                        {VEHICLE_OPTIONALS_40.map((opt) => {
+                          const selectedList = formDescription
+                            .split('•')
+                            .map((s) => s.trim())
+                            .filter(Boolean)
+                          const isChecked = selectedList.some(
+                            (s) => s.toLowerCase() === opt.toLowerCase()
+                          )
+                          return (
+                            <label
+                              key={opt}
+                              className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border text-[11px] font-semibold cursor-pointer transition-colors ${
+                                isChecked
+                                  ? 'bg-orange-50 border-[#FB6600] text-[#FB6600]'
+                                  : 'bg-white border-neutral-200 text-neutral-700 hover:border-neutral-400'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  const nextList = isChecked
+                                    ? selectedList.filter(
+                                        (s) => s.toLowerCase() !== opt.toLowerCase()
+                                      )
+                                    : [...selectedList, opt]
+                                  setFormDescription(nextList.join(' • '))
+                                }}
+                                className="w-3.5 h-3.5 accent-[#FB6600] shrink-0 cursor-pointer"
+                              />
+                              <span className="leading-tight">{opt}</span>
+                            </label>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -2853,11 +3117,9 @@ export default function MerchantProductsTab({
                               <span className="text-[11px] font-bold text-neutral-900 truncate block">{previewProduct.vehicle_year_fab || '—'}</span>
                             </div>
                             <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
-                              <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">Ano/Modelo</span>
+                              <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">Motorização</span>
                               <span className="text-[11px] font-bold text-neutral-900 truncate block">
-                                {previewProduct.vehicle_year_fab && previewProduct.vehicle_year_model
-                                  ? `${previewProduct.vehicle_year_fab}/${previewProduct.vehicle_year_model}`
-                                  : previewProduct.vehicle_year_model || previewProduct.vehicle_year_fab || '—'}
+                                {previewProduct.vehicle_engine || previewProduct.vehicle_year_model || 'Consulte'}
                               </span>
                             </div>
                           </div>

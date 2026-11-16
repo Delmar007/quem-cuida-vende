@@ -30,6 +30,7 @@ export interface ProductItem {
   vehicle_version?: string | null
   vehicle_year_fab?: string | null
   vehicle_year_model?: string | null
+  vehicle_engine?: string | null
   vehicle_km?: string | null
   vehicle_transmission?: string | null
   vehicle_traction?: string | null
@@ -1619,12 +1620,10 @@ export default function StoreProductsCatalog({
                                 </div>
                                 <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
                                   <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
-                                    Ano/Modelo
+                                    Motorização
                                   </span>
                                   <span className="text-[11px] font-bold text-neutral-900 truncate block">
-                                    {produto.vehicle_year_fab && produto.vehicle_year_model
-                                      ? `${produto.vehicle_year_fab}/${produto.vehicle_year_model}`
-                                      : produto.vehicle_year_model || produto.vehicle_year_fab || '—'}
+                                    {produto.vehicle_engine || produto.vehicle_year_model || 'Consulte'}
                                   </span>
                                 </div>
                               </div>

@@ -78,6 +78,7 @@ export interface ProductItem {
   vehicle_version?: string | null;
   vehicle_year_fab?: string | null;
   vehicle_year_model?: string | null;
+  vehicle_engine?: string | null;
   vehicle_km?: string | null;
   vehicle_transmission?: string | null;
   vehicle_traction?: string | null;
@@ -938,6 +939,7 @@ export default async function Home({ searchParams }: HomeProps) {
           vehicle_version: p.vehicle_version || null,
           vehicle_year_fab: p.vehicle_year_fab || null,
           vehicle_year_model: p.vehicle_year_model || null,
+          vehicle_engine: p.vehicle_engine || null,
           vehicle_km: p.vehicle_km || null,
           vehicle_transmission: p.vehicle_transmission || null,
           vehicle_traction: p.vehicle_traction || null,
@@ -1038,6 +1040,7 @@ export default async function Home({ searchParams }: HomeProps) {
         vehicle_version: lp.vehicle_version || null,
         vehicle_year_fab: lp.vehicle_year_fab || null,
         vehicle_year_model: lp.vehicle_year_model || null,
+        vehicle_engine: lp.vehicle_engine || null,
         vehicle_km: lp.vehicle_km || null,
         vehicle_transmission: lp.vehicle_transmission || null,
         vehicle_traction: lp.vehicle_traction || null,
@@ -1693,10 +1696,10 @@ export default async function Home({ searchParams }: HomeProps) {
                             </div>
                             <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
                               <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
-                                Ano/Modelo
+                                Motorização
                               </span>
                               <span className="text-[11px] font-bold text-gray-800 block truncate">
-                                {produto.vehicle_year_model || "2024/2025"}
+                                {produto.vehicle_engine || produto.vehicle_year_model || "Flex"}
                               </span>
                             </div>
                           </div>

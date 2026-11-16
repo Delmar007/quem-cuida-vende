@@ -24,6 +24,7 @@ export interface StoredProduct {
   vehicle_version?: string | null
   vehicle_year_fab?: string | null
   vehicle_year_model?: string | null
+  vehicle_engine?: string | null
   vehicle_km?: string | null
   vehicle_transmission?: string | null
   vehicle_traction?: string | null

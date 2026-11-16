@@ -41,6 +41,7 @@ export interface CreateProductInput {
   vehicleVersion?: string
   vehicleYearFab?: string
   vehicleYearModel?: string
+  vehicleEngine?: string
   vehicleKm?: string
   vehicleTransmission?: string
   vehicleTraction?: string
@@ -78,6 +79,7 @@ export interface UpdateProductInput {
   vehicleVersion?: string
   vehicleYearFab?: string
   vehicleYearModel?: string
+  vehicleEngine?: string
   vehicleKm?: string
   vehicleTransmission?: string
   vehicleTraction?: string
@@ -271,6 +273,7 @@ export async function createProductAction(data: CreateProductInput): Promise<{
     vehicle_version: data.vehicleVersion?.trim() || null,
     vehicle_year_fab: data.vehicleYearFab?.trim() || null,
     vehicle_year_model: data.vehicleYearModel?.trim() || null,
+    vehicle_engine: data.vehicleEngine?.trim() || null,
     vehicle_km: data.vehicleKm?.trim() || null,
     vehicle_transmission: data.vehicleTransmission?.trim() || null,
     vehicle_traction: data.vehicleTraction?.trim() || null,
@@ -316,6 +319,7 @@ export async function createProductAction(data: CreateProductInput): Promise<{
       vehicle_version: newProduct.vehicle_version,
       vehicle_year_fab: newProduct.vehicle_year_fab,
       vehicle_year_model: newProduct.vehicle_year_model,
+      vehicle_engine: newProduct.vehicle_engine,
       vehicle_km: newProduct.vehicle_km,
       vehicle_transmission: newProduct.vehicle_transmission,
       vehicle_traction: newProduct.vehicle_traction,
@@ -507,6 +511,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     vehicle_version: data.vehicleVersion !== undefined ? data.vehicleVersion?.trim() || null : existing.vehicle_version,
     vehicle_year_fab: data.vehicleYearFab !== undefined ? data.vehicleYearFab?.trim() || null : existing.vehicle_year_fab,
     vehicle_year_model: data.vehicleYearModel !== undefined ? data.vehicleYearModel?.trim() || null : existing.vehicle_year_model,
+    vehicle_engine: data.vehicleEngine !== undefined ? data.vehicleEngine?.trim() || null : existing.vehicle_engine,
     vehicle_km: data.vehicleKm !== undefined ? data.vehicleKm?.trim() || null : existing.vehicle_km,
     vehicle_transmission: data.vehicleTransmission !== undefined ? data.vehicleTransmission?.trim() || null : existing.vehicle_transmission,
     vehicle_traction: data.vehicleTraction !== undefined ? data.vehicleTraction?.trim() || null : existing.vehicle_traction,
@@ -546,6 +551,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
       vehicle_version: updatedProduct.vehicle_version,
       vehicle_year_fab: updatedProduct.vehicle_year_fab,
       vehicle_year_model: updatedProduct.vehicle_year_model,
+      vehicle_engine: updatedProduct.vehicle_engine,
       vehicle_km: updatedProduct.vehicle_km,
       vehicle_transmission: updatedProduct.vehicle_transmission,
       vehicle_traction: updatedProduct.vehicle_traction,
