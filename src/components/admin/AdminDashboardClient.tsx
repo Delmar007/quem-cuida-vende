@@ -819,10 +819,45 @@ export default function AdminDashboardClient({
         )}
 
         {activeTab === 'config' && (
-          <section className="lg:col-span-3 bg-white border border-neutral-200 p-5 shadow-2xs space-y-4">
+          <section className="lg:col-span-3 bg-white border border-neutral-200 p-5 shadow-2xs space-y-5">
             <h2 className="text-sm font-extrabold uppercase tracking-wider text-neutral-900">
               Configurações Gerais do Admin
             </h2>
+
+            {/* Controle do Catálogo Ilustrativo */}
+            <div className="p-4 border border-neutral-200 bg-neutral-50 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-extrabold uppercase tracking-wide text-neutral-900">
+                    Ocultar Catálogo Ilustrativo (Modo Produção Real)
+                  </h3>
+                  <p className="text-[11px] text-neutral-600 mt-0.5 max-w-xl">
+                    Quando ativado, o site remove todos os anúncios e lojas de demonstração e exibe exclusivamente as lojas e produtos reais cadastrados, mesmo antes de atingir 6 lojas ou 8 produtos.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => {
+                    const nextVal = !Boolean(config.hideDemoCatalog)
+                    persistConfig(
+                      { ...config, hideDemoCatalog: nextVal },
+                      nextVal
+                        ? 'Catálogo ilustrativo ocultado! Apenas lojas e produtos reais serão exibidos.'
+                        : 'Catálogo ilustrativo reativado para demonstração.'
+                    )
+                  }}
+                  className={`px-4 py-2 text-xs font-extrabold uppercase tracking-wider border transition-colors cursor-pointer shrink-0 ${
+                    config.hideDemoCatalog
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600'
+                      : 'bg-white hover:bg-neutral-100 text-neutral-800 border-neutral-300'
+                  }`}
+                >
+                  {config.hideDemoCatalog ? 'Ativado (Só Reais)' : 'Desativado (Mostrar Demo)'}
+                </button>
+              </div>
+            </div>
+
             <p className="text-xs text-neutral-600">
               A senha padrão de acesso é configurada pela variável de ambiente{' '}
               <code className="bg-neutral-100 px-1.5 py-0.5">ADMIN_PASSWORD</code> (padrão:{' '}

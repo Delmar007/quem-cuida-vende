@@ -24,6 +24,7 @@ export interface AdminBannerConfig {
   direction: BannerDirection
   goldOrderMode: GoldOrderMode
   siteBanners: SiteBannerItem[]
+  hideDemoCatalog?: boolean
   updatedAt?: string
 }
 
@@ -32,6 +33,7 @@ export const DEFAULT_ADMIN_BANNER_CONFIG: AdminBannerConfig = {
   direction: 'right-to-left',
   goldOrderMode: 'arrival',
   siteBanners: [],
+  hideDemoCatalog: false,
 }
 
 export function normalizeBannerConfig(raw?: Partial<AdminBannerConfig> | null): AdminBannerConfig {
@@ -71,6 +73,7 @@ export function normalizeBannerConfig(raw?: Partial<AdminBannerConfig> | null): 
     direction,
     goldOrderMode,
     siteBanners,
+    hideDemoCatalog: Boolean(raw?.hideDemoCatalog),
     updatedAt: raw?.updatedAt,
   }
 }

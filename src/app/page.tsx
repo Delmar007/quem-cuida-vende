@@ -970,8 +970,11 @@ export default async function Home({ searchParams }: HomeProps) {
     is_active: Boolean(s.is_active),
   }));
 
+  const adminBannerConfig = getAdminBannerConfigServer();
+  const hideDemoCatalog = Boolean(adminBannerConfig.hideDemoCatalog);
+
   const baseStores: StoreItem[] =
-    dbStores.length >= 6
+    hideDemoCatalog || dbStores.length >= 6
       ? dbStores
       : [
           ...dbStores,
@@ -1044,7 +1047,7 @@ export default async function Home({ searchParams }: HomeProps) {
     });
 
   const baseProducts: ProductItem[] =
-    dbProducts.length >= 8
+    hideDemoCatalog || dbProducts.length >= 8
       ? dbProducts
       : [
           ...dbProducts,
@@ -1184,7 +1187,6 @@ export default async function Home({ searchParams }: HomeProps) {
       : "Todas as Promoções";
 
   const hasCategoryFilter = Boolean((cat && cat !== "por_rua") || subcat || rua);
-  const adminBannerConfig = getAdminBannerConfigServer();
   const bannerGoldStores = allStores
     .filter((s) => {
       if (!s.is_active) return false;
