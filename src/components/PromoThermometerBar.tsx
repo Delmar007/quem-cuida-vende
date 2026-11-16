@@ -21,6 +21,7 @@ export interface PromoThermometerProps {
 }
 
 interface TimeMetrics {
+  hasCountdown: boolean
   expired: boolean
   remainingPercent: number
   finalizaText: string
@@ -33,26 +34,28 @@ function computeThermometerMetrics(
   endDate?: string | null
 ): TimeMetrics {
   const now = Date.now()
-  if (!startDate && !endDate) {
+  if (!endDate) {
     return {
+      hasCountdown: false,
       expired: false,
-      remainingPercent: 50,
-      finalizaText: 'Finaliza em 5 dias',
-      hoursRemaining: 120,
-      totalHours: 240,
+      remainingPercent: 0,
+      finalizaText: 'Pronta entrega na loja',
+      hoursRemaining: 0,
+      totalHours: 0,
     }
   }
 
-  const startMs = startDate ? new Date(startDate).getTime() : now - 5 * 24 * 3600 * 1000
-  const endMs = endDate ? new Date(endDate).getTime() : now + 5 * 24 * 3600 * 1000
+  const endMs = new Date(endDate).getTime()
+  const startMs = startDate ? new Date(startDate).getTime() : now
 
-  if (isNaN(startMs) || isNaN(endMs) || endMs <= startMs) {
+  if (isNaN(endMs) || isNaN(startMs) || endMs <= startMs) {
     return {
+      hasCountdown: false,
       expired: false,
-      remainingPercent: 50,
-      finalizaText: 'Finaliza em 5 dias',
-      hoursRemaining: 120,
-      totalHours: 240,
+      remainingPercent: 0,
+      finalizaText: 'Pronta entrega na loja',
+      hoursRemaining: 0,
+      totalHours: 0,
     }
   }
 
@@ -60,6 +63,7 @@ function computeThermometerMetrics(
 
   if (now >= endMs) {
     return {
+      hasCountdown: true,
       expired: true,
       remainingPercent: 0,
       finalizaText: 'Campanha encerrada',
@@ -87,6 +91,7 @@ function computeThermometerMetrics(
   }
 
   return {
+    hasCountdown: true,
     expired: false,
     remainingPercent,
     finalizaText,
@@ -164,28 +169,53 @@ export default function PromoThermometerBar({
           variant === 'card' ? 'px-3 py-2' : 'px-3.5 py-2.5'
         }`}
       >
-        {/* Lado Esquerdo: Ícone de Relógio Circular + "Finaliza em X dias" */}
+        {/* Lado Esquerdo: Contagem regressiva real OU "Pronta entrega na loja" */}
         <div className="flex items-center gap-2 min-w-0">
-          <svg
-            className={`${
-              variant === 'card' ? 'w-4 h-4' : 'w-[18px] h-[18px]'
-            } text-[#8c939d] shrink-0`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <circle cx="12" cy="12" r="9" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" />
-          </svg>
-          <span
-            className={`${
-              variant === 'card' ? 'text-xs' : 'text-[13px]'
-            } text-[#7f858d] font-normal truncate`}
-          >
-            {prefixTitle}
-            {metrics.finalizaText}
-          </span>
+          {metrics.hasCountdown ? (
+            <>
+              <svg
+                className={`${
+                  variant === 'card' ? 'w-4 h-4' : 'w-[18px] h-[18px]'
+                } text-[#8c939d] shrink-0`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 2" />
+              </svg>
+              <span
+                className={`${
+                  variant === 'card' ? 'text-xs' : 'text-[13px]'
+                } text-[#7f858d] font-normal truncate`}
+              >
+                {prefixTitle}
+                {metrics.finalizaText}
+              </span>
+            </>
+          ) : (
+            <>
+              <svg
+                className={`${
+                  variant === 'card' ? 'w-4 h-4' : 'w-[18px] h-[18px]'
+                } text-emerald-600 shrink-0`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span
+                className={`${
+                  variant === 'card' ? 'text-xs' : 'text-[13px]'
+                } text-emerald-700 font-semibold truncate`}
+              >
+                Pronta entrega na loja
+              </span>
+            </>
+          )}
         </div>
 
         {/* Lado Direito: Coração Outline (Exatamente como nas imagens) */}
@@ -222,13 +252,15 @@ export default function PromoThermometerBar({
         )}
       </div>
 
-      {/* Linha de Termômetro Temporal que diminui a cada hora até finalizar */}
-      <div className="w-full h-[2.5px] bg-gray-100 overflow-hidden">
-        <div
-          className="h-full bg-[#FB6600]/80 transition-all duration-500"
-          style={{ width: `${metrics.remainingPercent}%` }}
-        />
-      </div>
+      {/* Linha de Termômetro Temporal que diminui a cada hora até finalizar (apenas com data limite real) */}
+      {metrics.hasCountdown && (
+        <div className="w-full h-[2.5px] bg-gray-100 overflow-hidden">
+          <div
+            className="h-full bg-[#FB6600]/80 transition-all duration-500"
+            style={{ width: `${metrics.remainingPercent}%` }}
+          />
+        </div>
+      )}
     </div>
   )
 }
