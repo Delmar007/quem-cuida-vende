@@ -69,6 +69,45 @@ const FALLBACK_VEHICLE_YEARS: string[] = Array.from(
   (_, i) => String(new Date().getFullYear() + 1 - i)
 )
 
+const CAR_MAIN_CATEGORIES: string[] = [
+  'Sedan',
+  'Hatch',
+  'SUV',
+  'Crossover',
+  'Picape',
+  'Pickup',
+  'Camionete',
+  'Picape compacta',
+  'Picape média',
+  'Picape grande',
+  'Conversível',
+  'Coupé',
+  'Fastback',
+  'Perua',
+  'Minivan',
+  'Van',
+  'Furgão',
+  'Utilitário',
+  'Jipe',
+  'Off-road',
+  'Esportivo',
+  'Antigo',
+]
+
+const CAR_SUBCATEGORIES_MAP: Record<string, string[]> = {
+  sedan: ['Sedan compacto', 'Sedan médio', 'Sedan grande', 'Sedan de luxo'],
+  hatch: ['Hatch compacto', 'Hatch médio'],
+  suv: ['SUV compacto', 'SUV médio', 'SUV grande', 'SUV de luxo', 'SUV cupê'],
+  pickup: ['Picape cabine simples', 'Picape cabine estendida', 'Picape cabine dupla', 'Picape cabine tripla'],
+  picape: ['Picape cabine simples', 'Picape cabine estendida', 'Picape cabine dupla', 'Picape cabine tripla'],
+}
+
+function formatKmValue(raw: string): string {
+  const digits = raw.replace(/\D/g, '')
+  if (!digits) return ''
+  return Number(digits).toLocaleString('pt-BR')
+}
+
 const FIPE_VEHICLE_BRANDS: string[] = Array.from(
   new Set(FIPE_MARCAS.map((m: any) => toTitleCase(m.nome.trim())))
 ).sort((a: string, b: string) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
@@ -433,13 +472,27 @@ export default function MerchantProductsTab({
   const activeFormCategoryObj = categories.find(
     (c) => c.name.toLowerCase().trim() === formCategory.toLowerCase().trim()
   )
-  const formAvailableSubcategories = activeFormCategoryObj ? activeFormCategoryObj.subcategories : []
+  const carPresetSubs = formIsVehicle
+    ? CAR_SUBCATEGORIES_MAP[formCategory.toLowerCase().trim()] || []
+    : []
+  const formAvailableSubcategories = useMemo(() => {
+    const base = activeFormCategoryObj ? [...activeFormCategoryObj.subcategories] : []
+    for (const subName of carPresetSubs) {
+      if (!base.some((s) => s.name.toLowerCase().trim() === subName.toLowerCase())) {
+        base.push({ id: `car-sub-${subName}`, name: subName, is_active: true } as any)
+      }
+    }
+    return base
+  }, [activeFormCategoryObj, carPresetSubs])
 
   // Reset de subcategoria se categoria for alterada no formulário
   const handleFormCategoryChange = (newCatName: string) => {
     setFormCategory(newCatName)
     const match = categories.find((c) => c.name.toLowerCase().trim() === newCatName.toLowerCase().trim())
-    if (match && match.subcategories.length > 0) {
+    const preset = formIsVehicle ? CAR_SUBCATEGORIES_MAP[newCatName.toLowerCase().trim()] || [] : []
+    if (preset.length > 0) {
+      setFormSubcategory(preset[0])
+    } else if (match && match.subcategories.length > 0) {
       setFormSubcategory(match.subcategories[0].name)
     } else {
       setFormSubcategory('')
@@ -1780,9 +1833,10 @@ export default function MerchantProductsTab({
                         </label>
                         <input
                           type="text"
+                          inputMode="numeric"
                           value={formVehicleKm}
-                          onChange={(e) => setFormVehicleKm(e.target.value)}
-                          placeholder="Ex.: 42.000"
+                          onChange={(e) => setFormVehicleKm(formatKmValue(e.target.value))}
+                          placeholder="Ex.: 50.000"
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-semibold transition-all shadow-2xs"
                         />
                       </div>
@@ -1815,9 +1869,12 @@ export default function MerchantProductsTab({
                         >
                           <option value="4x2">4x2</option>
                           <option value="4x4">4x4</option>
-                          <option value="Dianteira">Dianteira</option>
-                          <option value="Traseira">Traseira</option>
-                          <option value="AWD / Integral">AWD / Integral</option>
+                          <option value="6x2">6x2</option>
+                          <option value="6x4">6x4</option>
+                          <option value="6x6">6x6</option>
+                          <option value="8x2">8x2</option>
+                          <option value="8x4">8x4</option>
+                          <option value="AWD">AWD</option>
                         </select>
                       </div>
 
@@ -2437,11 +2494,10 @@ export default function MerchantProductsTab({
                   </h4>
                 </div>
 
-                {categories.length === 0 ? (
+                {categories.length === 0 && !formIsVehicle ? (
                   <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 flex items-center justify-between flex-wrap gap-2 shadow-2xs">
                     <span className="font-medium">
                       Nenhuma categoria cadastrada no Tópico 05.
-                      {formIsVehicle && ` Será usada "${formVehicleCategory}" por padrão.`}
                     </span>
                     <a
                       href="?topico=5"
@@ -2464,10 +2520,18 @@ export default function MerchantProductsTab({
                       >
                         <option value="">
                           {formIsVehicle
-                            ? `Padrão do veículo (${formVehicleCategory || 'Auto'})`
+                            ? 'Selecione a categoria do carro...'
                             : 'Selecione uma categoria...'}
                         </option>
-                        {categories.map((c) => (
+                        {(formIsVehicle
+                          ? Array.from(
+                              new Set([
+                                ...CAR_MAIN_CATEGORIES,
+                                ...categories.map((c) => c.name),
+                              ])
+                            ).map((name) => ({ id: name, name }))
+                          : categories
+                        ).map((c) => (
                           <option key={c.id} value={c.name}>
                             {c.name}
                           </option>
