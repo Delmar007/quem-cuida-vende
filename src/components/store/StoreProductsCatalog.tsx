@@ -1619,7 +1619,7 @@ export default function StoreProductsCatalog({
                             href={buildWhatsappAvailabilityUrl({
                               phone: storePhone,
                               productName: produto.name,
-                              imageUrl: produto.images?.[0] || produto.image_url,
+                              storeName,
                               storeSlug,
                               storeId,
                             })}

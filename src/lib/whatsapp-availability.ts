@@ -1,12 +1,14 @@
 export function buildWhatsappAvailabilityUrl({
   phone,
   productName,
-  imageUrl,
+  storeName,
+  imageUrl: _imageUrl,
   storeSlug,
   storeId,
 }: {
   phone?: string | null
   productName: string
+  storeName?: string | null
   imageUrl?: string | null
   storeSlug?: string | null
   storeId?: string | null
@@ -17,21 +19,20 @@ export function buildWhatsappAvailabilityUrl({
       ? `55${rawDigits}`
       : rawDigits
 
-  let photoOrPageUrl = ''
-  const trimmedImg = (imageUrl || '').trim()
-  if (/^https?:\/\//i.test(trimmedImg)) {
-    photoOrPageUrl = trimmedImg
-  } else if (trimmedImg.startsWith('/')) {
-    photoOrPageUrl = `https://www.kittanda.com.br${trimmedImg}`
-  } else if (storeSlug) {
-    photoOrPageUrl = `https://www.kittanda.com.br/${storeSlug}`
+  let pageUrl = ''
+  const cleanSlug = (storeSlug || '').trim()
+  if (cleanSlug) {
+    pageUrl = `https://www.kittanda.com.br/${cleanSlug}`
   } else if (storeId) {
-    photoOrPageUrl = `https://www.kittanda.com.br/loja/${storeId}`
+    pageUrl = `https://www.kittanda.com.br/loja/${storeId}`
   }
 
-  const lines = ['ESSE ITEM ESTA DISPONIVEL ?', productName]
-  if (photoOrPageUrl) {
-    lines.push(photoOrPageUrl)
+  const lines = ['ESSE ITEM ESTA DISPONIVEL ?', `Produto: ${productName}`]
+  if (storeName?.trim()) {
+    lines.push(`Loja: ${storeName.trim()}`)
+  }
+  if (pageUrl) {
+    lines.push(`Link: ${pageUrl}`)
   }
 
   const encoded = encodeURIComponent(lines.join('\n'))
