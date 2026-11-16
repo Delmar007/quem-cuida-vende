@@ -122,6 +122,7 @@ interface StoreProductsCatalogProps {
   categories?: StoreCategoryWithSubcategories[]
   storeName: string
   storePhone?: string | null
+  storeInstagramUrl?: string | null
   storeLogoUrl?: string | null
   storeAddress?: string | null
   storeDescription?: string | null
@@ -139,6 +140,7 @@ export default function StoreProductsCatalog({
   categories = [],
   storeName,
   storePhone,
+  storeInstagramUrl,
   storeLogoUrl,
   storeAddress,
   storeDescription,
@@ -576,8 +578,24 @@ export default function StoreProductsCatalog({
           <div className="bg-white border border-gray-200/90 p-4 rounded-[2px] shadow-2xs space-y-3.5">
             {/* Topo: 1. Logo Redonda, 2. Nome da Loja, 3. Endereço, 4. Texto Explicativo/Slogan, 5. Categoria/Subcategoria, 6. Botão WhatsApp */}
             <div className="relative pb-3.5 border-b border-gray-100 flex flex-col items-center text-center">
-              {/* Botão Compartilhar no canto superior direito */}
-              <div className="absolute top-0 right-0">
+              {/* Botões Instagram + Compartilhar no canto superior direito */}
+              <div className="absolute top-0 right-0 flex items-center gap-1.5">
+                {storeInstagramUrl && (
+                  <a
+                    href={storeInstagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg border border-gray-300/80 hover:border-black flex items-center justify-center text-gray-700 hover:text-black transition-colors cursor-pointer bg-white shadow-2xs"
+                    title="Instagram da loja"
+                    aria-label="Instagram da loja"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" strokeLinecap="round" />
+                    </svg>
+                  </a>
+                )}
                 <button
                   type="button"
                   onClick={handleShare}
@@ -1066,8 +1084,24 @@ export default function StoreProductsCatalog({
           
           {/* TOPO: 1. LOGO REDONDA, 2. NOME DA LOJA, 3. ENDEREÇO, 4. TEXTO EXPLICATIVO/SLOGAN, 5. CATEGORIA/SUBCATEGORIA, 6. BOTÃO DO WHATSAPP */}
           <div className="relative pb-4 border-b border-gray-100 flex flex-col items-center text-center">
-            {/* Botão de Compartilhar (Quadrado com cantos arredondados) */}
-            <div className="absolute top-0 right-0">
+            {/* Botões Instagram + Compartilhar (Quadrados com cantos arredondados) */}
+            <div className="absolute top-0 right-0 flex items-center gap-1.5">
+              {storeInstagramUrl && (
+                <a
+                  href={storeInstagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-lg border border-gray-300/80 hover:border-black flex items-center justify-center text-gray-700 hover:text-black transition-colors cursor-pointer bg-white shadow-2xs"
+                  title="Instagram da loja"
+                  aria-label="Instagram da loja"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" strokeLinecap="round" />
+                  </svg>
+                </a>
+              )}
               <button
                 type="button"
                 onClick={handleShare}

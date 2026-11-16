@@ -17,6 +17,7 @@ export interface StoreAdminData {
   number: string | null
   neighborhood: string | null
   reference_point?: string | null
+  instagram_url?: string | null
   city: string | null
   state: string | null
   category: string
@@ -251,6 +252,12 @@ export async function updateStoreAction(
   const number = (formData.get('number') as string)?.trim() || null
   const neighborhood = (formData.get('neighborhood') as string)?.trim() || null
   const referencePoint = (formData.get('reference_point') as string)?.trim() || null
+  const rawInstagram = (formData.get('instagram_url') as string)?.trim() || null
+  const instagramUrl = rawInstagram
+    ? rawInstagram.startsWith('http://') || rawInstagram.startsWith('https://')
+      ? rawInstagram
+      : `https://instagram.com/${rawInstagram.replace(/^@/, '')}`
+    : null
   const city = (formData.get('city') as string)?.trim() || null
   const state = (formData.get('state') as string)?.trim().toUpperCase() || null
   const phone = (formData.get('phone') as string)?.replace(/\D/g, '') || null
@@ -300,6 +307,7 @@ export async function updateStoreAction(
     number,
     neighborhood,
     reference_point: referencePoint,
+    instagram_url: instagramUrl,
     city,
     state,
     phone,
@@ -352,23 +360,34 @@ export async function updateStoreAction(
       .single()
 
     if (!updateError && updatedStore) {
-      finalStore = { ...updatedStore, reference_point: (updatedStore as any).reference_point ?? referencePoint }
+      finalStore = {
+        ...updatedStore,
+        reference_point: (updatedStore as any).reference_point ?? referencePoint,
+        instagram_url: (updatedStore as any).instagram_url ?? instagramUrl,
+      }
     } else if (updateError) {
-      // Caso a coluna reference_point ainda não exista no Supabase, tenta upsert sem ela
-      if (updateError.message?.toLowerCase().includes('reference_point')) {
-        const { reference_point: _omit, ...payloadWithoutRef } = updatePayload
+      // Caso alguma coluna opcional ainda não exista no Supabase, tenta upsert sem ela
+      if (
+        updateError.message?.toLowerCase().includes('reference_point') ||
+        updateError.message?.toLowerCase().includes('instagram_url')
+      ) {
+        const { reference_point: _omitRef, instagram_url: _omitIg, ...payloadClean } = updatePayload
         const { data: retryStore } = await supabase
           .from('stores')
           .upsert({
             id: storeId,
             owner_id: user.id,
             slug: resolvedSlug,
-            ...payloadWithoutRef,
+            ...payloadClean,
           }, { onConflict: 'id' })
           .select()
           .single()
         if (retryStore) {
-          finalStore = { ...retryStore, reference_point: referencePoint }
+          finalStore = {
+            ...retryStore,
+            reference_point: referencePoint,
+            instagram_url: instagramUrl,
+          }
         }
       } else {
         console.warn('Supabase update warning, falling back to local storage:', updateError.message)

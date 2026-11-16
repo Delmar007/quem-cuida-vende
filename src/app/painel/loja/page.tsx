@@ -24,6 +24,7 @@ import MerchantFavoritesTab from '@/components/merchant/MerchantFavoritesTab'
 import MerchantBirthdaysTab from '@/components/merchant/MerchantBirthdaysTab'
 import MerchantSubscriptionTab from '@/components/merchant/MerchantSubscriptionTab'
 import MerchantPromoTimerTab from '@/components/merchant/MerchantPromoTimerTab'
+import MerchantSocialMediaTab from '@/components/merchant/MerchantSocialMediaTab'
 
 const CATEGORIAS = [
   { id: 'moda', label: 'Moda', icon: '👗' },
@@ -215,6 +216,13 @@ const TOPICOS = [
     subtitulo: 'Termômetro de campanha',
     icone: '⏱️',
   },
+  {
+    id: 13,
+    numero: '13',
+    titulo: 'Gerador de Mídia Social',
+    subtitulo: 'Arte PNG 1:1 para Instagram',
+    icone: '📸',
+  },
 ]
 
 function MerchantStoreAdminContent() {
@@ -256,6 +264,7 @@ function MerchantStoreAdminContent() {
   const [responsibleName, setResponsibleName] = useState('')
   const [description, setDescription] = useState('')
   const [phone, setPhone] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
   const [cnpjCpf, setCnpjCpf] = useState('')
 
   // Logotipo
@@ -337,6 +346,7 @@ function MerchantStoreAdminContent() {
     setCity(store.city || '')
     setState(store.state || '')
     setPhone(store.phone ? formatPhone(store.phone) : '')
+    setInstagramUrl(store.instagram_url || '')
     setCnpjCpf(store.cnpj_cpf ? formatCnpj(store.cnpj_cpf) : '')
 
     setCurrentLogoUrl(store.logo_url)
@@ -691,6 +701,7 @@ function MerchantStoreAdminContent() {
       formData.append('city', city.trim())
       formData.append('state', state.trim().toUpperCase())
       formData.append('phone', phone)
+      formData.append('instagram_url', instagramUrl.trim())
       formData.append('cnpj_cpf', cnpjCpf.trim())
 
       const currentStoreForSave = stores.find((s) => s.id === selectedStoreId) || stores[0] || null
@@ -828,6 +839,8 @@ function MerchantStoreAdminContent() {
       case 10:
       case 12:
         return Boolean(activeStore?.id && name.trim())
+      case 13:
+        return productsCount > 0
       case 11:
         return Boolean(activeStore?.effective_plan || activeStore?.plan)
       default:
@@ -1349,6 +1362,22 @@ function MerchantStoreAdminContent() {
                           setIsDirty(true)
                         }}
                         placeholder="00.000.000/0001-00"
+                        className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs sm:text-[13px] font-bold text-neutral-800 mb-1.5">
+                        Instagram da Loja (Opcional — cria o ícone na sua vitrine)
+                      </label>
+                      <input
+                        type="text"
+                        value={instagramUrl}
+                        onChange={(e) => {
+                          setInstagramUrl(e.target.value)
+                          setIsDirty(true)
+                        }}
+                        placeholder="Ex.: @sualoja ou https://instagram.com/sualoja"
                         className="w-full h-11 border border-neutral-300 px-3.5 text-sm text-neutral-900 bg-white focus:outline-none focus:border-[#FB6600] focus:ring-2 focus:ring-[#FB6600]/15 rounded-md transition-colors"
                       />
                     </div>
@@ -1922,6 +1951,19 @@ function MerchantStoreAdminContent() {
             )}
 
             {/* =================================================================== */}
+            {/* DISPOSITIVO 13: GERADOR DE MÍDIA PARA MÍDIAS SOCIAIS                */}
+            {/* =================================================================== */}
+            {currentTopic === 13 && (
+              <MerchantSocialMediaTab
+                storeId={selectedStoreId}
+                storeName={name}
+                storeSlug={activeStore?.slug}
+                storeLogoUrl={logoPreview || currentLogoUrl}
+                storeInstagramUrl={instagramUrl || activeStore?.instagram_url}
+              />
+            )}
+
+            {/* =================================================================== */}
             {/* BARRA DE NAVEGAÇÃO E AÇÕES                                         */}
             {/* =================================================================== */}
             <div className="bg-white border border-neutral-200 p-4 sm:p-5 rounded-md shadow-xs flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6">
@@ -1939,8 +1981,8 @@ function MerchantStoreAdminContent() {
 
                 <button
                   type="button"
-                  disabled={currentTopic >= 12}
-                  onClick={() => setCurrentTopic((prev) => Math.min(12, prev + 1))}
+                  disabled={currentTopic >= TOPICOS.length}
+                  onClick={() => setCurrentTopic((prev) => Math.min(TOPICOS.length, prev + 1))}
                   className="h-11 px-4 border border-neutral-300 hover:border-black text-xs sm:text-sm font-semibold text-neutral-800 hover:text-black transition-colors rounded-md cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   Próximo &rarr;

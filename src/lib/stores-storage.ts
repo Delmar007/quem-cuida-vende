@@ -14,6 +14,7 @@ export interface StoredStore {
   number: string | null
   neighborhood: string | null
   reference_point?: string | null
+  instagram_url?: string | null
   city: string | null
   state: string | null
   category: string

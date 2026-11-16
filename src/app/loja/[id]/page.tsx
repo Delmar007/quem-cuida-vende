@@ -237,6 +237,7 @@ export default async function StoreDetailPage({ params }: StorePageProps) {
           categories={storeCategories}
           storeName={store.name}
           storePhone={store.phone}
+          storeInstagramUrl={store.instagram_url}
           storeLogoUrl={store.logo_url}
           storeAddress={fullAddress}
           storeDescription={store.description}
