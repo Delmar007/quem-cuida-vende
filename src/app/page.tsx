@@ -1713,9 +1713,9 @@ export default async function Home({ searchParams }: HomeProps) {
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 items-center gap-2">
-                      {/* 1 coluna à esquerda: Botão WhatsApp VER DISPONIBILIDADE (2 linhas) */}
-                      <div className="col-span-1">
+                    <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(122px,auto)_1fr] items-center gap-2">
+                      {/* Coluna esquerda (+30px): Botão WhatsApp VER DISPONIBILIDADE (2 linhas) */}
+                      <div>
                         <WhatsappAvailabilityButton
                           phone={
                             produto.store_phone ||
@@ -1735,8 +1735,8 @@ export default async function Home({ searchParams }: HomeProps) {
                         />
                       </div>
 
-                      {/* 2 colunas à direita: Preço promocional em cima + preço regular riscado embaixo */}
-                      <div className="col-span-2 min-w-0 flex flex-col items-end text-right">
+                      {/* Coluna direita: Preço promocional em cima + preço regular riscado embaixo */}
+                      <div className="min-w-0 flex flex-col items-end text-right">
                         <div
                           className={`font-heading text-[19px] font-bold tracking-normal tabular-nums leading-tight ${
                             hasDiscount ? "text-[#FB6600]" : "text-neutral-900"

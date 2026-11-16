@@ -1661,8 +1661,8 @@ export default function StoreProductsCatalog({
                           )}
                         </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 items-center gap-2">
-                          <div className="col-span-1">
+                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-[minmax(122px,auto)_1fr] items-center gap-2">
+                          <div>
                             <WhatsappAvailabilityButton
                               phone={storePhone}
                               productName={produto.name}
@@ -1674,7 +1674,7 @@ export default function StoreProductsCatalog({
                               compact={true}
                             />
                           </div>
-                          <div className="col-span-2 min-w-0 flex flex-col items-end text-right">
+                          <div className="min-w-0 flex flex-col items-end text-right">
                             <span
                               className={`text-[19px] font-bold leading-tight tabular-nums ${
                                 hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
