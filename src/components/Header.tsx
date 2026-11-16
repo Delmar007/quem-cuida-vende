@@ -553,7 +553,7 @@ export default function Header() {
           </form>
 
           {/* AÇÕES DO TOPO - DESKTOP */}
-          <div className="hidden sm:flex items-center gap-2.5 md:gap-3 text-[13px] text-gray-500 font-normal">
+          <div className="hidden sm:flex items-center gap-2 md:gap-2.5 text-[13px] font-heading tracking-tight text-gray-500 font-normal">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -583,7 +583,7 @@ export default function Header() {
               <>
                 <Link
                   href="/perfil"
-                  className="text-black hover:text-[#FB6600] font-medium uppercase truncate max-w-[100px] md:max-w-[130px] transition-colors cursor-pointer"
+                  className="text-[13px] text-black hover:text-[#FB6600] font-semibold uppercase truncate max-w-[100px] md:max-w-[130px] transition-colors cursor-pointer"
                   title="Acessar Meu Perfil (Dados, Foto, WhatsApp, Endereço, Favoritos, Seguindo e Feed que sigo)"
                 >
                   {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
@@ -593,7 +593,7 @@ export default function Header() {
                     <span className="text-gray-300 text-xs font-light">|</span>
                     <Link
                       href="/painel/loja"
-                      className="hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer text-xs whitespace-nowrap"
+                      className="text-[13px] hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
                       title="Acessar painel da minha loja"
                     >
                       MINHA LOJA
@@ -610,7 +610,7 @@ export default function Header() {
                     router.push('/')
                     router.refresh()
                   }}
-                  className="hover:text-black uppercase transition-colors cursor-pointer text-gray-500"
+                  className="text-[13px] hover:text-black font-semibold uppercase transition-colors cursor-pointer text-gray-500"
                 >
                   SAIR
                 </button>
@@ -673,7 +673,7 @@ export default function Header() {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                   />
                 </svg>
                 {unreadFeedPromosCount > 0 && (
@@ -809,18 +809,34 @@ export default function Header() {
                 </div>
               )}
             </div>
+            <Link
+              href="/admin"
+              onClick={() => setIsPromoMenuOpen(false)}
+              title="Administração do Site"
+              aria-label="Administração do Site"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
+            >
+              <svg className="w-[18px] h-[18px] stroke-[1.75]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </Link>
             <span className="text-gray-300 text-xs font-light">|</span>
             <button
               type="button"
               onClick={() => setIsPlansOpen(true)}
-              className="text-[11px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center gap-1"
+              className="text-[13px] font-heading font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
             >
               <span>PLANOS</span>
             </button>
           </div>
 
-          {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sacolinha + 3px + Avatar + Nome ou Entrar) */}
-          <div className="flex sm:hidden items-center text-[14px] text-gray-500 font-normal shrink-0">
+          {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sino + Engrenagem + Avatar + Nome ou Entrar) */}
+          <div className="flex sm:hidden items-center text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             <button
               type="button"
               aria-label={
@@ -834,7 +850,7 @@ export default function Header() {
                 markFeedAsSeen()
                 router.push('/perfil?aba=feed')
               }}
-              className={`relative inline-flex items-center justify-center w-9 h-9 mr-[3px] rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+              className={`relative inline-flex items-center justify-center w-9 h-9 rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
                 pathname === '/perfil' && searchParams.get('aba') === 'feed'
                   ? 'text-[#FB6600] bg-orange-50'
                   : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
@@ -851,7 +867,7 @@ export default function Header() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                 />
               </svg>
               {unreadFeedPromosCount > 0 && (
@@ -860,6 +876,23 @@ export default function Header() {
                 </span>
               )}
             </button>
+
+            <Link
+              href="/admin"
+              onClick={() => setIsPromoMenuOpen(false)}
+              title="Administração do Site"
+              aria-label="Administração do Site"
+              className="inline-flex items-center justify-center w-8 h-8 mr-[3px] rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
+            >
+              <svg className="w-[18px] h-[18px] stroke-[1.75]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </Link>
 
             <div 
               onClick={() => {
@@ -887,7 +920,7 @@ export default function Header() {
             {user ? (
               <Link
                 href="/perfil"
-                className="ml-1.5 text-black hover:text-[#FB6600] font-semibold truncate max-w-[82px] transition-colors cursor-pointer"
+                className="ml-1.5 text-[13px] text-black hover:text-[#FB6600] font-semibold uppercase truncate max-w-[82px] transition-colors cursor-pointer"
                 title="Acessar Meu Perfil"
               >
                 {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
@@ -906,13 +939,13 @@ export default function Header() {
 
         {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca (centro) + PLANOS e SAIR (dir) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
-          <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[11.5px] text-gray-600">
+          <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[13px] font-heading tracking-tight text-gray-600">
             <div className="shrink-0 flex items-center">
               {user ? (
                 Boolean(user.hasStore) && (
                   <Link
                     href="/painel/loja"
-                    className="text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
+                    className="text-[13px] text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
                   >
                     MINHA LOJA
                   </Link>
@@ -921,7 +954,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={openRegister}
-                  className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                  className="text-[13px] text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Crie uma conta
                 </button>
@@ -965,7 +998,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => setIsPlansOpen(true)}
-                className="text-[11.5px] font-bold uppercase tracking-wide text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+                className="text-[13px] font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
               >
                 PLANOS
               </button>
@@ -979,7 +1012,7 @@ export default function Header() {
                     router.push('/')
                     router.refresh()
                   }}
-                  className="text-[11.5px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                  className="text-[13px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
                 >
                   SAIR
                 </button>
@@ -1064,8 +1097,8 @@ export default function Header() {
                 )
               })}
 
-              {/* BOTÃO ARREDONDADO PRETO: LIMPA FILTRO + ENGRENAGEM ADMIN (2px) */}
-              <div className="flex items-center gap-[2px] shrink-0">
+              {/* BOTÃO ARREDONDADO PRETO: LIMPA FILTRO */}
+              <div className="flex items-center shrink-0">
                 <Link
                   href="/"
                   onClick={() => {
@@ -1078,24 +1111,6 @@ export default function Header() {
                 >
                   <span>Limpa</span>
                   <span>Filtro</span>
-                </Link>
-
-                {/* ENGRENAGEM ADMIN DO SITE */}
-                <Link
-                  href="/admin"
-                  onClick={() => setIsPromoMenuOpen(false)}
-                  title="Administração do Site"
-                  aria-label="Administração do Site"
-                  className="inline-flex items-center justify-center w-6 h-6 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
-                >
-                  <svg className="w-4 h-4 stroke-[1.8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
                 </Link>
               </div>
             </div>
