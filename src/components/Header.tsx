@@ -403,7 +403,7 @@ export default function Header() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-white uppercase truncate">
+            <span className="text-[14px] md:text-[17px] text-white uppercase truncate">
               {[selectedLocation.state, selectedLocation.city, selectedLocation.neighborhood]
                 .filter(Boolean)
                 .join(' - ')}
@@ -527,7 +527,7 @@ export default function Header() {
           </Link>
 
           {/* CAIXA DE BUSCA RETANGULAR COM ÍCONE DE LUPA PRETA */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden sm:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white">
+          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white">
             <input 
               type="text"
               value={searchTerm}
@@ -553,7 +553,7 @@ export default function Header() {
           </form>
 
           {/* AÇÕES DO TOPO - DESKTOP */}
-          <div className="hidden sm:flex items-center gap-[2px] text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
+          <div className="hidden md:flex items-center gap-[2px] text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -836,7 +836,7 @@ export default function Header() {
           </div>
 
           {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sino + Engrenagem + Avatar + Nome + SAIR) */}
-          <div className="flex sm:hidden items-center gap-[2px] text-[15.5px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
+          <div className="flex md:hidden items-center gap-[2px] text-[15.5px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             <button
               type="button"
               aria-label={
@@ -953,7 +953,7 @@ export default function Header() {
         </div>
 
         {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca ampliada (centro) + PLANOS (dir) */}
-        <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
+        <div className="md:hidden w-full border-t border-gray-100 bg-neutral-50/70">
           <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[15.5px] font-heading tracking-tight text-gray-600">
             <div className="shrink-0 flex items-center">
               {user ? (

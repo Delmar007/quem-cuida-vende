@@ -1671,28 +1671,28 @@ export default async function Home({ searchParams }: HomeProps) {
                             const rawPlan = (prodStoreObj?.plan || "bronze").toLowerCase();
                             if (rawPlan === "ouro" || rawPlan === "auto_100") {
                               return (
-                                <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-500">
+                                <span className="mt-0.5 text-[10.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-500">
                                   OURO
                                 </span>
                               );
                             }
                             if (rawPlan === "prata" || rawPlan === "auto_50") {
                               return (
-                                <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-slate-400">
+                                <span className="mt-0.5 text-[10.5px] font-bold uppercase tracking-wider leading-[1.05] text-slate-400">
                                   PRATA
                                 </span>
                               );
                             }
                             if (rawPlan === "bronze_plus") {
                               return (
-                                <span className="mt-0.5 flex flex-col items-end text-[8.5px] font-bold uppercase tracking-wider leading-[1.02] text-[#B45309]/85">
+                                <span className="mt-0.5 flex flex-col items-end text-[10.5px] font-bold uppercase tracking-wider leading-[1.02] text-[#B45309]/85">
                                   <span>BRONZE</span>
                                   <span>PLUS</span>
                                 </span>
                               );
                             }
                             return (
-                              <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-700/75">
+                              <span className="mt-0.5 text-[10.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-700/75">
                                 BRONZE
                               </span>
                             );
