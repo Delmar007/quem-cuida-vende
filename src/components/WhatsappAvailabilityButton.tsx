@@ -65,7 +65,7 @@ export default function WhatsappAvailabilityButton({
       className={
         className ||
         (compact
-          ? 'text-[11px] bg-[#25D366] hover:bg-[#1EBE5D] text-white px-2.5 py-1.5 font-bold uppercase tracking-tight transition-colors inline-flex items-center justify-center gap-1.5 rounded-[2px] shrink-0'
+          ? 'text-[12px] bg-[#25D366] hover:bg-[#1EBE5D] text-white px-3 py-3.5 min-h-[52px] font-bold uppercase tracking-tight transition-colors inline-flex items-center justify-center gap-1.5 rounded-[2px] shrink-0'
           : 'mt-1.5 w-full font-heading text-xs bg-[#25D366] hover:bg-[#1EBE5D] text-white px-3 py-2 font-bold uppercase tracking-tight transition-colors flex items-center justify-center gap-1.5 rounded-[2px]')
       }
     >

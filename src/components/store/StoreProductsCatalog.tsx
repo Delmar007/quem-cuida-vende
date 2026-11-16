@@ -1664,14 +1664,14 @@ export default function StoreProductsCatalog({
                         <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
                           <div className="min-w-0 flex flex-col">
                             <span
-                              className={`text-base font-bold leading-tight tabular-nums ${
+                              className={`text-[19px] font-bold leading-tight tabular-nums ${
                                 hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
                               }`}
                             >
                               R$ {formatCurrencyBRL(priceFinal)}
                             </span>
                             {hasPromo && (
-                              <span className="text-xs text-gray-400 line-through leading-tight tabular-nums mt-0.5">
+                              <span className="text-[14.4px] text-gray-400 line-through leading-tight tabular-nums mt-0.5">
                                 R$ {formatCurrencyBRL(produto.price)}
                               </span>
                             )}

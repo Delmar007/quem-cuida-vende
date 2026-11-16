@@ -1717,14 +1717,14 @@ export default async function Home({ searchParams }: HomeProps) {
                       {/* Coluna esquerda: Preço promocional em cima + preço regular riscado embaixo */}
                       <div className="min-w-0 flex flex-col">
                         <div
-                          className={`font-heading text-base font-bold tracking-normal tabular-nums leading-tight ${
+                          className={`font-heading text-[19px] font-bold tracking-normal tabular-nums leading-tight ${
                             hasDiscount ? "text-[#FB6600]" : "text-neutral-900"
                           }`}
                         >
                           R$ {String(produto.price || "").replace(/^R\$\s*/i, "").trim()}
                         </div>
                         {hasDiscount && produto.regular_price && (
-                          <div className="text-xs text-gray-400 line-through tabular-nums leading-tight mt-0.5">
+                          <div className="text-[14.4px] text-gray-400 line-through tabular-nums leading-tight mt-0.5">
                             R$ {formatCurrencyBRL(produto.regular_price)}
                           </div>
                         )}

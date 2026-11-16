@@ -496,14 +496,14 @@ export default function UserOfficeClient({
               <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Preço</span>
               <div className="flex items-baseline gap-1.5">
                 <span
-                  className={`text-base font-bold ${
+                  className={`text-[19px] font-bold ${
                     hasDiscount ? 'text-[#FB6600]' : 'text-neutral-900'
                   }`}
                 >
                   {produto.price}
                 </span>
                 {hasDiscount && produto.regular_price && (
-                  <span className="text-[10px] text-gray-400 line-through">
+                  <span className="text-[12px] text-gray-400 line-through">
                     R$ {formatCurrencyBRL(produto.regular_price)}
                   </span>
                 )}
