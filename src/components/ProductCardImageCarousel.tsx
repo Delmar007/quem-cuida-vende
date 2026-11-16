@@ -113,7 +113,7 @@ export default function ProductCardImageCarousel({
 
       {/* Indicador discreto de paginação quando houver múltiplas imagens */}
       {total > 1 && (
-        <div className="absolute top-2.5 right-2.5 z-10 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[2px] backdrop-blur-[2px]">
+        <div className="absolute top-2.5 right-2.5 z-10 bg-black/60 text-white text-[10.8px] font-bold px-1.5 py-0.5 rounded-[2px] backdrop-blur-[2px] tabular-nums">
           {(currentIndex % total) + 1}/{total}
         </div>
       )}
