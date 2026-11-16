@@ -1713,24 +1713,24 @@ export default async function Home({ searchParams }: HomeProps) {
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-1">
-                      {/* 1. Preço de venda (laranja quando promocional, preto no preço normal) */}
-                      <div
-                        className={`font-heading text-base font-bold tracking-normal tabular-nums leading-tight ${
-                          hasDiscount ? "text-[#FB6600]" : "text-neutral-900"
-                        }`}
-                      >
-                        R$ {String(produto.price || "").replace(/^R\$\s*/i, "").trim()}
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                      {/* Coluna esquerda: Preço promocional em cima + preço regular riscado embaixo */}
+                      <div className="min-w-0 flex flex-col">
+                        <div
+                          className={`font-heading text-base font-bold tracking-normal tabular-nums leading-tight ${
+                            hasDiscount ? "text-[#FB6600]" : "text-neutral-900"
+                          }`}
+                        >
+                          R$ {String(produto.price || "").replace(/^R\$\s*/i, "").trim()}
+                        </div>
+                        {hasDiscount && produto.regular_price && (
+                          <div className="text-xs text-gray-400 line-through tabular-nums leading-tight mt-0.5">
+                            R$ {formatCurrencyBRL(produto.regular_price)}
+                          </div>
+                        )}
                       </div>
 
-                      {/* 2. Preço anterior / referência riscado logo abaixo */}
-                      {hasDiscount && produto.regular_price && (
-                        <div className="text-xs text-gray-400 line-through tabular-nums leading-tight">
-                          R$ {formatCurrencyBRL(produto.regular_price)}
-                        </div>
-                      )}
-
-                      {/* 3. Botão WhatsApp: VER DISPONIBILIDADE */}
+                      {/* Coluna direita: Botão WhatsApp VER DISPONIBILIDADE */}
                       <WhatsappAvailabilityButton
                         phone={
                           produto.store_phone ||
@@ -1746,6 +1746,7 @@ export default async function Home({ searchParams }: HomeProps) {
                           SEED_STORES.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.slug
                         }
                         storeId={produto.store_id}
+                        compact={true}
                       />
                     </div>
                   </div>

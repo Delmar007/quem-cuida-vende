@@ -1661,23 +1661,20 @@ export default function StoreProductsCatalog({
                           )}
                         </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                          <div>
-                            <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Preço</span>
-                            <div className="flex items-baseline gap-1.5">
-                              <span
-                                className={`text-base font-bold ${
-                                  hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
-                                }`}
-                              >
-                                R$ {formatCurrencyBRL(priceFinal)}
+                        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex flex-col">
+                            <span
+                              className={`text-base font-bold leading-tight tabular-nums ${
+                                hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
+                              }`}
+                            >
+                              R$ {formatCurrencyBRL(priceFinal)}
+                            </span>
+                            {hasPromo && (
+                              <span className="text-xs text-gray-400 line-through leading-tight tabular-nums mt-0.5">
+                                R$ {formatCurrencyBRL(produto.price)}
                               </span>
-                              {hasPromo && (
-                                <span className="text-[10px] text-gray-400 line-through">
-                                  R$ {formatCurrencyBRL(produto.price)}
-                                </span>
-                              )}
-                            </div>
+                            )}
                           </div>
                           <WhatsappAvailabilityButton
                             phone={storePhone}
