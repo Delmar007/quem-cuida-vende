@@ -612,10 +612,10 @@ export default function Header() {
           {/* ========================================================= */}
           {/* A. VERSÃO DESKTOP (md:flex): Layout horizontal completo   */}
           {/* ========================================================= */}
-          <div className="hidden md:flex items-center justify-between gap-3 px-4">
+          <div className="hidden md:flex items-center justify-between gap-2 px-3">
             
             {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
-            <div className="flex items-center gap-3 lg:gap-3.5 font-heading text-[12.5px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
+            <div className="flex items-center gap-2 lg:gap-2.5 font-heading text-[11.5px] font-semibold tracking-[-0.04em] overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
               {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
               <Link
@@ -799,10 +799,10 @@ export default function Header() {
             </div>
 
             {/* LADO DIREITO: Botão de Seleção "Produtos" */}
-            <div className="border-l border-gray-200 pl-6 flex items-center h-full shrink-0">
+            <div className="border-l border-gray-200 pl-3 flex items-center h-full shrink-0">
               <Link
                 href={buildFilterUrl({ tipo: 'produtos' })}
-                className={`flex items-center gap-2 py-3.5 font-heading text-[14px] font-semibold tracking-tight transition-colors relative shrink-0 ${
+                className={`flex items-center gap-1.5 py-3.5 font-heading text-[13px] font-semibold tracking-tight transition-colors relative shrink-0 ${
                   currentView === 'produtos'
                     ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                     : "text-black hover:text-[#FB6600]"
