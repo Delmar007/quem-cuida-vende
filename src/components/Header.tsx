@@ -553,7 +553,7 @@ export default function Header() {
           </form>
 
           {/* AÇÕES DO TOPO - DESKTOP */}
-          <div className="hidden sm:flex items-center gap-1.5 md:gap-2 text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
+          <div className="hidden sm:flex items-center gap-[2px] text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -835,8 +835,8 @@ export default function Header() {
             </button>
           </div>
 
-          {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sino + Engrenagem + Avatar + Nome ou Entrar) */}
-          <div className="flex sm:hidden items-center text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
+          {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sino + Engrenagem + Avatar + Nome + SAIR) */}
+          <div className="flex sm:hidden items-center gap-[2px] text-[15.5px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             <button
               type="button"
               aria-label={
@@ -850,7 +850,7 @@ export default function Header() {
                 markFeedAsSeen()
                 router.push('/perfil?aba=feed')
               }}
-              className={`relative inline-flex items-center justify-center w-9 h-9 rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+              className={`relative inline-flex items-center justify-center w-8 h-8 rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
                 pathname === '/perfil' && searchParams.get('aba') === 'feed'
                   ? 'text-[#FB6600] bg-orange-50'
                   : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
@@ -858,7 +858,7 @@ export default function Header() {
             >
               <svg
                 aria-hidden="true"
-                className="w-[20px] h-[20px]"
+                className="w-[25px] h-[25px]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -871,7 +871,7 @@ export default function Header() {
                 />
               </svg>
               {unreadFeedPromosCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-[15px] h-[15px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                <span className="absolute top-0 right-0 min-w-[15px] h-[15px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
                   {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
                 </span>
               )}
@@ -882,9 +882,9 @@ export default function Header() {
               onClick={() => setIsPromoMenuOpen(false)}
               title="Administração do Site"
               aria-label="Administração do Site"
-              className="inline-flex items-center justify-center w-8 h-8 mr-[3px] rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
             >
-              <svg className="w-[18px] h-[18px] stroke-[1.75]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <svg className="w-[23px] h-[23px] stroke-[1.75]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -898,7 +898,7 @@ export default function Header() {
               onClick={() => {
                 router.push('/perfil');
               }}
-              className="w-[34px] h-[34px] rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
+              className="w-[32px] h-[32px] rounded-full overflow-hidden border border-gray-300 flex items-center justify-center shrink-0 bg-gray-50 transition-colors cursor-pointer hover:border-black"
               title={user ? (user.user_metadata?.full_name || user.email) : 'Meu Perfil'}
             >
               {avatarUrl ? (
@@ -918,18 +918,33 @@ export default function Header() {
               )}
             </div>
             {user ? (
-              <Link
-                href="/perfil"
-                className="ml-1.5 text-[13px] text-black hover:text-[#FB6600] font-semibold uppercase truncate max-w-[82px] transition-colors cursor-pointer"
-                title="Acessar Meu Perfil"
-              >
-                {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
-              </Link>
+              <>
+                <Link
+                  href="/perfil"
+                  className="ml-1 text-[15.5px] text-black hover:text-[#FB6600] font-semibold uppercase truncate max-w-[70px] transition-colors cursor-pointer"
+                  title="Acessar Meu Perfil"
+                >
+                  {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+                </Link>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await logoutAction()
+                    setUser(null)
+                    setAvatarUrl(null)
+                    router.push('/')
+                    router.refresh()
+                  }}
+                  className="ml-1 text-[13px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  SAIR
+                </button>
+              </>
             ) : (
               <button 
                 type="button"
                 onClick={openLogin}
-                className="ml-1.5 text-black font-semibold hover:text-[#FB6600] transition-colors cursor-pointer"
+                className="ml-1 text-[15.5px] text-black font-semibold hover:text-[#FB6600] transition-colors cursor-pointer"
               >
                 Entrar
               </button>
@@ -937,15 +952,15 @@ export default function Header() {
           </div>
         </div>
 
-        {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca (centro) + PLANOS e SAIR (dir) */}
+        {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca ampliada (centro) + PLANOS (dir) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
-          <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[13px] font-heading tracking-tight text-gray-600">
+          <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[15.5px] font-heading tracking-tight text-gray-600">
             <div className="shrink-0 flex items-center">
               {user ? (
                 Boolean(user.hasStore) && (
                   <Link
                     href="/painel/loja"
-                    className="text-[13px] text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
+                    className="text-[15.5px] text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
                   >
                     MINHA LOJA
                   </Link>
@@ -954,7 +969,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={openRegister}
-                  className="text-[13px] text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                  className="text-[15.5px] text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Crie uma conta
                 </button>
@@ -994,29 +1009,14 @@ export default function Header() {
               </button>
             </form>
 
-            <div className="shrink-0 flex items-center gap-1.5">
+            <div className="shrink-0 flex items-center">
               <button
                 type="button"
                 onClick={() => setIsPlansOpen(true)}
-                className="text-[13px] font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+                className="text-[15.5px] font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
               >
                 PLANOS
               </button>
-              {user && (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await logoutAction()
-                    setUser(null)
-                    setAvatarUrl(null)
-                    router.push('/')
-                    router.refresh()
-                  }}
-                  className="text-[13px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
-                >
-                  SAIR
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -1361,7 +1361,7 @@ export default function Header() {
                         key={promo.id}
                         href={targetHref}
                         onClick={() => setIsMobileCatOpen(false)}
-                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-[13px] uppercase transition-colors ${
                           isPromoSelected
                             ? 'bg-orange-50/70 text-[#FB6600] font-bold'
                             : promo.isOrange
@@ -1403,7 +1403,7 @@ export default function Header() {
                           e.stopPropagation()
                           setIsMobileCatOpen(false)
                         }}
-                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase tracking-wide transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-[13px] uppercase tracking-wide transition-colors ${
                           isCatActive
                             ? 'text-[#FB6600] font-bold bg-orange-50/50'
                             : cat.isOrange
@@ -1440,7 +1440,7 @@ export default function Header() {
                           e.stopPropagation()
                           setIsMobileCatOpen(false)
                         }}
-                        className={`flex items-center justify-between px-3 h-9 text-xs uppercase tracking-wide transition-colors ${
+                        className={`flex items-center justify-between px-3 h-9 text-[13px] uppercase tracking-wide transition-colors ${
                           isPorRuaActive
                             ? 'text-[#FB6600] font-bold bg-orange-50/50'
                             : 'text-[#FB6600] font-bold hover:bg-orange-50/40'
@@ -1465,7 +1465,7 @@ export default function Header() {
                       e.stopPropagation()
                       setIsMobileCatOpen(false)
                     }}
-                    className="text-xs text-gray-500 hover:text-[#FB6600] uppercase flex items-center justify-between py-1 font-medium"
+                    className="text-[13px] text-gray-500 hover:text-[#FB6600] uppercase flex items-center justify-between py-1 font-medium"
                   >
                     <span>LIMPAR CATEGORIA</span>
                   </Link>
