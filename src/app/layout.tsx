@@ -28,8 +28,30 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.kittanda.com.br"),
   title: "Kittanda Outlet - Outlet de Estoque",
-  description: "As melhores ofertas e liquidações de estoque",
+  description: "As melhores ofertas e liquidações de estoque direto das lojas físicas da cidade",
+  openGraph: {
+    title: "Kittanda Outlet - Ofertas e Estoque Local",
+    description: "Encontre produtos com desconto e fale direto no WhatsApp com as lojas físicas da sua cidade.",
+    siteName: "Kittanda Outlet",
+    locale: "pt_BR",
+    type: "website",
+    images: [
+      {
+        url: "/logo-kittanda-laranja.png",
+        width: 1200,
+        height: 630,
+        alt: "Kittanda Outlet",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kittanda Outlet - Ofertas e Estoque Local",
+    description: "Encontre produtos com desconto e fale direto no WhatsApp com as lojas físicas da sua cidade.",
+    images: ["/logo-kittanda-laranja.png"],
+  },
 };
 
 export default function RootLayout({

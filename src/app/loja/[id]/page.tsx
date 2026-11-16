@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
@@ -36,6 +37,176 @@ function formatCategorySubcategory(category?: string | null, subcategory?: strin
 
 interface StorePageProps {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ produto?: string; p?: string }>;
+}
+
+function toAbsoluteOgImageUrl(rawUrl?: string | null): string | null {
+  const val = (rawUrl || '').trim();
+  if (!val || val.startsWith('data:')) return null;
+  if (/^https?:\/\//i.test(val)) return val;
+  if (val.startsWith('/')) return `https://www.kittanda.com.br${val}`;
+  return null;
+}
+
+async function findStoreByParam(rawParam: string): Promise<any | null> {
+  const id = decodeURIComponent(rawParam);
+  const hyphenVariant = id.replace(/_/g, '-');
+  const underscoreVariant = id.replace(/-/g, '_');
+  const supabase = await createClient();
+
+  let store: any = null;
+  try {
+    const slugCandidates = Array.from(new Set([id, hyphenVariant, underscoreVariant]));
+    const orFilters = [
+      `id.eq.${id}`,
+      ...slugCandidates.map((s) => `slug.eq.${s}`),
+    ].join(',');
+    const { data: storeData } = await supabase
+      .from('stores')
+      .select('*')
+      .or(orFilters)
+      .limit(1)
+      .maybeSingle();
+    if (storeData) {
+      store = storeData;
+    }
+
+    if (!store) {
+      const { data: allStores } = await supabase.from('stores').select('*');
+      if (allStores && allStores.length > 0) {
+        const targetNorm = toStoreSlug(id);
+        store =
+          allStores.find(
+            (s: any) => s.slug === id || toStoreSlug(s.name || '') === targetNorm
+          ) || null;
+      }
+    }
+  } catch {
+    // fallback local
+  }
+
+  if (!store) {
+    store =
+      getLocalStoreById(id) ||
+      getLocalStoreById(hyphenVariant) ||
+      getLocalStoreById(underscoreVariant);
+  }
+
+  if (!store) {
+    const targetNorm = toStoreSlug(id);
+    const seed = SEED_STORES.find(
+      (s) =>
+        s.id === id ||
+        s.slug === id ||
+        s.slug === hyphenVariant ||
+        toStoreSlug(s.name) === targetNorm
+    );
+    if (seed) store = seed;
+  }
+
+  return store;
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: StorePageProps): Promise<Metadata> {
+  const { id } = await params;
+  const resolvedQuery = searchParams ? await searchParams : {};
+  const targetProductId = (resolvedQuery.produto || resolvedQuery.p || '').trim();
+
+  const store = await findStoreByParam(id);
+  if (!store) {
+    return {
+      title: 'Loja não encontrada | Kittanda Outlet',
+    };
+  }
+
+  const locationTag = store.reference_point || store.neighborhood || store.city || '';
+  const storeBannerImg =
+    toAbsoluteOgImageUrl(store.large_banner_url) ||
+    toAbsoluteOgImageUrl(store.small_banner_url) ||
+    toAbsoluteOgImageUrl(store.logo_url) ||
+    'https://www.kittanda.com.br/logo-kittanda-laranja.png';
+
+  if (targetProductId) {
+    let targetProd: any = null;
+    try {
+      const supabase = await createClient();
+      const { data: dbProd } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', targetProductId)
+        .maybeSingle();
+      if (dbProd) targetProd = dbProd;
+    } catch {
+      // fallback local
+    }
+    if (!targetProd) {
+      targetProd =
+        getLocalProducts(store.id).find((p) => p.id === targetProductId) || null;
+    }
+
+    if (targetProd) {
+      const hasPromo = Boolean(
+        typeof targetProd.promotional_price === 'number' &&
+          targetProd.promotional_price > 0 &&
+          targetProd.promotional_price < targetProd.price
+      );
+      const effectivePrice = hasPromo
+        ? targetProd.promotional_price
+        : targetProd.price;
+      const priceText = formatCurrencyBRL(effectivePrice);
+      const prodImage =
+        toAbsoluteOgImageUrl(targetProd.images?.[0] || targetProd.image_url) ||
+        storeBannerImg;
+      const ogTitle = `${targetProd.name} — R$ ${priceText} | ${store.name}`;
+      const ogDescription = `${store.name}${locationTag ? ` • ${locationTag}` : ''} — Confira a disponibilidade pelo WhatsApp na Kittanda Outlet.`;
+
+      return {
+        title: ogTitle,
+        description: ogDescription,
+        openGraph: {
+          title: ogTitle,
+          description: ogDescription,
+          type: 'website',
+          locale: 'pt_BR',
+          siteName: 'Kittanda Outlet',
+          images: [{ url: prodImage, width: 1200, height: 630, alt: targetProd.name }],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: ogTitle,
+          description: ogDescription,
+          images: [prodImage],
+        },
+      };
+    }
+  }
+
+  const storeTitle = `${store.name}${locationTag ? ` • ${locationTag}` : ''} | Catálogo Oficial Kittanda`;
+  const storeDescription =
+    store.description ||
+    `Confira o estoque e ofertas de ${store.name} na Kittanda Outlet e reserve pelo WhatsApp.`;
+
+  return {
+    title: storeTitle,
+    description: storeDescription,
+    openGraph: {
+      title: storeTitle,
+      description: storeDescription,
+      type: 'website',
+      locale: 'pt_BR',
+      siteName: 'Kittanda Outlet',
+      images: [{ url: storeBannerImg, width: 1200, height: 630, alt: store.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: storeTitle,
+      description: storeDescription,
+      images: [storeBannerImg],
+    },
+  };
 }
 
 export default async function StoreDetailPage({ params }: StorePageProps) {

@@ -38,6 +38,9 @@ export function buildWhatsappAvailabilityUrl({
   } else if (storeId) {
     pageUrl = `https://www.kittanda.com.br/loja/${storeId}`
   }
+  if (pageUrl && productId) {
+    pageUrl = `${pageUrl}?produto=${encodeURIComponent(productId)}`
+  }
 
   const code = formatProductCode(sku, productId)
   const lines = [
