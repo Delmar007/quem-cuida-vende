@@ -97,8 +97,9 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=120&q=80",
     street: "Av. Afonso Pena",
+    neighborhood: "Centro",
+    reference_point: "Shopping Campo Grande",
     phone: "67999887766",
-    description: "Moda feminina contemporânea e looks exclusivos para festas e eventos.",
     plan: "ouro",
     is_active: true,
   },
@@ -112,6 +113,7 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=120&q=80",
     street: "Rua Barão do Rio Branco",
+    neighborhood: "Centro",
     phone: "67988776655",
     description: "Coleções de moda feminina, linha fitness para treino e moda praia para o verão.",
     plan: "prata",
@@ -127,6 +129,7 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=120&q=80",
     street: "Av. Mato Grosso",
+    neighborhood: "Jardim dos Estados",
     phone: "67977665544",
     description: "Móveis e artigos finos de decoração e utilidades domésticas.",
     plan: "bronze_plus",
@@ -142,6 +145,7 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=120&q=80",
     street: "Rua Quatorze de Julho",
+    neighborhood: "Centro",
     phone: "67966554433",
     description: "Roupas masculinas de alfaiataria, jeanswear e peças para o dia a dia.",
     plan: "bronze",
@@ -157,8 +161,9 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=120&q=80",
     street: "Av. Afonso Pena",
+    neighborhood: "Santa Fé",
+    reference_point: "Shopping Campo Grande",
     phone: "67955443322",
-    description: "Produtos de maquiagem importada, fragrâncias e tratamento facial.",
     plan: "ouro",
     is_active: true,
   },
@@ -172,6 +177,7 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=120&q=80",
     street: "Rua Ceará",
+    neighborhood: "Jardim dos Estados",
     phone: "67944332211",
     description: "Acessórios, rações nobres e cuidados completos para cães e gatos.",
     plan: "prata",
@@ -187,6 +193,8 @@ const SEED_STORES: StoreItem[] = [
     small_banner_url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=400&q=80",
     logo_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=120&q=80",
     street: "Av. Afonso Pena",
+    neighborhood: "Centro",
+    reference_point: "Pátio Central Shopping",
     phone: "67933221100",
     description: "Smartphones, periféricos gamers e tecnologia de ponta.",
     plan: "ouro",
@@ -201,6 +209,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=400&q=80",
     street: "Av. Coronel Antonino",
+    neighborhood: "Coronel Antonino",
     phone: "67922110099",
     description: "Peças originais, rodas esportivas e som para veículos leves e pesados.",
     plan: "bronze",
@@ -215,6 +224,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=400&q=80",
     street: "Av. Eduardo Elias Zahran",
+    neighborhood: "Vila Vilas Boas",
     phone: "67991122334",
     description: "Seminovos e usados revisados com garantia de procedência e financiamento.",
     plan: "bronze",
@@ -229,6 +239,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=400&q=80",
     street: "Av. Guaicurus",
+    neighborhood: "Universitário",
     phone: "67992233445",
     description: "Insumos agrícolas, sementes selecionadas e nutrição animal para o campo.",
     plan: "bronze",
@@ -243,6 +254,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=400&q=80",
     street: "Rua Joaquim Murtinho",
+    neighborhood: "Itanhangá Park",
     phone: "67993344556",
     description: "Materiais escolares, cadeiras ergonômicas e suprimentos corporativos.",
     plan: "bronze",
@@ -257,6 +269,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=400&q=80",
     street: "Rua Antônio Maria Coelho",
+    neighborhood: "Jardim dos Estados",
     phone: "67994455667",
     description: "Enxoval completo e moda infantil confortável para todas as idades.",
     plan: "bronze",
@@ -271,6 +284,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80",
     street: "Rua Euclides da Cunha",
+    neighborhood: "Jardim dos Estados",
     phone: "67995566778",
     description: "Luminárias, quadros, vasos artesanais e peças de design para sua casa.",
     plan: "bronze",
@@ -285,6 +299,7 @@ const SEED_STORES: StoreItem[] = [
     large_banner_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=940&q=80",
     small_banner_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80",
     street: "Rua Rui Barbosa",
+    neighborhood: "Centro",
     phone: "67996677889",
     description: "Linha profissional para barba, cabelo e cuidados masculinos.",
     plan: "bronze",
@@ -1386,14 +1401,14 @@ export default async function Home({ searchParams }: HomeProps) {
 
                     {/* Rodapé do Card de Loja */}
                     <div className="relative z-10">
-                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-heading font-extrabold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-0.5`}>
-                        {loja.name}
+                      <h3 className={`${bannerType === "triple" ? "text-2xl md:text-3xl" : "text-xl"} font-heading font-extrabold tracking-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight mb-1 flex flex-wrap items-baseline gap-x-2`}>
+                        <span>{loja.name}</span>
+                        {(loja.reference_point || loja.neighborhood) && (
+                          <span className="text-xs sm:text-sm font-semibold text-orange-300 drop-shadow-sm">
+                            • {[loja.neighborhood, loja.reference_point].filter(Boolean).join(" • ")}
+                          </span>
+                        )}
                       </h3>
-                      {(loja.reference_point || loja.neighborhood) && (
-                        <p className="text-[11px] font-semibold text-orange-300 drop-shadow-sm mb-1 line-clamp-1">
-                          📍 {[loja.neighborhood, loja.reference_point].filter(Boolean).join(" • ")}
-                        </p>
-                      )}
                       {loja.description && (
                         <p className="text-xs sm:text-[13px] text-gray-100 leading-relaxed line-clamp-1 drop-shadow-md max-w-2xl">
                           {loja.description}
@@ -1606,24 +1621,24 @@ export default async function Home({ searchParams }: HomeProps) {
                             )}
                           </div>
                           <div className="min-w-0">
-                            <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1 block">
-                              {produto.store_name}
-                            </span>
                             {(() => {
                               const storeMatch = allStores.find(
                                 (s) => s.id === produto.store_id || s.name === produto.store_name
                               );
-                              const locText = [
-                                produto.store_neighborhood || storeMatch?.neighborhood,
-                                produto.store_reference_point || storeMatch?.reference_point,
-                              ]
-                                .filter(Boolean)
-                                .join(" • ");
-                              return locText ? (
-                                <span className="text-[10px] font-medium text-gray-500 line-clamp-1 block">
-                                  📍 {locText}
+                              const locText =
+                                produto.store_reference_point ||
+                                storeMatch?.reference_point ||
+                                produto.store_neighborhood ||
+                                storeMatch?.neighborhood ||
+                                "";
+                              return (
+                                <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1 block">
+                                  {produto.store_name}
+                                  {locText ? (
+                                    <span className="text-[#FB6600] font-bold"> • {locText}</span>
+                                  ) : null}
                                 </span>
-                              ) : null;
+                              );
                             })()}
                           </div>
                         </div>
