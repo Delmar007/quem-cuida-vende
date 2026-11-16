@@ -386,11 +386,13 @@ export default function Header() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="truncate">
-              {selectedLocation.state}
-              {selectedLocation.city ? ` • ${selectedLocation.city}` : ''}
-              {selectedLocation.neighborhood ? ` • ${selectedLocation.neighborhood}` : ''}
-            </span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-white">
+              <span>Estado (UF): {selectedLocation.state}</span>
+              <span aria-hidden="true">•</span>
+              <span>Cidade: {selectedLocation.city || 'Todas'}</span>
+              <span aria-hidden="true">•</span>
+              <span>Bairro: {selectedLocation.neighborhood || 'Todos'}</span>
+            </div>
           </div>
 
           <button

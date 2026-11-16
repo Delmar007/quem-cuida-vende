@@ -1660,12 +1660,44 @@ export default async function Home({ searchParams }: HomeProps) {
                             })()}
                           </div>
                         </div>
-                        {dataParte && (
-                          <span className="flex flex-col items-end shrink-0 text-right leading-[1.15] text-[12px] text-gray-400 tabular-nums">
-                            <span>{dataParte}</span>
-                            {horaParte && <span>{horaParte}</span>}
-                          </span>
-                        )}
+                        <div className="flex flex-col items-end shrink-0 text-right">
+                          {dataParte && (
+                            <span className="flex flex-col items-end leading-[1.15] text-[12px] text-gray-400 tabular-nums">
+                              <span>{dataParte}</span>
+                              {horaParte && <span>{horaParte}</span>}
+                            </span>
+                          )}
+                          {(() => {
+                            const rawPlan = (prodStoreObj?.plan || "bronze").toLowerCase();
+                            if (rawPlan === "ouro" || rawPlan === "auto_100") {
+                              return (
+                                <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-500">
+                                  OURO
+                                </span>
+                              );
+                            }
+                            if (rawPlan === "prata" || rawPlan === "auto_50") {
+                              return (
+                                <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-slate-400">
+                                  PRATA
+                                </span>
+                              );
+                            }
+                            if (rawPlan === "bronze_plus") {
+                              return (
+                                <span className="mt-0.5 flex flex-col items-end text-[8.5px] font-bold uppercase tracking-wider leading-[1.02] text-[#B45309]/85">
+                                  <span>BRONZE</span>
+                                  <span>PLUS</span>
+                                </span>
+                              );
+                            }
+                            return (
+                              <span className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider leading-[1.05] text-amber-700/75">
+                                BRONZE
+                              </span>
+                            );
+                          })()}
+                        </div>
                       </div>
                       <h3 className="font-heading text-[18px] text-gray-900 font-semibold leading-[1.28] tracking-tight mb-1 line-clamp-2">
                         {toTitleCase(produto.name)}
