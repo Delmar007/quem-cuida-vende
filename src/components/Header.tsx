@@ -68,6 +68,9 @@ export default function Header() {
   const currentFiltro = rawFiltro
   const currentQuery = searchParams.get('q') || ''
   const currentRua = searchParams.get('rua') || ''
+  const currentUf = searchParams.get('uf') || ''
+  const currentCidade = searchParams.get('cidade') || ''
+  const currentBairro = searchParams.get('bairro') || ''
 
   const tiposPromocao: { id: string; label: string; isOrange?: boolean }[] = [
     { id: 'outlet', label: 'Outlet' },
@@ -205,6 +208,9 @@ export default function Header() {
     filtro = currentFiltro,
     q = currentQuery,
     rua = currentRua,
+    uf = currentUf,
+    cidade = currentCidade,
+    bairro = currentBairro,
   }: {
     tipo?: string
     cat?: string
@@ -212,6 +218,9 @@ export default function Header() {
     filtro?: string
     q?: string
     rua?: string
+    uf?: string
+    cidade?: string
+    bairro?: string
   }) => {
     const params = new URLSearchParams()
     if (tipo) params.set('tipo', tipo)
@@ -225,6 +234,9 @@ export default function Header() {
     }
     if (filtro) params.set('filtro', filtro)
     if (q) params.set('q', q)
+    if (uf) params.set('uf', uf)
+    if (cidade) params.set('cidade', cidade)
+    if (bairro) params.set('bairro', bairro)
     const qs = params.toString()
     return qs ? `/?${qs}` : '/'
   }
@@ -279,7 +291,17 @@ export default function Header() {
   }, [searchParams.toString()])
 
   useEffect(() => {
-    setSelectedLocation(getStoredLocation())
+    if (currentUf || currentCidade || currentBairro) {
+      const fromUrl: KittandaLocation = {
+        state: (currentUf || DEFAULT_KITTANDA_LOCATION.state).toUpperCase(),
+        city: currentCidade || DEFAULT_KITTANDA_LOCATION.city,
+        neighborhood: currentBairro,
+      }
+      setSelectedLocation(fromUrl)
+      saveStoredLocation(fromUrl)
+    } else {
+      setSelectedLocation(getStoredLocation())
+    }
     const handleLocationChanged = (ev: Event) => {
       const custom = ev as CustomEvent<KittandaLocation>
       if (custom.detail) {
@@ -292,7 +314,7 @@ export default function Header() {
     return () => {
       window.removeEventListener(KITTANDA_LOCATION_EVENT, handleLocationChanged)
     }
-  }, [])
+  }, [currentUf, currentCidade, currentBairro])
 
   const markFeedAsSeen = () => {
     setUnreadFeedPromosCount(0)
@@ -434,6 +456,7 @@ export default function Header() {
                     const nextLoc: KittandaLocation = { state: nextUf, city: nextCity, neighborhood: '' }
                     setSelectedLocation(nextLoc)
                     saveStoredLocation(nextLoc)
+                    router.push(buildFilterUrl({ uf: nextLoc.state, cidade: nextLoc.city, bairro: '' }))
                   }}
                   className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
                 >
@@ -458,6 +481,7 @@ export default function Header() {
                     }
                     setSelectedLocation(nextLoc)
                     saveStoredLocation(nextLoc)
+                    router.push(buildFilterUrl({ uf: nextLoc.state, cidade: nextLoc.city, bairro: '' }))
                   }}
                   className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
                 >
@@ -482,10 +506,17 @@ export default function Header() {
                       }
                       setSelectedLocation(nextLoc)
                       saveStoredLocation(nextLoc)
+                      router.push(
+                        buildFilterUrl({
+                          uf: nextLoc.state,
+                          cidade: nextLoc.city,
+                          bairro: nextLoc.neighborhood,
+                        })
+                      )
                     }}
                     className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
                   >
-                    <option value="">Todos os bairros</option>
+                    <option value="">Todos os bairros (cidade toda)</option>
                     {CAMPO_GRANDE_MS_BAIRROS.map((b) => (
                       <option key={b} value={b}>
                         {b}
@@ -503,8 +534,15 @@ export default function Header() {
                       }
                       setSelectedLocation(nextLoc)
                       saveStoredLocation(nextLoc)
+                      router.push(
+                        buildFilterUrl({
+                          uf: nextLoc.state,
+                          cidade: nextLoc.city,
+                          bairro: nextLoc.neighborhood.trim(),
+                        })
+                      )
                     }}
-                    placeholder="Digite o bairro..."
+                    placeholder="Em branco = cidade toda"
                     className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
                   />
                 )}

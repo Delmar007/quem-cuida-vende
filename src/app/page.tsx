@@ -29,7 +29,17 @@ function formatCurrencyBRL(value: number | string | null | undefined): string {
 export const instant = false;
 
 interface HomeProps {
-  searchParams: Promise<{ tipo?: string; cat?: string; subcat?: string; filtro?: string; q?: string; rua?: string }>;
+  searchParams: Promise<{
+    tipo?: string;
+    cat?: string;
+    subcat?: string;
+    filtro?: string;
+    q?: string;
+    rua?: string;
+    uf?: string;
+    cidade?: string;
+    bairro?: string;
+  }>;
 }
 
 export interface StoreItem {
@@ -44,6 +54,8 @@ export interface StoreItem {
   phone?: string | null;
   street?: string | null;
   neighborhood?: string | null;
+  city?: string | null;
+  state?: string | null;
   reference_point?: string | null;
   description?: string | null;
   plan?: string;
@@ -790,6 +802,33 @@ export default async function Home({ searchParams }: HomeProps) {
   const rawFiltro = (resolvedParams.filtro || "").toLowerCase().trim();
   const query = (resolvedParams.q || "").toLowerCase().trim();
   const rua = (resolvedParams.rua || "").trim();
+  const filterUf = (resolvedParams.uf || "").trim().toUpperCase();
+  const filterCidade = (resolvedParams.cidade || "").trim();
+  const filterBairro = (resolvedParams.bairro || "").trim();
+
+  const normalizeRegion = (val?: string | null) =>
+    (val || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+  const matchesStoreRegion = (store?: { state?: string | null; city?: string | null; neighborhood?: string | null } | null) => {
+    if (!filterUf && !filterCidade && !filterBairro) return true;
+    const stUf = normalizeRegion(store?.state || "MS");
+    const stCity = normalizeRegion(store?.city || "Campo Grande");
+    const stBairro = normalizeRegion(store?.neighborhood || "");
+
+    if (filterUf && stUf !== normalizeRegion(filterUf)) return false;
+    if (filterCidade && stCity !== normalizeRegion(filterCidade)) return false;
+    if (filterBairro) {
+      const targetBairro = normalizeRegion(filterBairro);
+      if (!stBairro || (!stBairro.includes(targetBairro) && !targetBairro.includes(stBairro))) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   // Dicionário amigável de nomes de categorias
   const nomesCategorias: Record<string, string> = {
@@ -894,6 +933,8 @@ export default async function Home({ searchParams }: HomeProps) {
         phone: s.phone || s.whatsapp || null,
         street: s.street || null,
         neighborhood: s.neighborhood || null,
+        city: s.city || null,
+        state: s.state || null,
         reference_point: s.reference_point || null,
         description: s.description,
         plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
@@ -968,6 +1009,8 @@ export default async function Home({ searchParams }: HomeProps) {
     phone: s.phone || null,
     street: s.street || null,
     neighborhood: s.neighborhood || null,
+    city: s.city || null,
+    state: s.state || null,
     reference_point: s.reference_point || null,
     description: s.description,
     plan: (s.effective_plan || s.plan || "bronze").toLowerCase(),
@@ -1076,14 +1119,17 @@ export default async function Home({ searchParams }: HomeProps) {
       return false;
     }
 
-    // A2. Filtro Por Rua (verifica a rua da loja proprietária do produto)
+    // A2. Filtro Por Rua e Região (UF / Cidade / Bairro)
+    const storeObj = allStores.find(
+      (s) => s.id === prod.store_id || s.name === prod.store_name
+    );
     if (rua) {
-      const storeObj = allStores.find(
-        (s) => s.id === prod.store_id || s.name === prod.store_name
-      );
       if (!streetsMatch(storeObj?.street, rua) && !streetsMatch(storeObj?.reference_point, rua)) {
         return false;
       }
+    }
+    if (!matchesStoreRegion(storeObj || { neighborhood: prod.store_neighborhood })) {
+      return false;
     }
 
     // B. Subcategoria
@@ -1129,6 +1175,11 @@ export default async function Home({ searchParams }: HomeProps) {
   // para a subcategoria e modalidade selecionadas."
   // =========================================================================
   const lojasFiltradas = allStores.filter((store) => {
+    // Filtro Por Região (UF / Cidade / Bairro)
+    if (!matchesStoreRegion(store)) {
+      return false;
+    }
+
     // Filtro Por Rua / Shopping e Galeria
     if (rua && !streetsMatch(store.street, rua) && !streetsMatch(store.reference_point, rua)) {
       return false;
@@ -1206,6 +1257,7 @@ export default async function Home({ searchParams }: HomeProps) {
       ) {
         return false;
       }
+      if (!matchesStoreRegion(s)) return false;
       if (rua && !streetsMatch(s.street, rua) && !streetsMatch(s.reference_point, rua)) return false;
       return true;
     })
