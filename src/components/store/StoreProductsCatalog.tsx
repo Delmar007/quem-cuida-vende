@@ -1591,13 +1591,13 @@ export default function StoreProductsCatalog({
                       {/* Conteúdo do Card */}
                       <div className="p-4 flex flex-col flex-grow justify-between bg-white">
                         <div className="flex flex-col flex-grow">
-                          <div className="flex items-center justify-between text-[11px] text-gray-400 uppercase tracking-wide mb-1">
+                          <div className="flex items-center justify-between text-[13.2px] text-gray-400 uppercase tracking-wide mb-1">
                             <span className="font-semibold text-gray-600 line-clamp-1">{storeName}</span>
-                            {dataFormatada && <span className="text-[10px] shrink-0 text-gray-400">{dataFormatada}</span>}
+                            {dataFormatada && <span className="text-[12px] shrink-0 text-gray-400">{dataFormatada}</span>}
                           </div>
                           <h3
                             onClick={() => handleOpenDetailModal(produto)}
-                            className={`text-sm text-gray-900 font-semibold leading-snug mb-1 cursor-pointer hover:text-[#FB6600] transition-colors ${
+                            className={`text-[16.8px] text-gray-900 font-semibold leading-snug mb-1 cursor-pointer hover:text-[#FB6600] transition-colors ${
                               isVehicleCard ? 'line-clamp-1' : 'line-clamp-2'
                             }`}
                           >
@@ -1654,15 +1654,27 @@ export default function StoreProductsCatalog({
                             </div>
                           ) : (
                             produto.description && (
-                              <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                              <p className="text-[14.4px] text-gray-500 line-clamp-2 mb-2">
                                 {produto.description}
                               </p>
                             )
                           )}
                         </div>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex flex-col">
+                        <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 items-center gap-2">
+                          <div className="col-span-1">
+                            <WhatsappAvailabilityButton
+                              phone={storePhone}
+                              productName={produto.name}
+                              storeName={storeName}
+                              productId={produto.id}
+                              sku={produto.sku}
+                              storeSlug={storeSlug}
+                              storeId={storeId}
+                              compact={true}
+                            />
+                          </div>
+                          <div className="col-span-2 min-w-0 flex flex-col items-end text-right">
                             <span
                               className={`text-[19px] font-bold leading-tight tabular-nums ${
                                 hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
@@ -1676,16 +1688,6 @@ export default function StoreProductsCatalog({
                               </span>
                             )}
                           </div>
-                          <WhatsappAvailabilityButton
-                            phone={storePhone}
-                            productName={produto.name}
-                            storeName={storeName}
-                            productId={produto.id}
-                            sku={produto.sku}
-                            storeSlug={storeSlug}
-                            storeId={storeId}
-                            compact={true}
-                          />
                         </div>
                       </div>
                     </div>

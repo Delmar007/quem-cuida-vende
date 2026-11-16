@@ -1642,7 +1642,7 @@ export default async function Home({ searchParams }: HomeProps) {
                                 storeMatch?.neighborhood ||
                                 "";
                               return (
-                                <span className="font-heading font-semibold uppercase text-[11px] text-gray-700 line-clamp-1 block">
+                                <span className="font-heading font-semibold uppercase text-[13.2px] text-gray-700 line-clamp-1 block">
                                   {produto.store_name}
                                   {locText ? (
                                     <span className="text-[#FB6600] font-bold"> • {locText}</span>
@@ -1652,9 +1652,9 @@ export default async function Home({ searchParams }: HomeProps) {
                             })()}
                           </div>
                         </div>
-                        {dataFormatada && <span className="text-[11px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
+                        {dataFormatada && <span className="text-[13.2px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
                       </div>
-                      <h3 className="font-heading text-[15px] text-gray-900 font-semibold leading-snug tracking-tight mb-1.5 line-clamp-2">
+                      <h3 className="font-heading text-[18px] text-gray-900 font-semibold leading-snug tracking-tight mb-1.5 line-clamp-2">
                         {toTitleCase(produto.name)}
                       </h3>
 
@@ -1706,16 +1706,37 @@ export default async function Home({ searchParams }: HomeProps) {
                         </div>
                       ) : (
                         produto.description && (
-                          <p className="text-[13px] text-gray-600 leading-relaxed line-clamp-2 mb-2">
+                          <p className="text-[15.6px] text-gray-600 leading-relaxed line-clamp-2 mb-2">
                             {produto.description}
                           </p>
                         )
                       )}
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
-                      {/* Coluna esquerda: Preço promocional em cima + preço regular riscado embaixo */}
-                      <div className="min-w-0 flex flex-col">
+                    <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 items-center gap-2">
+                      {/* 1 coluna à esquerda: Botão WhatsApp VER DISPONIBILIDADE (2 linhas) */}
+                      <div className="col-span-1">
+                        <WhatsappAvailabilityButton
+                          phone={
+                            produto.store_phone ||
+                            allStores.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.phone ||
+                            SEED_STORES.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.phone
+                          }
+                          productName={produto.name}
+                          storeName={produto.store_name}
+                          productId={produto.id}
+                          storeSlug={
+                            produto.store_slug ||
+                            allStores.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.slug ||
+                            SEED_STORES.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.slug
+                          }
+                          storeId={produto.store_id}
+                          compact={true}
+                        />
+                      </div>
+
+                      {/* 2 colunas à direita: Preço promocional em cima + preço regular riscado embaixo */}
+                      <div className="col-span-2 min-w-0 flex flex-col items-end text-right">
                         <div
                           className={`font-heading text-[19px] font-bold tracking-normal tabular-nums leading-tight ${
                             hasDiscount ? "text-[#FB6600]" : "text-neutral-900"
@@ -1729,25 +1750,6 @@ export default async function Home({ searchParams }: HomeProps) {
                           </div>
                         )}
                       </div>
-
-                      {/* Coluna direita: Botão WhatsApp VER DISPONIBILIDADE */}
-                      <WhatsappAvailabilityButton
-                        phone={
-                          produto.store_phone ||
-                          allStores.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.phone ||
-                          SEED_STORES.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.phone
-                        }
-                        productName={produto.name}
-                        storeName={produto.store_name}
-                        productId={produto.id}
-                        storeSlug={
-                          produto.store_slug ||
-                          allStores.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.slug ||
-                          SEED_STORES.find((s) => s.id === produto.store_id || s.name === produto.store_name)?.slug
-                        }
-                        storeId={produto.store_id}
-                        compact={true}
-                      />
                     </div>
                   </div>
                 </div>
