@@ -1063,9 +1063,9 @@ export default function Header() {
                       e.stopPropagation()
                       setIsMobileCatOpen(false)
                     }}
-                    className="text-xs text-gray-500 hover:text-[#FB6600] flex items-center justify-between py-1 font-medium"
+                    className="text-xs text-gray-500 hover:text-[#FB6600] uppercase flex items-center justify-between py-1 font-medium"
                   >
-                    <span>Limpar categoria</span>
+                    <span>LIMPAR CATEGORIA</span>
                   </Link>
                   <div className="flex items-center gap-[2px] shrink-0">
                     <Link
