@@ -1714,8 +1714,12 @@ export default async function Home({ searchParams }: HomeProps) {
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-1">
-                      {/* 1. Preço de venda (R$ perfeitamente alinhado na mesma fonte e linha) */}
-                      <div className="font-heading text-base font-bold text-neutral-900 tracking-normal tabular-nums leading-tight">
+                      {/* 1. Preço de venda (laranja quando promocional, preto no preço normal) */}
+                      <div
+                        className={`font-heading text-base font-bold tracking-normal tabular-nums leading-tight ${
+                          hasDiscount ? "text-[#FB6600]" : "text-neutral-900"
+                        }`}
+                      >
                         R$ {String(produto.price || "").replace(/^R\$\s*/i, "").trim()}
                       </div>
 

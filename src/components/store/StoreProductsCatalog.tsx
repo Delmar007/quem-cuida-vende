@@ -1074,7 +1074,11 @@ export default function StoreProductsCatalog({
                         <div className="mt-1 pt-1.5 border-t border-gray-100 flex items-center justify-between">
                           <div>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+                              <span
+                                className={`text-xs sm:text-sm font-bold ${
+                                  hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
+                                }`}
+                              >
                                 R$ {formatCurrencyBRL(priceFinal)}
                               </span>
                             </div>
@@ -1661,7 +1665,11 @@ export default function StoreProductsCatalog({
                           <div>
                             <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Preço</span>
                             <div className="flex items-baseline gap-1.5">
-                              <span className="text-base font-bold text-neutral-900">
+                              <span
+                                className={`text-base font-bold ${
+                                  hasPromo ? 'text-[#FB6600]' : 'text-neutral-900'
+                                }`}
+                              >
                                 R$ {formatCurrencyBRL(priceFinal)}
                               </span>
                               {hasPromo && (

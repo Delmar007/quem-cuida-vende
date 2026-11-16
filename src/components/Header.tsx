@@ -343,7 +343,7 @@ export default function Header() {
             <img 
               src="/logo-kittanda-laranja.png" 
               alt="Kittanda Outlet" 
-              className="w-[200px] sm:w-[250px] md:w-[300px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="w-[160px] sm:w-[250px] md:w-[300px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
@@ -640,8 +640,48 @@ export default function Header() {
             </button>
           </div>
 
-          {/* AÇÕES DO TOPO - MOBILE (Linha 1: apenas Avatar + Nome ou Entrar) */}
-          <div className="flex sm:hidden items-center gap-2 text-[15.5px] text-gray-500 font-normal shrink-0">
+          {/* AÇÕES DO TOPO - MOBILE (Linha 1: Sacolinha + 3px + Avatar + Nome ou Entrar) */}
+          <div className="flex sm:hidden items-center text-[14px] text-gray-500 font-normal shrink-0">
+            <button
+              type="button"
+              aria-label={
+                unreadFeedPromosCount > 0
+                  ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
+                  : 'Feed que sigo'
+              }
+              aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
+              title="Abrir Feed que sigo"
+              onClick={() => {
+                markFeedAsSeen()
+                router.push('/perfil?aba=feed')
+              }}
+              className={`relative inline-flex items-center justify-center w-9 h-9 mr-[3px] rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+                pathname === '/perfil' && searchParams.get('aba') === 'feed'
+                  ? 'text-[#FB6600] bg-orange-50'
+                  : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
+              }`}
+            >
+              <svg
+                aria-hidden="true"
+                className="w-[20px] h-[20px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.75}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              {unreadFeedPromosCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[15px] h-[15px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                  {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
+                </span>
+              )}
+            </button>
+
             <div 
               onClick={() => {
                 router.push('/perfil');
@@ -668,7 +708,7 @@ export default function Header() {
             {user ? (
               <Link
                 href="/perfil"
-                className="text-black hover:text-[#FB6600] font-semibold truncate max-w-[100px] transition-colors cursor-pointer"
+                className="ml-1.5 text-black hover:text-[#FB6600] font-semibold truncate max-w-[82px] transition-colors cursor-pointer"
                 title="Acessar Meu Perfil"
               >
                 {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
@@ -677,7 +717,7 @@ export default function Header() {
               <button 
                 type="button"
                 onClick={openLogin}
-                className="text-black font-semibold hover:text-[#FB6600] transition-colors cursor-pointer"
+                className="ml-1.5 text-black font-semibold hover:text-[#FB6600] transition-colors cursor-pointer"
               >
                 Entrar
               </button>
@@ -685,88 +725,87 @@ export default function Header() {
           </div>
         </div>
 
-        {/* LINHA EXTRA NO MOBILE: restante das informações do cabeçalho (MINHA LOJA, Bolsa, PLANOS, Sair) */}
+        {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca (centro) + PLANOS e SAIR (dir) */}
         <div className="sm:hidden w-full border-t border-gray-100 bg-neutral-50/70">
-          <div className="mx-auto max-w-[940px] px-4 py-2 flex items-center justify-between gap-2 text-[16px] text-gray-600 flex-wrap">
-            {user ? (
-              Boolean(user.hasStore) && (
-                <Link
-                  href="/painel/loja"
-                  className="text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
+          <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[11.5px] text-gray-600">
+            <div className="shrink-0 flex items-center">
+              {user ? (
+                Boolean(user.hasStore) && (
+                  <Link
+                    href="/painel/loja"
+                    className="text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
+                  >
+                    MINHA LOJA
+                  </Link>
+                )
+              ) : (
+                <button
+                  type="button"
+                  onClick={openRegister}
+                  className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  MINHA LOJA
-                </Link>
-              )
-            ) : (
-              <button
-                type="button"
-                onClick={openRegister}
-                className="text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
-              >
-                Crie uma conta
-              </button>
-            )}
-            <button
-              type="button"
-              aria-label={
-                unreadFeedPromosCount > 0
-                  ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
-                  : 'Feed que sigo'
-              }
-              aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
-              title="Abrir Feed que sigo"
-              onClick={() => {
-                markFeedAsSeen()
-                router.push('/perfil?aba=feed')
-              }}
-              className={`relative inline-flex items-center justify-center min-w-[40px] min-h-[40px] rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
-                pathname === '/perfil' && searchParams.get('aba') === 'feed'
-                  ? 'text-[#FB6600] bg-orange-50'
-                  : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
-              }`}
-            >
-              <svg
-                aria-hidden="true"
-                className="w-[21px] h-[21px]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.75}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                />
-              </svg>
-              {unreadFeedPromosCount > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
-                  {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
-                </span>
+                  Crie uma conta
+                </button>
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsPlansOpen(true)}
-              className="text-[14.5px] font-bold uppercase tracking-wider text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+            </div>
+
+            <form
+              onSubmit={handleSearch}
+              className="flex-1 min-w-0 flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white h-8"
             >
-              PLANOS
-            </button>
-            {user && (
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Buscar..."
+                aria-label="Buscar por produto ou nome da loja"
+                className="w-full min-w-0 px-2.5 py-1 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none bg-transparent"
+              />
+              <button
+                type="submit"
+                aria-label="Buscar"
+                className="px-2 py-1 text-black hover:text-[#FB6600] transition-colors cursor-pointer shrink-0 flex items-center justify-center"
+                title="Buscar"
+              >
+                <svg
+                  className="w-3.5 h-3.5 stroke-[2]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </form>
+
+            <div className="shrink-0 flex items-center gap-2">
               <button
                 type="button"
-                onClick={async () => {
-                  await logoutAction()
-                  setUser(null)
-                  setAvatarUrl(null)
-                  router.push('/')
-                  router.refresh()
-                }}
-                className="text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                onClick={() => setIsPlansOpen(true)}
+                className="text-[11.5px] font-bold uppercase tracking-wide text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
               >
-                SAIR
+                PLANOS
               </button>
-            )}
+              {user && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await logoutAction()
+                    setUser(null)
+                    setAvatarUrl(null)
+                    router.push('/')
+                    router.refresh()
+                  }}
+                  className="text-[11.5px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                >
+                  SAIR
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
