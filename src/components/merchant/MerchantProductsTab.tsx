@@ -13,6 +13,11 @@ import {
 } from '@/app/actions/products'
 import { getStoreCategoriesAction } from '@/app/actions/categories'
 import { StoreCategoryWithSubcategories } from '@/lib/categories-storage'
+import {
+  CAR_MAIN_CATEGORIES,
+  CAR_SUBCATEGORIES_MAP,
+  isUsedOrDealershipCarStore,
+} from '@/lib/car-categories'
 import { StoredProduct } from '@/lib/products-storage'
 import { getPlan, PlanId } from '@/lib/plans'
 import { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog'
@@ -68,39 +73,6 @@ const FALLBACK_VEHICLE_YEARS: string[] = Array.from(
   { length: 47 },
   (_, i) => String(new Date().getFullYear() + 1 - i)
 )
-
-const CAR_MAIN_CATEGORIES: string[] = [
-  'Sedan',
-  'Hatch',
-  'SUV',
-  'Crossover',
-  'Picape',
-  'Pickup',
-  'Camionete',
-  'Picape compacta',
-  'Picape média',
-  'Picape grande',
-  'Conversível',
-  'Coupé',
-  'Fastback',
-  'Perua',
-  'Minivan',
-  'Van',
-  'Furgão',
-  'Utilitário',
-  'Jipe',
-  'Off-road',
-  'Esportivo',
-  'Antigo',
-]
-
-const CAR_SUBCATEGORIES_MAP: Record<string, string[]> = {
-  sedan: ['Sedan compacto', 'Sedan médio', 'Sedan grande', 'Sedan de luxo'],
-  hatch: ['Hatch compacto', 'Hatch médio'],
-  suv: ['SUV compacto', 'SUV médio', 'SUV grande', 'SUV de luxo', 'SUV cupê'],
-  pickup: ['Picape cabine simples', 'Picape cabine estendida', 'Picape cabine dupla', 'Picape cabine tripla'],
-  picape: ['Picape cabine simples', 'Picape cabine estendida', 'Picape cabine dupla', 'Picape cabine tripla'],
-}
 
 function formatKmValue(raw: string): string {
   const digits = raw.replace(/\D/g, '')
@@ -185,6 +157,11 @@ export default function MerchantProductsTab({
   const isVehicleSegmentStore = useMemo(() => {
     return (storeCategory || '').toLowerCase().trim() === 'carro'
   }, [storeCategory])
+
+  // Regra: somente lojas de carros Usados e Concessionárias têm o menu pronto de categorias/subcategorias
+  const isUsedOrDealershipCar = useMemo(() => {
+    return isUsedOrDealershipCarStore(storeCategory, storeSubcategories)
+  }, [storeCategory, storeSubcategories])
 
   // Filtros e busca
   const [searchTerm, setSearchTerm] = useState('')
@@ -472,7 +449,7 @@ export default function MerchantProductsTab({
   const activeFormCategoryObj = categories.find(
     (c) => c.name.toLowerCase().trim() === formCategory.toLowerCase().trim()
   )
-  const carPresetSubs = formIsVehicle
+  const carPresetSubs = isUsedOrDealershipCar
     ? CAR_SUBCATEGORIES_MAP[formCategory.toLowerCase().trim()] || []
     : []
   const formAvailableSubcategories = useMemo(() => {
@@ -489,7 +466,7 @@ export default function MerchantProductsTab({
   const handleFormCategoryChange = (newCatName: string) => {
     setFormCategory(newCatName)
     const match = categories.find((c) => c.name.toLowerCase().trim() === newCatName.toLowerCase().trim())
-    const preset = formIsVehicle ? CAR_SUBCATEGORIES_MAP[newCatName.toLowerCase().trim()] || [] : []
+    const preset = isUsedOrDealershipCar ? CAR_SUBCATEGORIES_MAP[newCatName.toLowerCase().trim()] || [] : []
     if (preset.length > 0) {
       setFormSubcategory(preset[0])
     } else if (match && match.subcategories.length > 0) {
@@ -2494,7 +2471,7 @@ export default function MerchantProductsTab({
                   </h4>
                 </div>
 
-                {categories.length === 0 && !formIsVehicle ? (
+                {categories.length === 0 && !isUsedOrDealershipCar ? (
                   <div className="p-4 bg-amber-50/80 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-950 flex items-center justify-between flex-wrap gap-2 shadow-2xs">
                     <span className="font-medium">
                       Nenhuma categoria cadastrada no Tópico 05.
@@ -2519,11 +2496,11 @@ export default function MerchantProductsTab({
                         className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
                       >
                         <option value="">
-                          {formIsVehicle
+                          {isUsedOrDealershipCar
                             ? 'Selecione a categoria do carro...'
                             : 'Selecione uma categoria...'}
                         </option>
-                        {(formIsVehicle
+                        {(isUsedOrDealershipCar
                           ? Array.from(
                               new Set([
                                 ...CAR_MAIN_CATEGORIES,

@@ -10,6 +10,10 @@ import { toTitleCase } from '@/lib/textFormat'
 import { buildWhatsappAvailabilityUrl } from '@/lib/whatsapp-availability'
 import DefaultStoreAvatar from '@/components/DefaultStoreAvatar'
 import WhatsappAvailabilityButton from '@/components/WhatsappAvailabilityButton'
+import {
+  buildReadyCarStoreCategories,
+  isUsedOrDealershipCarStore,
+} from '@/lib/car-categories'
 
 export interface ProductItem {
   id: string
@@ -202,6 +206,22 @@ export default function StoreProductsCatalog({
   // Se a loja tiver categorias cadastradas no Dispositivo nº 6, usamos elas.
   // Caso contrário, extraímos categorias dos próprios produtos ou usamos exemplo base.
   const displayCategories = useMemo(() => {
+    const isCarDealership = isUsedOrDealershipCarStore(storeCategory, storeSubcategories)
+    if (isCarDealership) {
+      const readyCarCats = buildReadyCarStoreCategories(storeId || 'car-store')
+      if (!categories || categories.length === 0) {
+        return readyCarCats
+      }
+      const activeCustom = categories.filter((c) => c.is_active !== false)
+      const merged = [...readyCarCats]
+      for (const custom of activeCustom) {
+        if (!merged.some((r) => r.name.toLowerCase().trim() === custom.name.toLowerCase().trim())) {
+          merged.push(custom)
+        }
+      }
+      return merged
+    }
+
     if (categories && categories.length > 0) {
       return categories.filter((c) => c.is_active !== false)
     }
