@@ -18,6 +18,8 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [unreadFeedPromosCount, setUnreadFeedPromosCount] = useState(0)
+  const [recentFeedPromos, setRecentFeedPromos] = useState<any[]>([])
+  const [isFeedPreviewOpen, setIsFeedPreviewOpen] = useState(false)
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
@@ -268,6 +270,7 @@ export default function Header() {
 
     if (!user) {
       setUnreadFeedPromosCount(0)
+      setRecentFeedPromos([])
       return
     }
 
@@ -276,6 +279,7 @@ export default function Header() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!active || !data || !Array.isArray(data.promotions)) return
+        setRecentFeedPromos(data.promotions.slice(0, 4))
         let lastSeenMs = 0
         try {
           const saved = localStorage.getItem('kittanda_feed_last_seen_at')
@@ -452,26 +456,180 @@ export default function Header() {
               </>
             )}
             <span className="text-gray-300 text-xs font-light">|</span>
-            <button 
-              type="button" 
-              aria-label="Feed que sigo"
-              title="Abrir Feed que sigo"
-              className="text-gray-400 hover:text-[#FB6600] transition-colors p-0.5 cursor-pointer"
-              onClick={() => router.push('/perfil?aba=feed')}
+            <div
+              className="relative flex items-center"
+              onMouseEnter={() => setIsFeedPreviewOpen(true)}
+              onMouseLeave={() => setIsFeedPreviewOpen(false)}
             >
-              <svg 
-                className="w-5 h-5 stroke-[1.4]" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
+              <button
+                type="button"
+                aria-label={
+                  unreadFeedPromosCount > 0
+                    ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
+                    : 'Feed que sigo'
+                }
+                aria-haspopup="true"
+                aria-expanded={isFeedPreviewOpen}
+                aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
+                title="Feed que sigo — Novidades das lojas que você acompanha"
+                className={`relative inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+                  pathname === '/perfil' && searchParams.get('aba') === 'feed'
+                    ? 'text-[#FB6600] bg-orange-50'
+                    : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
+                }`}
+                onClick={() => {
+                  markFeedAsSeen()
+                  setIsFeedPreviewOpen(false)
+                  router.push('/perfil?aba=feed')
+                }}
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" 
-                />
-              </svg>
-            </button>
+                <svg
+                  aria-hidden="true"
+                  className="w-[19px] h-[19px]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
+                </svg>
+                {unreadFeedPromosCount > 0 && (
+                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                    {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
+                  </span>
+                )}
+              </button>
+
+              {isFeedPreviewOpen && (
+                <div
+                  role="region"
+                  aria-label="Prévia do Feed que sigo"
+                  className="absolute right-0 top-full pt-2 z-50 w-80"
+                >
+                  <div className="bg-white border border-neutral-200 rounded-md shadow-xl overflow-hidden normal-case tracking-normal text-left">
+                    <div className="px-3.5 py-2.5 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#FB6600]" aria-hidden="true" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
+                          Feed que sigo
+                        </span>
+                      </div>
+                      {unreadFeedPromosCount > 0 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-[#FB6600] tabular-nums">
+                          {unreadFeedPromosCount} {unreadFeedPromosCount === 1 ? 'nova' : 'novas'}
+                        </span>
+                      )}
+                    </div>
+
+                    {!user ? (
+                      <div className="p-4 text-center space-y-2.5">
+                        <p className="text-xs text-neutral-600 leading-relaxed">
+                          Entre na sua conta para acompanhar em um só lugar as novidades e promoções das lojas que você segue.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsFeedPreviewOpen(false)
+                            openLogin()
+                          }}
+                          className="w-full py-2 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors cursor-pointer"
+                        >
+                          Entrar para ver meu Feed
+                        </button>
+                      </div>
+                    ) : recentFeedPromos.length === 0 ? (
+                      <div className="p-4 text-center space-y-2">
+                        <p className="text-xs font-semibold text-neutral-800">
+                          Seu feed está pronto para você
+                        </p>
+                        <p className="text-[11px] text-neutral-500 leading-relaxed">
+                          Siga suas lojas favoritas para receber aqui as últimas postagens e ofertas.
+                        </p>
+                      </div>
+                    ) : (
+                      <ul className="divide-y divide-neutral-100 max-h-64 overflow-y-auto">
+                        {recentFeedPromos.map((promo: any) => {
+                          const storeName = promo?.stores?.name || 'Loja seguida'
+                          const priceValue =
+                            typeof promo?.price_promotional === 'number' && promo.price_promotional > 0
+                              ? promo.price_promotional
+                              : promo?.price_original
+                          return (
+                            <li key={promo.id}>
+                              <Link
+                                href={`/loja/${promo.store_id}`}
+                                onClick={() => {
+                                  markFeedAsSeen()
+                                  setIsFeedPreviewOpen(false)
+                                }}
+                                className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-orange-50/50 transition-colors"
+                              >
+                                <div className="w-11 h-11 rounded-[3px] bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0">
+                                  {promo.image_url ? (
+                                    <img
+                                      src={promo.image_url}
+                                      alt={promo.title || 'Produto'}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                                      <svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                      </svg>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-[10px] font-bold uppercase tracking-wide text-[#FB6600] truncate">
+                                    {storeName}
+                                  </p>
+                                  <p className="text-xs font-semibold text-neutral-900 truncate">
+                                    {promo.title}
+                                  </p>
+                                  {typeof priceValue === 'number' && priceValue > 0 && (
+                                    <p className="text-[11px] font-bold text-neutral-800 tabular-nums">
+                                      R$ {priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
+                                  )}
+                                </div>
+                              </Link>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+
+                    <div className="p-2.5 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          markFeedAsSeen()
+                          setIsFeedPreviewOpen(false)
+                          router.push('/perfil?aba=feed')
+                        }}
+                        className="flex-1 py-2 px-3 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors cursor-pointer text-center"
+                      >
+                        Abrir Feed que sigo
+                      </button>
+                      <Link
+                        href="/?filtro=feed_que_sigo"
+                        onClick={() => {
+                          markFeedAsSeen()
+                          setIsFeedPreviewOpen(false)
+                        }}
+                        className="py-2 px-2.5 bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-200 text-[11px] font-semibold rounded-[3px] transition-colors whitespace-nowrap"
+                      >
+                        Catálogo
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             <span className="text-gray-300 text-xs font-light">|</span>
             <button
               type="button"
@@ -550,19 +708,30 @@ export default function Header() {
             )}
             <button
               type="button"
-              aria-label="Feed que sigo"
+              aria-label={
+                unreadFeedPromosCount > 0
+                  ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
+                  : 'Feed que sigo'
+              }
+              aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
               title="Abrir Feed que sigo"
               onClick={() => {
                 markFeedAsSeen()
                 router.push('/perfil?aba=feed')
               }}
-              className="relative inline-flex items-center justify-center text-gray-600 hover:text-[#FB6600] transition-colors cursor-pointer p-0.5 shrink-0"
+              className={`relative inline-flex items-center justify-center min-w-[40px] min-h-[40px] rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+                pathname === '/perfil' && searchParams.get('aba') === 'feed'
+                  ? 'text-[#FB6600] bg-orange-50'
+                  : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
+              }`}
             >
               <svg
-                className="w-[21px] h-[21px] stroke-[1.7]"
+                aria-hidden="true"
+                className="w-[21px] h-[21px]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                strokeWidth={1.75}
               >
                 <path
                   strokeLinecap="round"
@@ -571,7 +740,7 @@ export default function Header() {
                 />
               </svg>
               {unreadFeedPromosCount > 0 && (
-                <span className="absolute -top-1 -right-1.5 min-w-[14px] h-[14px] px-[3px] bg-red-600 text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums">
+                <span className="absolute top-1 right-1 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
                   {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
                 </span>
               )}

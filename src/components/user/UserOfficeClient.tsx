@@ -135,6 +135,8 @@ export default function UserOfficeClient({
     initialUser.favoriteProductIds || []
   )
   const [selectedStoreFilterInFeed, setSelectedStoreFilterInFeed] = useState<string>('all')
+  const [feedSearchQuery, setFeedSearchQuery] = useState<string>('')
+  const [feedSortOrder, setFeedSortOrder] = useState<'recent' | 'price_asc' | 'price_desc' | 'promo'>('recent')
 
   // Feedback de salvamento
   const [isSaving, setIsSaving] = useState(false)
@@ -308,16 +310,48 @@ export default function UserOfficeClient({
   )
 
   // Produtos das lojas que o usuário segue ("Feed que sigo")
-  const followedProducts = allProducts.filter((p) => {
-    const isFromFollowedStore = followedStores.some(
+  const allFollowedProducts = allProducts.filter((p) =>
+    followedStores.some(
       (s) => s.id === p.store_id || s.name.toLowerCase() === p.store_name.toLowerCase()
     )
-    if (!isFromFollowedStore) return false
-    if (selectedStoreFilterInFeed !== 'all' && p.store_id !== selectedStoreFilterInFeed) {
-      return false
-    }
-    return true
-  })
+  )
+
+  const parseNumericPrice = (p: ProductItem): number => {
+    if (typeof p.promotional_price === 'number' && p.promotional_price > 0) return p.promotional_price
+    if (typeof p.regular_price === 'number' && p.regular_price > 0) return p.regular_price
+    const cleaned = String(p.price || '')
+      .replace(/[^\d,]/g, '')
+      .replace(',', '.')
+    const parsed = parseFloat(cleaned)
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  const normalizedFeedSearch = feedSearchQuery.trim().toLowerCase()
+
+  const followedProducts = allFollowedProducts
+    .filter((p) => {
+      if (selectedStoreFilterInFeed !== 'all' && p.store_id !== selectedStoreFilterInFeed) {
+        return false
+      }
+      if (normalizedFeedSearch) {
+        const haystack = `${p.name} ${p.store_name} ${p.description || ''}`.toLowerCase()
+        if (!haystack.includes(normalizedFeedSearch)) return false
+      }
+      if (feedSortOrder === 'promo') {
+        return (
+          typeof p.regular_price === 'number' &&
+          typeof p.promotional_price === 'number' &&
+          p.promotional_price > 0 &&
+          p.promotional_price < p.regular_price
+        )
+      }
+      return true
+    })
+    .sort((a, b) => {
+      if (feedSortOrder === 'price_asc') return parseNumericPrice(a) - parseNumericPrice(b)
+      if (feedSortOrder === 'price_desc') return parseNumericPrice(b) - parseNumericPrice(a)
+      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
+    })
 
   // Produtos favoritos do usuário
   const favoriteProducts = allProducts.filter((p) => favoriteProductIds.includes(p.id))
@@ -376,6 +410,8 @@ export default function UserOfficeClient({
         <button
           type="button"
           onClick={() => handleToggleFavorite(produto.id)}
+          aria-label={isFav ? `Remover ${produto.name} dos Favoritos` : `Salvar ${produto.name} nos Favoritos`}
+          aria-pressed={isFav}
           title={isFav ? 'Remover dos Favoritos' : 'Salvar nos Favoritos'}
           className={`absolute top-2.5 right-2.5 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer border shadow-sm ${
             isFav
@@ -468,7 +504,7 @@ export default function UserOfficeClient({
               </div>
             </div>
             <Link
-              href={`/loja/${storeObj?.slug || produto.store_id}`}
+              href={`/loja/${storeObj?.slug || produto.store_id}?produto=${encodeURIComponent(produto.id)}`}
               className="text-xs border border-gray-300 px-3 py-1.5 text-gray-700 hover:border-black hover:text-black font-semibold transition-colors"
             >
               Ver na Loja
@@ -952,83 +988,229 @@ export default function UserOfficeClient({
           {/* ================================================================= */}
           {activeTab === 'feed' && (
             <section className="space-y-5 animate-in fade-in duration-200">
-              <div className="bg-white border border-neutral-200 p-5 sm:p-6 rounded-[2px] shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600] block">
-                      Meu Perfil • Feed Exclusivo
-                    </span>
-                    <h2 className="text-lg font-black uppercase tracking-tight text-[#FB6600]">
-                      Feed que sigo
-                    </h2>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Todos os itens postados pelas lojas que você segue aparecem reunidos aqui.
-                    </p>
+              <div className="bg-white border border-neutral-200 p-5 sm:p-6 rounded-[4px] shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-11 h-11 rounded-full bg-orange-50 border border-orange-200/80 text-[#FB6600] flex items-center justify-center shrink-0">
+                      <svg
+                        aria-hidden="true"
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.75}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10.5px] uppercase font-bold tracking-widest text-[#FB6600]">
+                          Meu Perfil • Feed Exclusivo
+                        </span>
+                        {followedStores.length > 0 && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 tabular-nums">
+                            {allFollowedProducts.length} {allFollowedProducts.length === 1 ? 'item' : 'itens'} • {followedStores.length}{' '}
+                            {followedStores.length === 1 ? 'loja' : 'lojas'}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="text-lg font-black uppercase tracking-tight text-neutral-900 mt-0.5">
+                        Feed que sigo
+                      </h2>
+                      <p className="text-xs text-neutral-500 mt-0.5">
+                        Novidades e ofertas das lojas que você acompanha, organizadas em um só lugar.
+                      </p>
+                    </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('seguindo')}
-                    className="px-3.5 py-2 border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider text-neutral-800 rounded-[2px] cursor-pointer self-start sm:self-auto"
-                  >
-                    Gerenciar Lojas Seguidas ({followedStores.length})
-                  </button>
-                </div>
-
-                {/* Filtro rápido por loja seguida */}
-                {followedStores.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-neutral-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+                  <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+                    <Link
+                      href="/?filtro=feed_que_sigo"
+                      className="px-3.5 py-2 bg-neutral-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-[3px] transition-colors"
+                    >
+                      Ver no Catálogo
+                    </Link>
                     <button
                       type="button"
+                      onClick={() => setActiveTab('seguindo')}
+                      className="px-3.5 py-2 border border-neutral-300 hover:border-black text-xs font-bold uppercase tracking-wider text-neutral-800 rounded-[3px] cursor-pointer transition-colors"
+                    >
+                      Gerenciar Lojas ({followedStores.length})
+                    </button>
+                  </div>
+                </div>
+
+                {/* Busca rápida e ordenação dentro do Feed */}
+                {followedStores.length > 0 && (
+                  <div className="pt-4 border-t border-neutral-100 flex flex-col sm:flex-row gap-2.5">
+                    <div className="relative flex-1">
+                      <svg
+                        aria-hidden="true"
+                        className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={1.75}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+                      </svg>
+                      <input
+                        type="search"
+                        value={feedSearchQuery}
+                        onChange={(e) => setFeedSearchQuery(e.target.value)}
+                        placeholder="Buscar produto ou loja no seu feed..."
+                        aria-label="Buscar produto ou loja no seu feed"
+                        className="w-full pl-9 pr-8 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-[3px] focus:outline-none focus:border-[#FB6600] focus:bg-white transition-colors"
+                      />
+                      {feedSearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setFeedSearchQuery('')}
+                          aria-label="Limpar busca"
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 text-sm cursor-pointer"
+                        >
+                          &times;
+                        </button>
+                      )}
+                    </div>
+                    <select
+                      value={feedSortOrder}
+                      onChange={(e) => setFeedSortOrder(e.target.value as any)}
+                      aria-label="Ordenar itens do feed"
+                      className="px-3 py-2 text-xs font-semibold bg-neutral-50 border border-neutral-200 rounded-[3px] text-neutral-800 focus:outline-none focus:border-[#FB6600] cursor-pointer"
+                    >
+                      <option value="recent">Mais recentes</option>
+                      <option value="promo">Apenas em promoção</option>
+                      <option value="price_asc">Menor preço</option>
+                      <option value="price_desc">Maior preço</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Filtro rápido por loja seguida com avatar e contador */}
+                {followedStores.length > 0 && (
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                    <button
+                      type="button"
+                      aria-pressed={selectedStoreFilterInFeed === 'all'}
                       onClick={() => setSelectedStoreFilterInFeed('all')}
-                      className={`px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-[2px] whitespace-nowrap cursor-pointer border transition-colors ${
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full whitespace-nowrap cursor-pointer border transition-colors ${
                         selectedStoreFilterInFeed === 'all'
                           ? 'bg-[#FB6600] text-white border-[#FB6600]'
                           : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:border-neutral-400'
                       }`}
                     >
-                      Todas que sigo ({followedStores.length})
-                    </button>
-                    {followedStores.map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => setSelectedStoreFilterInFeed(st.id)}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-[2px] whitespace-nowrap cursor-pointer border transition-colors ${
-                          selectedStoreFilterInFeed === st.id
-                            ? 'bg-black text-white border-black'
-                            : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400'
+                      <span>Todas</span>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                          selectedStoreFilterInFeed === 'all'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-neutral-200/80 text-neutral-700'
                         }`}
                       >
-                        {st.name}
-                      </button>
-                    ))}
+                        {allFollowedProducts.length}
+                      </span>
+                    </button>
+                    {followedStores.map((st) => {
+                      const storeProductCount = allFollowedProducts.filter(
+                        (p) => p.store_id === st.id || p.store_name.toLowerCase() === st.name.toLowerCase()
+                      ).length
+                      const isSelected = selectedStoreFilterInFeed === st.id
+                      return (
+                        <button
+                          key={st.id}
+                          type="button"
+                          aria-pressed={isSelected}
+                          onClick={() => setSelectedStoreFilterInFeed(st.id)}
+                          className={`inline-flex items-center gap-2 pl-1.5 pr-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap cursor-pointer border transition-colors ${
+                            isSelected
+                              ? 'bg-neutral-900 text-white border-neutral-900'
+                              : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400'
+                          }`}
+                        >
+                          <span className="w-5 h-5 rounded-full bg-neutral-100 border border-neutral-200 overflow-hidden flex items-center justify-center shrink-0 text-[10px] font-bold text-neutral-700">
+                            {st.logo_url ? (
+                              <img src={st.logo_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              st.name[0]?.toUpperCase() || 'L'
+                            )}
+                          </span>
+                          <span>{st.name}</span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                              isSelected ? 'bg-white/20 text-white' : 'bg-neutral-100 text-neutral-600'
+                            }`}
+                          >
+                            {storeProductCount}
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>
 
               {followedStores.length === 0 ? (
-                <div className="bg-white border border-dashed border-neutral-300 p-10 text-center rounded-[2px]">
-                  <span className="text-3xl block mb-2">🏪</span>
+                <div className="bg-white border border-dashed border-neutral-300 p-10 text-center rounded-[4px]">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-orange-50 border border-orange-200 text-[#FB6600] flex items-center justify-center">
+                    <svg
+                      aria-hidden="true"
+                      className="w-7 h-7"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.75}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                  </div>
                   <h3 className="text-sm font-bold text-neutral-900 uppercase mb-1">
                     Você ainda não está seguindo nenhuma loja
                   </h3>
-                  <p className="text-xs text-neutral-500 max-w-md mx-auto mb-5">
-                    Siga suas lojas favoritas para montar o seu <strong>Feed que sigo</strong> com todas as publicações delas em um único lugar.
+                  <p className="text-xs text-neutral-500 max-w-md mx-auto mb-5 leading-relaxed">
+                    Siga suas lojas favoritas para montar o seu <strong>Feed que sigo</strong> com todas as publicações e promoções delas em um único lugar.
+                  </p>
+                  <div className="flex items-center justify-center gap-3 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('seguindo')}
+                      className="px-5 py-2.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-wider rounded-[3px] cursor-pointer transition-colors"
+                    >
+                      Escolher Lojas para Seguir
+                    </button>
+                    <Link
+                      href="/?tipo=lojas"
+                      className="px-5 py-2.5 bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-300 text-xs font-bold uppercase tracking-wider rounded-[3px] transition-colors"
+                    >
+                      Explorar Catálogo de Lojas
+                    </Link>
+                  </div>
+                </div>
+              ) : followedProducts.length === 0 ? (
+                <div className="bg-white border border-dashed border-neutral-300 p-10 text-center rounded-[4px] space-y-3">
+                  <p className="text-sm font-semibold text-neutral-800">
+                    Nenhum produto encontrado para o filtro selecionado.
                   </p>
                   <button
                     type="button"
-                    onClick={() => setActiveTab('seguindo')}
-                    className="px-5 py-2.5 bg-[#FB6600] hover:bg-[#e05b00] text-white text-xs font-bold uppercase tracking-wider rounded-[2px] cursor-pointer"
+                    onClick={() => {
+                      setSelectedStoreFilterInFeed('all')
+                      setFeedSearchQuery('')
+                      setFeedSortOrder('recent')
+                    }}
+                    className="px-4 py-2 bg-neutral-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-[3px] cursor-pointer transition-colors"
                   >
-                    Escolher Lojas para Seguir
+                    Limpar filtros do Feed
                   </button>
-                </div>
-              ) : followedProducts.length === 0 ? (
-                <div className="bg-white border border-dashed border-neutral-300 p-10 text-center rounded-[2px]">
-                  <p className="text-sm font-semibold text-neutral-700 mb-1">
-                    Nenhum produto encontrado para o filtro selecionado.
-                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
