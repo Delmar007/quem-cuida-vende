@@ -335,6 +335,15 @@ export default function Header() {
 
   return (
     <>
+      {/* 0. FAIXA SUPERIOR LARANJA: Largura total com texto dentro dos 940px */}
+      <div className="w-full bg-[#FB6600] text-white">
+        <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-center text-center">
+          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider leading-tight">
+            Kittanda Outlet • As melhores ofertas e lojas da sua cidade em um só lugar
+          </p>
+        </div>
+      </div>
+
       {/* 1. TOPO: Rola junto com a página */}
       <div className="w-full bg-white border-b border-gray-100">
         <div className="mx-auto max-w-[940px] px-4 min-h-[72px] py-1.5 flex items-center justify-between gap-3">
