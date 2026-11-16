@@ -1617,7 +1617,7 @@ export default async function Home({ searchParams }: HomeProps) {
                     <div className="flex flex-col flex-grow">
                       <div className="flex items-center justify-between text-xs text-gray-500 tracking-wide mb-1.5 gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
+                          <div className="w-[25px] h-[25px] rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
                             {storeLogoUrl ? (
                               <img
                                 src={storeLogoUrl}
