@@ -9,6 +9,16 @@ import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 import { logoutAction, getSessionUserAction } from '@/app/login/actions'
 import { ALPHABET, getStreetInitialLetter, mergeAndGroupStreetsByLetter, streetsMatch } from '@/lib/streets'
 import { getCommercialStreetsByLetterAction } from '@/app/actions/streets'
+import {
+  BRAZIL_STATES,
+  CAMPO_GRANDE_MS_BAIRROS,
+  DEFAULT_KITTANDA_LOCATION,
+  KITTANDA_LOCATION_EVENT,
+  KittandaLocation,
+  getCitiesForUf,
+  getStoredLocation,
+  saveStoredLocation,
+} from '@/lib/brazil-locations'
 
 export default function Header() {
   const router = useRouter()
@@ -20,6 +30,8 @@ export default function Header() {
   const [unreadFeedPromosCount, setUnreadFeedPromosCount] = useState(0)
   const [recentFeedPromos, setRecentFeedPromos] = useState<any[]>([])
   const [isFeedPreviewOpen, setIsFeedPreviewOpen] = useState(false)
+  const [selectedLocation, setSelectedLocation] = useState<KittandaLocation>(DEFAULT_KITTANDA_LOCATION)
+  const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false)
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
@@ -249,6 +261,22 @@ export default function Header() {
     }
   }, [searchParams.toString()])
 
+  useEffect(() => {
+    setSelectedLocation(getStoredLocation())
+    const handleLocationChanged = (ev: Event) => {
+      const custom = ev as CustomEvent<KittandaLocation>
+      if (custom.detail) {
+        setSelectedLocation(custom.detail)
+      } else {
+        setSelectedLocation(getStoredLocation())
+      }
+    }
+    window.addEventListener(KITTANDA_LOCATION_EVENT, handleLocationChanged)
+    return () => {
+      window.removeEventListener(KITTANDA_LOCATION_EVENT, handleLocationChanged)
+    }
+  }, [])
+
   const markFeedAsSeen = () => {
     setUnreadFeedPromosCount(0)
     try {
@@ -335,13 +363,138 @@ export default function Header() {
 
   return (
     <>
-      {/* 0. FAIXA SUPERIOR LARANJA: Largura total com texto dentro dos 940px */}
-      <div className="w-full bg-[#FB6600] text-white">
-        <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-center text-center">
-          <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider leading-tight">
-            Kittanda Outlet • As melhores ofertas e lojas da sua cidade em um só lugar
-          </p>
+      {/* 0. FAIXA SUPERIOR LARANJA: Largura total com UF, Cidade e Bairro dentro dos 940px */}
+      <div className="w-full bg-[#FB6600] text-white relative z-40">
+        <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-between gap-2 text-[11px] sm:text-xs">
+          <div className="flex items-center gap-1.5 min-w-0 font-bold uppercase tracking-wider">
+            <svg
+              aria-hidden="true"
+              className="w-3.5 h-3.5 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <span className="truncate">
+              {selectedLocation.state}
+              {selectedLocation.city ? ` • ${selectedLocation.city}` : ''}
+              {selectedLocation.neighborhood ? ` • ${selectedLocation.neighborhood}` : ''}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsLocationMenuOpen((prev) => !prev)}
+            className="shrink-0 text-[10.5px] sm:text-[11px] font-bold uppercase tracking-wider bg-white/15 hover:bg-white/25 px-2 py-0.5 rounded-[2px] transition-colors cursor-pointer"
+          >
+            {isLocationMenuOpen ? 'Fechar' : 'Alterar Região'}
+          </button>
         </div>
+
+        {isLocationMenuOpen && (
+          <div className="w-full bg-white text-neutral-900 border-b border-orange-200 shadow-md">
+            <div className="mx-auto max-w-[940px] px-4 py-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+                  Estado (UF)
+                </label>
+                <select
+                  value={selectedLocation.state}
+                  onChange={(e) => {
+                    const nextUf = e.target.value
+                    const nextCity = getCitiesForUf(nextUf)[0] || ''
+                    const nextLoc: KittandaLocation = { state: nextUf, city: nextCity, neighborhood: '' }
+                    setSelectedLocation(nextLoc)
+                    saveStoredLocation(nextLoc)
+                  }}
+                  className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
+                >
+                  {BRAZIL_STATES.map((st) => (
+                    <option key={st.uf} value={st.uf}>
+                      {st.uf} — {st.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+                  Cidade
+                </label>
+                <select
+                  value={selectedLocation.city}
+                  onChange={(e) => {
+                    const nextLoc: KittandaLocation = {
+                      state: selectedLocation.state,
+                      city: e.target.value,
+                      neighborhood: '',
+                    }
+                    setSelectedLocation(nextLoc)
+                    saveStoredLocation(nextLoc)
+                  }}
+                  className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
+                >
+                  {getCitiesForUf(selectedLocation.state).map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
+                  Bairro
+                </label>
+                {selectedLocation.state === 'MS' && selectedLocation.city === 'Campo Grande' ? (
+                  <select
+                    value={selectedLocation.neighborhood}
+                    onChange={(e) => {
+                      const nextLoc: KittandaLocation = {
+                        ...selectedLocation,
+                        neighborhood: e.target.value,
+                      }
+                      setSelectedLocation(nextLoc)
+                      saveStoredLocation(nextLoc)
+                    }}
+                    className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
+                  >
+                    <option value="">Todos os bairros</option>
+                    {CAMPO_GRANDE_MS_BAIRROS.map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={selectedLocation.neighborhood}
+                    onChange={(e) => {
+                      const nextLoc: KittandaLocation = {
+                        ...selectedLocation,
+                        neighborhood: e.target.value,
+                      }
+                      setSelectedLocation(nextLoc)
+                      saveStoredLocation(nextLoc)
+                    }}
+                    placeholder="Digite o bairro..."
+                    className="w-full border border-neutral-300 bg-white px-2.5 py-1.5 text-xs text-neutral-900 rounded-[2px] focus:border-[#FB6600] focus:outline-none"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 1. TOPO: Rola junto com a página */}

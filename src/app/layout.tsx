@@ -79,9 +79,16 @@ export default function RootLayout({
         </main>
         
         {/* Footer */}
-        <footer className="border-t border-gray-200 mt-12 md:mt-16 py-8 w-full overflow-hidden">
-          <div className="mx-auto max-w-[940px] px-4 text-xs text-gray-400 text-center tracking-widest uppercase">
-            &copy; 2026 Kittanda Outlet &bull; Todos os direitos reservados.
+        <footer className="mt-12 md:mt-16 w-full bg-[#FB6600] text-white overflow-hidden">
+          <div className="mx-auto max-w-[940px] px-4 min-h-[72px] py-2 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <img
+              src="/logo-kittanda-laranja.png"
+              alt="Kittanda Outlet"
+              className="w-[150px] sm:w-[200px] h-auto object-contain brightness-0 invert shrink-0"
+            />
+            <p className="text-xs sm:text-sm font-bold text-white text-center sm:text-right tracking-wide leading-snug">
+              As melhores ofertas e lojas da sua cidade em um só lugar.
+            </p>
           </div>
         </footer>
       </body>

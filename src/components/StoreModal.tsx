@@ -4,6 +4,12 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ProfileData, createStoreAction } from '@/app/actions/profile'
 import { PlanId } from '@/lib/plans'
+import {
+  BRAZIL_STATES,
+  CAMPO_GRANDE_MS_BAIRROS,
+  getCitiesForUf,
+  saveStoredLocation,
+} from '@/lib/brazil-locations'
 
 interface StoreModalProps {
   isOpen: boolean
@@ -135,8 +141,8 @@ export default function StoreModal({
   const [street, setStreet] = useState('')
   const [number, setNumber] = useState('')
   const [neighborhood, setNeighborhood] = useState('')
-  const [city, setCity] = useState('')
-  const [state, setState] = useState('')
+  const [city, setCity] = useState('Campo Grande')
+  const [state, setState] = useState('MS')
   const [category, setCategory] = useState('moda')
   const [subcategories, setSubcategories] = useState<string[]>(['Feminina', 'Masculina'])
   
@@ -257,6 +263,11 @@ export default function StoreModal({
       })
 
       if (res.success) {
+        saveStoredLocation({
+          state: state.trim().toUpperCase() || 'MS',
+          city: city.trim() || 'Campo Grande',
+          neighborhood: neighborhood.trim(),
+        })
         setCreatedSuccess(res.store)
         if (onStoreCreated) onStoreCreated()
       } else {
@@ -466,6 +477,105 @@ export default function StoreModal({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                   <div>
                     <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                      Estado (UF)
+                    </label>
+                    <select
+                      value={state}
+                      onChange={(e) => {
+                        const nextUf = e.target.value
+                        const cities = getCitiesForUf(nextUf)
+                        const nextCity = cities[0] || ''
+                        setState(nextUf)
+                        setCity(nextCity)
+                        setNeighborhood('')
+                        saveStoredLocation({ state: nextUf, city: nextCity, neighborhood: '' })
+                      }}
+                      className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
+                    >
+                      {BRAZIL_STATES.map((st) => (
+                        <option key={st.uf} value={st.uf}>
+                          {st.uf} — {st.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                      Cidade
+                    </label>
+                    {(() => {
+                      const ufCities = getCitiesForUf(state)
+                      const cityOptions =
+                        city && !ufCities.includes(city) ? [city, ...ufCities] : ufCities
+                      return (
+                        <select
+                          value={city}
+                          onChange={(e) => {
+                            const nextCity = e.target.value
+                            setCity(nextCity)
+                            setNeighborhood('')
+                            saveStoredLocation({ state, city: nextCity, neighborhood: '' })
+                          }}
+                          className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
+                        >
+                          <option value="">Selecione a cidade</option>
+                          {cityOptions.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                        </select>
+                      )
+                    })()}
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                      Bairro
+                    </label>
+                    {state === 'MS' && city === 'Campo Grande' ? (
+                      (() => {
+                        const bairroOptions =
+                          neighborhood && !CAMPO_GRANDE_MS_BAIRROS.includes(neighborhood)
+                            ? [neighborhood, ...CAMPO_GRANDE_MS_BAIRROS]
+                            : CAMPO_GRANDE_MS_BAIRROS
+                        return (
+                          <select
+                            value={neighborhood}
+                            onChange={(e) => {
+                              const nextBairro = e.target.value
+                              setNeighborhood(nextBairro)
+                              saveStoredLocation({ state, city, neighborhood: nextBairro })
+                            }}
+                            className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
+                          >
+                            <option value="">Selecione o bairro</option>
+                            {bairroOptions.map((b) => (
+                              <option key={b} value={b}>
+                                {b}
+                              </option>
+                            ))}
+                          </select>
+                        )
+                      })()
+                    ) : (
+                      <input
+                        type="text"
+                        value={neighborhood}
+                        onChange={(e) => {
+                          const nextBairro = e.target.value
+                          setNeighborhood(nextBairro)
+                          saveStoredLocation({ state, city, neighborhood: nextBairro })
+                        }}
+                        placeholder="Bairro"
+                        className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
+                      />
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
                       CEP
                     </label>
                     <input
@@ -479,34 +589,6 @@ export default function StoreModal({
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                      Estado (UF)
-                    </label>
-                    <input
-                      type="text"
-                      value={state}
-                      onChange={(e) => setState(e.target.value.toUpperCase().slice(0, 2))}
-                      placeholder="UF (ex: SP)"
-                      maxLength={2}
-                      className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                      Cidade
-                    </label>
-                    <input
-                      type="text"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="Cidade"
-                      className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="sm:col-span-1">
-                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
                       Rua / Logradouro
                     </label>
                     <input
@@ -514,18 +596,6 @@ export default function StoreModal({
                       value={street}
                       onChange={(e) => setStreet(e.target.value)}
                       placeholder="Rua / Avenida"
-                      className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                      Bairro
-                    </label>
-                    <input
-                      type="text"
-                      value={neighborhood}
-                      onChange={(e) => setNeighborhood(e.target.value)}
-                      placeholder="Bairro"
                       className="w-full border border-gray-300 bg-white px-3 py-2 text-sm text-neutral-900 focus:border-black focus:outline-none"
                     />
                   </div>
