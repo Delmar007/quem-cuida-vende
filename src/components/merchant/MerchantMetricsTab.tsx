@@ -69,6 +69,27 @@ export default function MerchantMetricsTab({
         </p>
       </div>
 
+      {/* Destaque de Retorno (ROI) no WhatsApp */}
+      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-[2px] flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center font-bold shrink-0">
+            💬
+          </div>
+          <div>
+            <p className="text-sm font-extrabold text-emerald-950">
+              Sua vitrine gerou{' '}
+              <span className="text-[#169c46] underline decoration-2 underline-offset-2">
+                {metrics.weeklyWhatsappClicks.toLocaleString('pt-BR')} contatos
+              </span>{' '}
+              no WhatsApp esta semana
+            </p>
+            <p className="text-[11px] text-emerald-800">
+              Total acumulado de cliques no portal Kittanda: <strong>{metrics.whatsappClicks.toLocaleString('pt-BR')}</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Grid de Indicadores Principais */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 border border-neutral-200 rounded-[2px] shadow-xs">
@@ -190,6 +211,10 @@ export default function MerchantMetricsTab({
                 </div>
 
                 <div className="flex items-center gap-4 text-right">
+                  <div>
+                    <span className="text-xs font-bold text-emerald-600 block">{p.whatsappClicks || 0}</span>
+                    <span className="text-[10px] text-neutral-400 uppercase">WhatsApp</span>
+                  </div>
                   <div>
                     <span className="text-xs font-bold text-neutral-900 block">{p.views}</span>
                     <span className="text-[10px] text-neutral-400 uppercase">Acessos</span>

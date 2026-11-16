@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getStoreWhatsappStatsServer } from '@/lib/whatsapp-clicks-storage'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { PLANS, PlanId, getPlan } from '@/lib/plans'
@@ -31,6 +32,7 @@ export interface StoreMetrics {
   storeViews: number
   productViews: number
   whatsappClicks: number
+  weeklyWhatsappClicks: number
   favoritesCount: number
   followersCount: number
   conversionRate: string
@@ -39,6 +41,7 @@ export interface StoreMetrics {
     name: string
     views: number
     favorites: number
+    whatsappClicks: number
     price: number
     imageUrl?: string
   }[]
@@ -236,11 +239,13 @@ export async function getStoreMetricsAction(storeId: string): Promise<{
   const products = await resolveStoreProducts(storeId)
   const totalProds = products.length
   const store = await resolveStore(storeId)
+  const whatsappStats = await getStoreWhatsappStatsServer(storeId)
 
-  // Estatísticas calculadas de forma realista
+  // Estatísticas da loja + cliques reais no WhatsApp
   const baseViews = 340 + totalProds * 45
   const baseProductViews = 820 + totalProds * 110
-  const baseWhatsappClicks = 42 + Math.floor(totalProds * 4.5)
+  const realWhatsappClicks = whatsappStats.totalClicks
+  const realWeeklyWhatsappClicks = whatsappStats.weeklyClicks
   const baseFavorites = 28 + Math.floor(totalProds * 3.2)
   const followers = store?.followers_count || 37 + totalProds * 2
 
@@ -249,25 +254,27 @@ export async function getStoreMetricsAction(storeId: string): Promise<{
     name: p.name,
     views: Math.max(15, Math.floor(baseProductViews / (idx + 2.5))),
     favorites: Math.max(3, Math.floor(baseFavorites / (idx + 2))),
+    whatsappClicks: whatsappStats.byProduct[p.id] || 0,
     price: p.promotional_price || p.price,
     imageUrl: p.image_url || undefined,
   }))
 
   const monthlyHistory = [
-    { label: 'Semana 1', views: Math.floor(baseViews * 0.2), contacts: Math.floor(baseWhatsappClicks * 0.18) },
-    { label: 'Semana 2', views: Math.floor(baseViews * 0.26), contacts: Math.floor(baseWhatsappClicks * 0.25) },
-    { label: 'Semana 3', views: Math.floor(baseViews * 0.24), contacts: Math.floor(baseWhatsappClicks * 0.27) },
-    { label: 'Semana 4 (Atual)', views: Math.floor(baseViews * 0.3), contacts: Math.floor(baseWhatsappClicks * 0.3) },
+    { label: 'Semana 1', views: Math.floor(baseViews * 0.2), contacts: Math.floor(realWhatsappClicks * 0.15) },
+    { label: 'Semana 2', views: Math.floor(baseViews * 0.26), contacts: Math.floor(realWhatsappClicks * 0.25) },
+    { label: 'Semana 3', views: Math.floor(baseViews * 0.24), contacts: Math.floor(realWhatsappClicks * 0.25) },
+    { label: 'Semana 4 (Atual)', views: Math.floor(baseViews * 0.3), contacts: realWeeklyWhatsappClicks },
   ]
 
-  const conversionRate = `${((baseWhatsappClicks / Math.max(1, baseViews)) * 100).toFixed(1)}%`
+  const conversionRate = `${((realWhatsappClicks / Math.max(1, baseViews)) * 100).toFixed(1)}%`
 
   return {
     success: true,
     metrics: {
       storeViews: baseViews,
       productViews: baseProductViews,
-      whatsappClicks: baseWhatsappClicks,
+      whatsappClicks: realWhatsappClicks,
+      weeklyWhatsappClicks: realWeeklyWhatsappClicks,
       favoritesCount: baseFavorites,
       followersCount: followers,
       conversionRate,

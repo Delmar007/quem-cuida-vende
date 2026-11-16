@@ -1,7 +1,17 @@
+export function formatProductCode(sku?: string | null, productId?: string | null): string {
+  const cleanSku = (sku || '').trim()
+  if (cleanSku) return cleanSku.replace(/^#/, '')
+  const rawId = (productId || '').replace(/[^a-zA-Z0-9]/g, '')
+  if (rawId) return rawId.slice(-6).toUpperCase()
+  return '000000'
+}
+
 export function buildWhatsappAvailabilityUrl({
   phone,
   productName,
   storeName,
+  productId,
+  sku,
   imageUrl: _imageUrl,
   storeSlug,
   storeId,
@@ -9,6 +19,8 @@ export function buildWhatsappAvailabilityUrl({
   phone?: string | null
   productName: string
   storeName?: string | null
+  productId?: string | null
+  sku?: string | null
   imageUrl?: string | null
   storeSlug?: string | null
   storeId?: string | null
@@ -27,7 +39,11 @@ export function buildWhatsappAvailabilityUrl({
     pageUrl = `https://www.kittanda.com.br/loja/${storeId}`
   }
 
-  const lines = ['ESSE ITEM ESTA DISPONIVEL ?', `Produto: ${productName}`]
+  const code = formatProductCode(sku, productId)
+  const lines = [
+    `Olá! Vi este produto no portal Kittanda [Cód. #${code}] e quero saber se está disponível`,
+    `Produto: ${productName}`,
+  ]
   if (storeName?.trim()) {
     lines.push(`Loja: ${storeName.trim()}`)
   }

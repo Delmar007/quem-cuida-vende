@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getMyStoresAction, updateStoreAction, updateStorePlanAction, StoreAdminData } from '@/app/actions/store-admin'
 import { getStoreProductsAction } from '@/app/actions/products'
+import { getStoreMetricsAction } from '@/app/actions/merchant-tools'
 import StorePreviewModal, { StorePreviewData } from '@/components/StorePreviewModal'
 import PlansModal, { PlanType } from '@/components/PlansModal'
 import LogoAdjustModal from '@/components/merchant/LogoAdjustModal'
@@ -301,6 +302,7 @@ function MerchantStoreAdminContent() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [isPlansModalOpen, setIsPlansModalOpen] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
+  const [weeklyWhatsappClicks, setWeeklyWhatsappClicks] = useState<number>(0)
 
   // Formatação de Telefone / WhatsApp
   const formatPhone = (val: string) => {
@@ -417,6 +419,13 @@ function MerchantStoreAdminContent() {
   useEffect(() => {
     if (selectedStoreId) {
       loadStoreProductCount(selectedStoreId)
+      getStoreMetricsAction(selectedStoreId)
+        .then((res) => {
+          if (res.success) {
+            setWeeklyWhatsappClicks(res.metrics.weeklyWhatsappClicks)
+          }
+        })
+        .catch(() => {})
     }
   }, [selectedStoreId])
 
@@ -938,6 +947,31 @@ function MerchantStoreAdminContent() {
           )}
         </div>
       </div>
+
+      {/* Prova de ROI: Contatos no WhatsApp na semana */}
+      {activeStore && (
+        <div className="mb-5 bg-emerald-50 border border-emerald-200 rounded-md px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <span className="w-7 h-7 rounded-full bg-[#25D366] text-white flex items-center justify-center text-sm shrink-0">
+              💬
+            </span>
+            <p className="text-xs sm:text-sm font-bold text-emerald-950">
+              Sua vitrine gerou{' '}
+              <span className="text-[#169c46] font-black">
+                {weeklyWhatsappClicks.toLocaleString('pt-BR')} contatos
+              </span>{' '}
+              no WhatsApp esta semana
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCurrentTopic(9)}
+            className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline cursor-pointer"
+          >
+            Ver métricas &rsaquo;
+          </button>
+        </div>
+      )}
 
       {/* Alerta de Feedback (Sucesso / Erro) */}
       {feedback && (
