@@ -34,6 +34,7 @@ export interface StoredProduct {
   colors?: string[] | null
   is_outlet: boolean
   is_novidade: boolean
+  is_bait_offer?: boolean
   is_active: boolean
   suspended_by_downgrade?: boolean
   published_at: string

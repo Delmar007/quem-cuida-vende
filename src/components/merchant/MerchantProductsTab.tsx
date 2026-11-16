@@ -128,6 +128,7 @@ export default function MerchantProductsTab({
   // Tipo de Promoção do Produto
   const [formPromoType, setFormPromoType] = useState<string>('outlet')
   const [formHighlight, setFormHighlight] = useState<'none' | 'novidade' | 'outlet'>('novidade')
+  const [formIsBaitOffer, setFormIsBaitOffer] = useState(false)
   const [formIsActive, setFormIsActive] = useState(true)
 
   // Estados para Unidades, Pesos e Medidas (Produtos Gerais Pro Max)
@@ -344,6 +345,7 @@ export default function MerchantProductsTab({
     setFormFipePriceInternal('')
     setFormPromoType(useVehicleMode ? 'seminovo' === 'seminovo' ? 'semi_novo' : 'usado' : 'outlet')
     setFormHighlight(useVehicleMode ? 'novidade' : 'outlet')
+    setFormIsBaitOffer(false)
     setFormIsActive(true)
     setFormImages([])
     setFormPhotoOrientation(useVehicleMode ? 'horizontal' : 'vertical')
@@ -427,6 +429,7 @@ export default function MerchantProductsTab({
     } else {
       setFormHighlight('novidade')
     }
+    setFormIsBaitOffer(Boolean(prod.is_bait_offer))
 
     setFormIsActive(prod.is_active)
     setFormPhotoOrientation((prod as any).photo_orientation || (isVeh ? 'horizontal' : 'vertical'))
@@ -620,6 +623,7 @@ export default function MerchantProductsTab({
           colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
+          isBaitOffer: formIsBaitOffer,
           isActive: formIsActive,
         }
 
@@ -664,6 +668,7 @@ export default function MerchantProductsTab({
           colors: !formIsVehicle && formColors.length > 0 ? formColors : undefined,
           isOutlet: formPromoType === 'outlet',
           isNovidade: formPromoType === 'lancamento',
+          isBaitOffer: formIsBaitOffer,
           isActive: formIsActive,
         }
 
@@ -2559,6 +2564,55 @@ export default function MerchantProductsTab({
                     </div>
                   </div>
                 )}
+
+                {/* Seção 6: Oferta Isca (Máx. 3 por loja — Topo da Loja e Filtro de Produtos) */}
+                {(() => {
+                  const otherBaitCount = products.filter(
+                    (p) => Boolean(p.is_bait_offer) && p.id !== editingProduct?.id
+                  ).length
+                  const limitReached = otherBaitCount >= 3 && !formIsBaitOffer
+                  return (
+                    <div
+                      className={`p-4 rounded-xl border transition-colors ${
+                        formIsBaitOffer
+                          ? 'bg-orange-50/80 border-[#FB6600]'
+                          : 'bg-neutral-50 border-neutral-200'
+                      }`}
+                    >
+                      <label
+                        className={`flex items-start gap-3 ${
+                          limitReached ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formIsBaitOffer}
+                          disabled={limitReached}
+                          onChange={(e) => setFormIsBaitOffer(e.target.checked)}
+                          className="mt-1 w-4 h-4 accent-[#FB6600] rounded cursor-pointer disabled:cursor-not-allowed"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-xs sm:text-[13px] font-extrabold text-neutral-900">
+                              🔥 Marcar como Oferta Isca (15% a 50% OFF)
+                            </span>
+                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-white border border-neutral-200 text-neutral-700">
+                              {otherBaitCount + (formIsBaitOffer ? 1 : 0)}/3 marcadas
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-neutral-600 mt-1 leading-relaxed">
+                            Produtos marcados como <strong>Oferta Isca</strong> aparecem no <strong>topo da sua loja</strong> e no <strong>topo do filtro de produtos</strong>. Limite de até 3 itens por loja.
+                          </p>
+                          {limitReached && (
+                            <p className="text-[11px] font-bold text-rose-600 mt-1">
+                              Você já marcou 3 Ofertas Isca nesta loja. Desmarque uma existente para selecionar este item.
+                            </p>
+                          )}
+                        </div>
+                      </label>
+                    </div>
+                  )
+                })()}
               </div>
 
               {/* Rodapé Fixo / Sticky Pro Max */}

@@ -83,6 +83,7 @@ export interface ProductItem {
   vehicle_traction?: string | null;
   is_outlet: boolean;
   is_novidade: boolean;
+  is_bait_offer?: boolean;
   is_active: boolean;
   published_at: string;
 }
@@ -942,6 +943,7 @@ export default async function Home({ searchParams }: HomeProps) {
           vehicle_traction: p.vehicle_traction || null,
           is_outlet: Boolean(p.is_outlet),
           is_novidade: Boolean(p.is_novidade),
+          is_bait_offer: Boolean(p.is_bait_offer),
           is_active: Boolean(p.is_active),
           published_at: p.published_at || p.created_at || new Date().toISOString(),
         };
@@ -1041,6 +1043,7 @@ export default async function Home({ searchParams }: HomeProps) {
         vehicle_traction: lp.vehicle_traction || null,
         is_outlet: Boolean(lp.is_outlet),
         is_novidade: Boolean(lp.is_novidade),
+        is_bait_offer: Boolean(lp.is_bait_offer),
         is_active: Boolean(lp.is_active),
         published_at: lp.published_at || lp.created_at || new Date().toISOString(),
       };
@@ -1103,9 +1106,11 @@ export default async function Home({ searchParams }: HomeProps) {
     return true;
   });
 
-  // ORDENAÇÃO DE PRODUTOS: Ordem cronológica decrescente de cadastro ou publicação
-  // Regra: Mais recentes primeiro, mais antigos depois. Critério secundário estável: ID.
+  // ORDENAÇÃO DE PRODUTOS: Ofertas Isca no topo + ordem cronológica decrescente
   produtosFiltrados.sort((a, b) => {
+    if (Boolean(a.is_bait_offer) !== Boolean(b.is_bait_offer)) {
+      return a.is_bait_offer ? -1 : 1;
+    }
     const timeA = new Date(a.published_at).getTime();
     const timeB = new Date(b.published_at).getTime();
     if (timeB !== timeA) {

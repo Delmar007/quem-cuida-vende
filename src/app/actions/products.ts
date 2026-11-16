@@ -34,6 +34,7 @@ export interface CreateProductInput {
   subcategory?: string
   promoType?: string
   isVehicle?: boolean
+  isBaitOffer?: boolean
   vehicleCategory?: string
   vehicleBrand?: string
   vehicleModel?: string
@@ -70,6 +71,7 @@ export interface UpdateProductInput {
   subcategory?: string
   promoType?: string
   isVehicle?: boolean
+  isBaitOffer?: boolean
   vehicleCategory?: string
   vehicleBrand?: string
   vehicleModel?: string
@@ -218,6 +220,18 @@ export async function createProductAction(data: CreateProductInput): Promise<{
   }
 
   const productId = `prod-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`
+  const isBaitOffer = Boolean(data.isBaitOffer)
+  if (isBaitOffer) {
+    const { products: currentStoreProducts } = await getStoreProductsAction(data.storeId)
+    const baitCount = currentStoreProducts.filter((p) => Boolean(p.is_bait_offer)).length
+    if (baitCount >= 3) {
+      return {
+        success: false,
+        error: 'Limite de 3 Ofertas Isca atingido para esta loja. Desmarque uma oferta isca existente para marcar outra.',
+      }
+    }
+  }
+
   const now = new Date().toISOString()
 
   // Limite estrito de fotos: até 12 fotos para veículos (Carro / Usados e Concessionária) e 6 fotos para demais segmentos
@@ -267,6 +281,7 @@ export async function createProductAction(data: CreateProductInput): Promise<{
     colors: data.colors && data.colors.length > 0 ? data.colors : null,
     is_outlet: isOutlet,
     is_novidade: isNovidade,
+    is_bait_offer: isBaitOffer,
     is_active: data.isActive ?? true,
     published_at: now,
     created_at: now,
@@ -308,6 +323,7 @@ export async function createProductAction(data: CreateProductInput): Promise<{
         vehicle_plate_internal: newProduct.vehicle_plate_internal,
         is_outlet: newProduct.is_outlet,
         is_novidade: newProduct.is_novidade,
+        is_bait_offer: newProduct.is_bait_offer,
         is_active: newProduct.is_active,
         published_at: now,
         created_at: now,
@@ -387,6 +403,18 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     return { success: false, error: 'Produto não encontrado.' }
   }
 
+  const isBaitOffer = Boolean(data.isBaitOffer)
+  if (isBaitOffer) {
+    const { products: currentStoreProducts } = await getStoreProductsAction(data.storeId)
+    const baitCount = currentStoreProducts.filter((p) => Boolean(p.is_bait_offer)).length
+    if (baitCount >= 3) {
+      return {
+        success: false,
+        error: 'Limite de 3 Ofertas Isca atingido para esta loja. Desmarque uma oferta isca existente para marcar outra.',
+      }
+    }
+  }
+
   const now = new Date().toISOString()
 
   // Limite estrito de fotos: até 12 fotos para veículos (Carro / Usados e Concessionária) e 6 fotos para demais segmentos
@@ -406,6 +434,21 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
 
   let isOutlet = promoType === 'outlet'
   let isNovidade = promoType === 'lancamento'
+
+  const nextIsBaitOffer =
+    data.isBaitOffer !== undefined ? Boolean(data.isBaitOffer) : Boolean(existing.is_bait_offer)
+  if (nextIsBaitOffer && !existing.is_bait_offer) {
+    const { products: currentStoreProducts } = await getStoreProductsAction(data.storeId)
+    const baitCount = currentStoreProducts.filter(
+      (p) => Boolean(p.is_bait_offer) && p.id !== data.id
+    ).length
+    if (baitCount >= 3) {
+      return {
+        success: false,
+        error: 'Limite de 3 Ofertas Isca atingido para esta loja. Desmarque uma oferta isca existente para marcar outra.',
+      }
+    }
+  }
 
   const updatedProduct: StoredProduct = {
     ...existing,
@@ -449,6 +492,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     colors: data.colors !== undefined ? (data.colors.length > 0 ? data.colors : null) : (existing as any).colors,
     is_outlet: isOutlet,
     is_novidade: isNovidade,
+    is_bait_offer: nextIsBaitOffer,
     is_active: data.isActive !== undefined ? Boolean(data.isActive) : existing.is_active,
     updated_at: now,
   }
@@ -485,6 +529,7 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
         vehicle_plate_internal: updatedProduct.vehicle_plate_internal,
         is_outlet: updatedProduct.is_outlet,
         is_novidade: updatedProduct.is_novidade,
+        is_bait_offer: updatedProduct.is_bait_offer,
         is_active: updatedProduct.is_active,
         updated_at: now,
       })

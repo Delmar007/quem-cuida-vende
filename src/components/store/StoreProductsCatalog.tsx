@@ -35,6 +35,7 @@ export interface ProductItem {
   vehicle_traction?: string | null
   is_outlet?: boolean
   is_novidade?: boolean
+  is_bait_offer?: boolean
   is_active?: boolean
   photo_orientation?: 'vertical' | 'horizontal'
   published_at?: string
@@ -474,8 +475,11 @@ export default function StoreProductsCatalog({
   // Filtragem e Ordenação por ordem de chegada (cronológica decrescente)
   // "a disposição de produtos ficrá aleatoria, por ordem de chegada, conforme vai cadastrando os produtos vão descendo para baixo, tudo misturado"
   const filteredProducts = useMemo(() => {
-    // 1. Clonar para ordenar por data mais recente primeiro (novos produtos no topo, descendo conforme cadastrados)
+    // 1. Clonar para ordenar: Ofertas Isca no topo da loja, depois mais recentes primeiro
     const sorted = [...activeProducts].sort((a, b) => {
+      if (Boolean(a.is_bait_offer) !== Boolean(b.is_bait_offer)) {
+        return a.is_bait_offer ? -1 : 1
+      }
       const dateA = new Date(a.created_at || a.published_at || 0).getTime()
       const dateB = new Date(b.created_at || b.published_at || 0).getTime()
       return dateB - dateA
