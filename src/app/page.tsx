@@ -1634,7 +1634,7 @@ export default async function Home({ searchParams }: HomeProps) {
                               <DefaultStoreAvatar size="md" />
                             )}
                           </div>
-                          <div className="min-w-0 pt-0.5">
+                          <div className="min-w-0 flex flex-col">
                             {(() => {
                               const storeMatch = allStores.find(
                                 (s) => s.id === produto.store_id || s.name === produto.store_name
@@ -1646,18 +1646,22 @@ export default async function Home({ searchParams }: HomeProps) {
                                 storeMatch?.neighborhood ||
                                 "";
                               return (
-                                <span className="font-heading font-semibold uppercase text-[13.2px] leading-tight text-gray-700 line-clamp-2 block">
-                                  {produto.store_name}
+                                <>
+                                  <span className="font-heading font-semibold uppercase text-[13.2px] leading-[1.15] text-gray-700 line-clamp-1 block">
+                                    {produto.store_name}
+                                  </span>
                                   {locText ? (
-                                    <span className="text-[#FB6600] font-bold"> • {locText}</span>
+                                    <span className="font-heading font-bold uppercase text-[12px] leading-tight text-[#FB6600] line-clamp-1 block mt-0.5">
+                                      • {locText}
+                                    </span>
                                   ) : null}
-                                </span>
+                                </>
                               );
                             })()}
                           </div>
                         </div>
                         {dataParte && (
-                          <span className="flex flex-col items-end shrink-0 text-right leading-[1.15] text-[12px] text-gray-400 tabular-nums pt-0.5">
+                          <span className="flex flex-col items-end shrink-0 text-right leading-[1.15] text-[12px] text-gray-400 tabular-nums">
                             <span>{dataParte}</span>
                             {horaParte && <span>{horaParte}</span>}
                           </span>
