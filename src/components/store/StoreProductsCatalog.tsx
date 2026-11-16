@@ -1597,7 +1597,7 @@ export default function StoreProductsCatalog({
                           </div>
                           <h3
                             onClick={() => handleOpenDetailModal(produto)}
-                            className={`text-[16.8px] text-gray-900 font-semibold leading-snug mb-1 cursor-pointer hover:text-[#FB6600] transition-colors ${
+                            className={`text-[16.8px] text-gray-900 font-semibold leading-[1.28] mb-1 cursor-pointer hover:text-[#FB6600] transition-colors ${
                               isVehicleCard ? 'line-clamp-1' : 'line-clamp-2'
                             }`}
                           >
@@ -1608,10 +1608,10 @@ export default function StoreProductsCatalog({
                             <div className="mt-1.5 flex flex-col gap-2 flex-grow justify-center">
                               {/* Versão com os dados da versão */}
                               <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2.5 py-1.5">
-                                <span className="text-[9px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
+                                <span className="text-[14px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
                                   Versão
                                 </span>
-                                <span className="text-[11px] font-semibold text-neutral-800 leading-snug line-clamp-2 block">
+                                <span className="text-[16px] font-semibold text-neutral-800 leading-snug line-clamp-2 block">
                                   {produto.vehicle_version || produto.description || 'Consulte especificações da versão'}
                                 </span>
                               </div>
@@ -1619,34 +1619,34 @@ export default function StoreProductsCatalog({
                               {/* Grade 2x2: KM, Tração, Ano, Ano/Modelo */}
                               <div className="grid grid-cols-2 gap-1.5">
                                 <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
-                                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
+                                  <span className="text-[13.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
                                     KM
                                   </span>
-                                  <span className="text-[11px] font-bold text-neutral-900 truncate block">
+                                  <span className="text-[16px] font-bold text-neutral-900 truncate block">
                                     {produto.vehicle_km || 'Consulte'}
                                   </span>
                                 </div>
                                 <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
-                                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
+                                  <span className="text-[13.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
                                     Tração
                                   </span>
-                                  <span className="text-[11px] font-bold text-neutral-900 truncate block">
+                                  <span className="text-[16px] font-bold text-neutral-900 truncate block">
                                     {produto.vehicle_traction || 'Integral / 4x2'}
                                   </span>
                                 </div>
                                 <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
-                                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
+                                  <span className="text-[13.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
                                     Ano
                                   </span>
-                                  <span className="text-[11px] font-bold text-neutral-900 truncate block">
+                                  <span className="text-[16px] font-bold text-neutral-900 truncate block">
                                     {produto.vehicle_year_fab || '—'}
                                   </span>
                                 </div>
                                 <div className="bg-neutral-50 border border-neutral-200/80 rounded-[2px] px-2 py-1">
-                                  <span className="text-[8.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
+                                  <span className="text-[13.5px] font-bold uppercase tracking-wider text-neutral-400 block leading-none mb-0.5">
                                     Motorização
                                   </span>
-                                  <span className="text-[11px] font-bold text-neutral-900 truncate block">
+                                  <span className="text-[16px] font-bold text-neutral-900 truncate block">
                                     {produto.vehicle_engine || produto.vehicle_year_model || 'Consulte'}
                                   </span>
                                 </div>
@@ -1654,7 +1654,7 @@ export default function StoreProductsCatalog({
                             </div>
                           ) : (
                             produto.description && (
-                              <p className="text-[14.4px] text-gray-500 line-clamp-2 mb-2">
+                              <p className="text-[14.4px] text-gray-500 leading-[1.45] line-clamp-2 mb-1.5">
                                 {produto.description}
                               </p>
                             )

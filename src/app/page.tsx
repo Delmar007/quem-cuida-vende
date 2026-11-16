@@ -1525,8 +1525,12 @@ export default async function Home({ searchParams }: HomeProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-6 w-full max-w-full">
           {produtosFiltrados.map((produto, index) => {
             const dataPublicacao = new Date(produto.published_at);
-            const dataFormatada = !isNaN(dataPublicacao.getTime())
-              ? dataPublicacao.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+            const hasValidDate = !isNaN(dataPublicacao.getTime());
+            const dataParte = hasValidDate
+              ? dataPublicacao.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+              : "";
+            const horaParte = hasValidDate
+              ? dataPublicacao.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
               : "";
             const promoBadgeLabel =
               nomesPromocoes[(produto.promo_type || "").toLowerCase()] ||
@@ -1615,9 +1619,9 @@ export default async function Home({ searchParams }: HomeProps) {
                   {/* Conteúdo do Card */}
                   <div className="p-4 flex flex-col flex-grow justify-between bg-white">
                     <div className="flex flex-col flex-grow">
-                      <div className="flex items-center justify-between text-xs text-gray-500 tracking-wide mb-1.5 gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-[25px] h-[25px] rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
+                      <div className="flex items-start justify-between text-xs text-gray-500 tracking-wide mb-1.5 gap-2">
+                        <div className="flex items-start gap-2.5 min-w-0">
+                          <div className="w-[50px] h-[50px] rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
                             {storeLogoUrl ? (
                               <img
                                 src={storeLogoUrl}
@@ -1627,10 +1631,10 @@ export default async function Home({ searchParams }: HomeProps) {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <DefaultStoreAvatar size="sm" />
+                              <DefaultStoreAvatar size="md" />
                             )}
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 pt-0.5">
                             {(() => {
                               const storeMatch = allStores.find(
                                 (s) => s.id === produto.store_id || s.name === produto.store_name
@@ -1642,7 +1646,7 @@ export default async function Home({ searchParams }: HomeProps) {
                                 storeMatch?.neighborhood ||
                                 "";
                               return (
-                                <span className="font-heading font-semibold uppercase text-[13.2px] text-gray-700 line-clamp-1 block">
+                                <span className="font-heading font-semibold uppercase text-[13.2px] leading-tight text-gray-700 line-clamp-2 block">
                                   {produto.store_name}
                                   {locText ? (
                                     <span className="text-[#FB6600] font-bold"> • {locText}</span>
@@ -1652,53 +1656,58 @@ export default async function Home({ searchParams }: HomeProps) {
                             })()}
                           </div>
                         </div>
-                        {dataFormatada && <span className="text-[13.2px] shrink-0 text-gray-400 tabular-nums">{dataFormatada}</span>}
+                        {dataParte && (
+                          <span className="flex flex-col items-end shrink-0 text-right leading-[1.15] text-[12px] text-gray-400 tabular-nums pt-0.5">
+                            <span>{dataParte}</span>
+                            {horaParte && <span>{horaParte}</span>}
+                          </span>
+                        )}
                       </div>
-                      <h3 className="font-heading text-[18px] text-gray-900 font-semibold leading-snug tracking-tight mb-1.5 line-clamp-2">
+                      <h3 className="font-heading text-[18px] text-gray-900 font-semibold leading-[1.28] tracking-tight mb-1 line-clamp-2">
                         {toTitleCase(produto.name)}
                       </h3>
 
                       {isVehicleCard ? (
                         <div className="my-auto py-1.5 space-y-1.5">
                           <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
-                            <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
+                            <span className="text-[14px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
                               Versão
                             </span>
-                            <span className="text-[11px] font-semibold text-gray-800 block leading-snug line-clamp-1">
+                            <span className="text-[16px] font-semibold text-gray-800 block leading-snug line-clamp-1">
                               {toTitleCase(produto.vehicle_version || produto.description || "Versão Completa")}
                             </span>
                           </div>
 
                           <div className="grid grid-cols-2 gap-1.5">
                             <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
-                              <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
+                              <span className="text-[14px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
                                 KM
                               </span>
-                              <span className="text-[11px] font-bold text-gray-800 block truncate">
+                              <span className="text-[16px] font-bold text-gray-800 block truncate">
                                 {produto.vehicle_km || "0 km"}
                               </span>
                             </div>
                             <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
-                              <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
+                              <span className="text-[14px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
                                 Tração
                               </span>
-                              <span className="text-[11px] font-bold text-gray-800 block truncate">
+                              <span className="text-[16px] font-bold text-gray-800 block truncate">
                                 {produto.vehicle_traction || "4x2"}
                               </span>
                             </div>
                             <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
-                              <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
+                              <span className="text-[14px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
                                 Ano
                               </span>
-                              <span className="text-[11px] font-bold text-gray-800 block truncate">
+                              <span className="text-[16px] font-bold text-gray-800 block truncate">
                                 {produto.vehicle_year_fab || "2024"}
                               </span>
                             </div>
                             <div className="bg-gray-50 border border-gray-100 px-2.5 py-1.5 rounded-[2px]">
-                              <span className="text-[9px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
+                              <span className="text-[14px] uppercase tracking-wider text-gray-400 font-bold block leading-tight">
                                 Motorização
                               </span>
-                              <span className="text-[11px] font-bold text-gray-800 block truncate">
+                              <span className="text-[16px] font-bold text-gray-800 block truncate">
                                 {produto.vehicle_engine || produto.vehicle_year_model || "Flex"}
                               </span>
                             </div>
@@ -1706,7 +1715,7 @@ export default async function Home({ searchParams }: HomeProps) {
                         </div>
                       ) : (
                         produto.description && (
-                          <p className="text-[15.6px] text-gray-600 leading-relaxed line-clamp-2 mb-2">
+                          <p className="text-[15.6px] text-gray-600 leading-[1.45] line-clamp-2 mb-1.5">
                             {produto.description}
                           </p>
                         )
