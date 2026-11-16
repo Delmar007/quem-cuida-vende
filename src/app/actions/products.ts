@@ -289,53 +289,78 @@ export async function createProductAction(data: CreateProductInput): Promise<{
 
   let finalProduct = newProduct
 
-  // Tentar inserir no Supabase
+  // Tentar inserir no Supabase (removendo automaticamente colunas ainda não existentes no schema)
+  let supabaseInsertError: string | null = null
   try {
     const supabase = await createClient()
-    const { data: dbCreated, error: insertErr } = await supabase
-      .from('products')
-      .insert({
-        id: newProduct.id,
-        store_id: data.storeId,
-        name: newProduct.name,
-        description: newProduct.description,
-        sku: newProduct.sku,
-        price: newProduct.price,
-        promotional_price: newProduct.promotional_price,
-        cost_price_internal: newProduct.cost_price_internal,
-        fipe_price_internal: newProduct.fipe_price_internal,
-        image_url: newProduct.image_url,
-        images: newProduct.images || [],
-        photo_orientation: newProduct.photo_orientation,
-        category: newProduct.category,
-        subcategory: newProduct.subcategory,
-        promo_type: newProduct.promo_type,
-        is_vehicle: newProduct.is_vehicle,
-        vehicle_category: newProduct.vehicle_category,
-        vehicle_brand: newProduct.vehicle_brand,
-        vehicle_model: newProduct.vehicle_model,
-        vehicle_version: newProduct.vehicle_version,
-        vehicle_year_fab: newProduct.vehicle_year_fab,
-        vehicle_year_model: newProduct.vehicle_year_model,
-        vehicle_km: newProduct.vehicle_km,
-        vehicle_transmission: newProduct.vehicle_transmission,
-        vehicle_traction: newProduct.vehicle_traction,
-        vehicle_plate_internal: newProduct.vehicle_plate_internal,
-        is_outlet: newProduct.is_outlet,
-        is_novidade: newProduct.is_novidade,
-        is_bait_offer: newProduct.is_bait_offer,
-        is_active: newProduct.is_active,
-        published_at: now,
-        created_at: now,
-      })
-      .select()
-      .single()
+    const insertPayload: Record<string, any> = {
+      id: newProduct.id,
+      store_id: data.storeId,
+      name: newProduct.name,
+      description: newProduct.description,
+      sku: newProduct.sku,
+      price: newProduct.price,
+      promotional_price: newProduct.promotional_price,
+      cost_price_internal: newProduct.cost_price_internal,
+      fipe_price_internal: newProduct.fipe_price_internal,
+      image_url: newProduct.image_url,
+      images: newProduct.images || [],
+      photo_orientation: newProduct.photo_orientation,
+      category: newProduct.category,
+      subcategory: newProduct.subcategory,
+      promo_type: newProduct.promo_type,
+      is_vehicle: newProduct.is_vehicle,
+      vehicle_category: newProduct.vehicle_category,
+      vehicle_brand: newProduct.vehicle_brand,
+      vehicle_model: newProduct.vehicle_model,
+      vehicle_version: newProduct.vehicle_version,
+      vehicle_year_fab: newProduct.vehicle_year_fab,
+      vehicle_year_model: newProduct.vehicle_year_model,
+      vehicle_km: newProduct.vehicle_km,
+      vehicle_transmission: newProduct.vehicle_transmission,
+      vehicle_traction: newProduct.vehicle_traction,
+      vehicle_plate_internal: newProduct.vehicle_plate_internal,
+      is_outlet: newProduct.is_outlet,
+      is_novidade: newProduct.is_novidade,
+      is_bait_offer: newProduct.is_bait_offer,
+      is_active: newProduct.is_active,
+      published_at: now,
+      created_at: now,
+    }
 
-    if (!insertErr && dbCreated) {
-      finalProduct = { ...newProduct, ...dbCreated }
+    for (let attempt = 0; attempt < 15; attempt++) {
+      const { data: dbCreated, error: insertErr } = await supabase
+        .from('products')
+        .insert(insertPayload)
+        .select()
+        .single()
+
+      if (!insertErr && dbCreated) {
+        finalProduct = { ...newProduct, ...dbCreated }
+        supabaseInsertError = null
+        break
+      }
+
+      const errMsg = insertErr?.message || ''
+      const missingColMatch =
+        errMsg.match(/Could not find the '([^']+)' column/i) ||
+        errMsg.match(/column "([^"]+)" of relation "products" does not exist/i) ||
+        errMsg.match(/column "([^"]+)" does not exist/i)
+
+      if (missingColMatch && missingColMatch[1] && missingColMatch[1] in insertPayload) {
+        delete insertPayload[missingColMatch[1]]
+        continue
+      }
+
+      supabaseInsertError = errMsg || 'Erro ao salvar no banco de dados.'
+      break
     }
   } catch (err: any) {
-    // fallback local
+    supabaseInsertError = err?.message || null
+  }
+
+  if (supabaseInsertError && process.env.VERCEL) {
+    return { success: false, error: `Erro ao salvar produto: ${supabaseInsertError}` }
   }
 
   saveLocalProduct(finalProduct)
@@ -497,44 +522,62 @@ export async function updateProductAction(data: UpdateProductInput): Promise<{
     updated_at: now,
   }
 
-  // Tentar atualizar no Supabase
+  // Tentar atualizar no Supabase (removendo automaticamente colunas ainda não existentes no schema)
   try {
     const supabase = await createClient()
-    await supabase
-      .from('products')
-      .update({
-        name: updatedProduct.name,
-        description: updatedProduct.description,
-        sku: updatedProduct.sku,
-        price: updatedProduct.price,
-        promotional_price: updatedProduct.promotional_price,
-        cost_price_internal: updatedProduct.cost_price_internal,
-        fipe_price_internal: updatedProduct.fipe_price_internal,
-        image_url: updatedProduct.image_url,
-        images: updatedProduct.images || [],
-        photo_orientation: updatedProduct.photo_orientation,
-        category: updatedProduct.category,
-        subcategory: updatedProduct.subcategory,
-        promo_type: updatedProduct.promo_type,
-        is_vehicle: updatedProduct.is_vehicle,
-        vehicle_category: updatedProduct.vehicle_category,
-        vehicle_brand: updatedProduct.vehicle_brand,
-        vehicle_model: updatedProduct.vehicle_model,
-        vehicle_version: updatedProduct.vehicle_version,
-        vehicle_year_fab: updatedProduct.vehicle_year_fab,
-        vehicle_year_model: updatedProduct.vehicle_year_model,
-        vehicle_km: updatedProduct.vehicle_km,
-        vehicle_transmission: updatedProduct.vehicle_transmission,
-        vehicle_traction: updatedProduct.vehicle_traction,
-        vehicle_plate_internal: updatedProduct.vehicle_plate_internal,
-        is_outlet: updatedProduct.is_outlet,
-        is_novidade: updatedProduct.is_novidade,
-        is_bait_offer: updatedProduct.is_bait_offer,
-        is_active: updatedProduct.is_active,
-        updated_at: now,
-      })
-      .eq('id', data.id)
-      .eq('store_id', data.storeId)
+    const updatePayload: Record<string, any> = {
+      name: updatedProduct.name,
+      description: updatedProduct.description,
+      sku: updatedProduct.sku,
+      price: updatedProduct.price,
+      promotional_price: updatedProduct.promotional_price,
+      cost_price_internal: updatedProduct.cost_price_internal,
+      fipe_price_internal: updatedProduct.fipe_price_internal,
+      image_url: updatedProduct.image_url,
+      images: updatedProduct.images || [],
+      photo_orientation: updatedProduct.photo_orientation,
+      category: updatedProduct.category,
+      subcategory: updatedProduct.subcategory,
+      promo_type: updatedProduct.promo_type,
+      is_vehicle: updatedProduct.is_vehicle,
+      vehicle_category: updatedProduct.vehicle_category,
+      vehicle_brand: updatedProduct.vehicle_brand,
+      vehicle_model: updatedProduct.vehicle_model,
+      vehicle_version: updatedProduct.vehicle_version,
+      vehicle_year_fab: updatedProduct.vehicle_year_fab,
+      vehicle_year_model: updatedProduct.vehicle_year_model,
+      vehicle_km: updatedProduct.vehicle_km,
+      vehicle_transmission: updatedProduct.vehicle_transmission,
+      vehicle_traction: updatedProduct.vehicle_traction,
+      vehicle_plate_internal: updatedProduct.vehicle_plate_internal,
+      is_outlet: updatedProduct.is_outlet,
+      is_novidade: updatedProduct.is_novidade,
+      is_bait_offer: updatedProduct.is_bait_offer,
+      is_active: updatedProduct.is_active,
+      updated_at: now,
+    }
+
+    for (let attempt = 0; attempt < 15; attempt++) {
+      const { error: updateErr } = await supabase
+        .from('products')
+        .update(updatePayload)
+        .eq('id', data.id)
+        .eq('store_id', data.storeId)
+
+      if (!updateErr) break
+
+      const errMsg = updateErr.message || ''
+      const missingColMatch =
+        errMsg.match(/Could not find the '([^']+)' column/i) ||
+        errMsg.match(/column "([^"]+)" of relation "products" does not exist/i) ||
+        errMsg.match(/column "([^"]+)" does not exist/i)
+
+      if (missingColMatch && missingColMatch[1] && missingColMatch[1] in updatePayload) {
+        delete updatePayload[missingColMatch[1]]
+        continue
+      }
+      break
+    }
   } catch {
     // fallback local
   }

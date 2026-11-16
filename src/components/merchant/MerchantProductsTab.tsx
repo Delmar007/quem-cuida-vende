@@ -1423,6 +1423,19 @@ export default function MerchantProductsTab({
               }}
               className="p-4 sm:p-6 space-y-6 overflow-y-auto flex-1 bg-neutral-50/40"
             >
+              {feedback && feedback.type === 'error' && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-900 text-xs font-bold flex items-center justify-between gap-2">
+                  <span>⚠️ {feedback.message}</span>
+                  <button
+                    type="button"
+                    onClick={() => setFeedback(null)}
+                    className="font-black text-rose-700 hover:text-rose-950 cursor-pointer"
+                  >
+                    &times;
+                  </button>
+                </div>
+              )}
+
               {/* Seção 1: Informações Básicas */}
               <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs space-y-4">
                 <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
@@ -1467,6 +1480,7 @@ export default function MerchantProductsTab({
                           Marca (Tabela FIPE) <span className="text-[#FB6600]">*</span>
                         </label>
                         <select
+                          required={formIsVehicle}
                           value={formVehicleBrand}
                           onChange={(e) => setFormVehicleBrand(e.target.value)}
                           className="w-full h-11 px-3.5 text-sm border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FB6600]/25 focus:border-[#FB6600] font-bold bg-white cursor-pointer transition-all shadow-2xs"
