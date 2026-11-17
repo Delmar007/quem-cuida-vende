@@ -39,11 +39,11 @@ export async function GET(request: Request) {
 
   const storeIds = follows?.map((f: any) => f.store_id) ?? [];
   if (storeIds.length === 0) {
-    return NextResponse.json({ promotions: [], todayStartIso });
+    return NextResponse.json({ promotions: [], followedStores: [], todayStartIso });
   }
 
-  // 2️⃣ Promoções e produtos postados HOJE pelas lojas seguidas
-  const [promoResult, prodResult] = await Promise.all([
+  // 2️⃣ Promoções, produtos postados HOJE e dados das lojas seguidas
+  const [promoResult, prodResult, storesResult] = await Promise.all([
     supabase
       .from('promotions')
       .select(`id, store_id, title, description, image_url, price_original, price_promotional, start_at, end_at, type, created_at, stores (name, logo_url)`)
@@ -59,6 +59,11 @@ export async function GET(request: Request) {
       .gte('created_at', todayStartIso)
       .order('created_at', { ascending: false })
       .limit(limit),
+    supabase
+      .from('stores')
+      .select('*')
+      .in('id', storeIds)
+      .eq('is_active', true),
   ]);
 
   if (promoResult.error && prodResult.error) {
@@ -95,5 +100,19 @@ export async function GET(request: Request) {
     .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
     .slice(0, limit);
 
-  return NextResponse.json({ promotions: combined, todayStartIso });
+  const followedStores = (storesResult.data ?? []).map((st: any) => ({
+    id: st.id,
+    name: st.name,
+    slug: st.slug || st.id,
+    logo_url: st.logo_url || null,
+    small_banner_url: st.small_banner_url || null,
+    large_banner_url: st.large_banner_url || null,
+    reference_point: st.reference_point || st.neighborhood || null,
+    raffle_prize_image_url: st.raffle_prize_image_url || st.prize_image_url || null,
+    promo_start_date: st.promo_start_date || st.raffle_start_date || null,
+    raffle_date: st.raffle_date || st.promo_end_date || null,
+    raffle_rules: st.raffle_rules || st.description || null,
+  }));
+
+  return NextResponse.json({ promotions: combined, followedStores, todayStartIso });
 }

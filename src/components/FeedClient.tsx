@@ -1,17 +1,43 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import PromotionCard, { PromotionItem } from '@/components/PromotionCard';
 import EmptyFeedState from '@/components/EmptyFeedState';
+import DefaultStoreAvatar from '@/components/DefaultStoreAvatar';
 import { createClient } from '@/lib/supabase/client';
 
+interface FollowedStoreFeedCard {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url?: string | null;
+  small_banner_url?: string | null;
+  large_banner_url?: string | null;
+  reference_point?: string | null;
+  raffle_prize_image_url?: string | null;
+  promo_start_date?: string | null;
+  raffle_date?: string | null;
+  raffle_rules?: string | null;
+}
+
+function formatDatePtBr(raw?: string | null, fallback = '01/01/2026'): string {
+  if (!raw) return fallback;
+  const parsed = new Date(raw);
+  if (isNaN(parsed.getTime())) return raw;
+  return parsed.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
 export default function FeedClient() {
+  const [activeTab, setActiveTab] = useState<'produtos' | 'lojas'>('produtos');
   const [promotions, setPromotions] = useState<PromotionItem[]>([]);
+  const [followedStores, setFollowedStores] = useState<FollowedStoreFeedCard[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const observerRef = useRef<HTMLDivElement | null>(null);
 
   // 1. Verificar autenticação e zerar contador diário ao entrar no Feed
   useEffect(() => {
@@ -31,135 +57,243 @@ export default function FeedClient() {
     }
   }, []);
 
-  // 2. Buscar todos os produtos/promoções postados hoje pelas lojas seguidas
-  const loadInitialFeed = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/feed?limit=100');
-      if (res.status === 401) {
-        setUser(null);
-        setPromotions([]);
-        setHasMore(false);
-        return;
-      }
-      const data = await res.json();
-      const items = data.promotions || [];
-      setPromotions(items);
-      setHasMore(false);
-    } catch (e) {
-      console.error('Erro ao carregar feed:', e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // 2. Buscar todos os produtos/promoções postados hoje e lojas seguidas
   useEffect(() => {
+    const loadInitialFeed = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/feed?limit=100');
+        if (res.status === 401) {
+          setUser(null);
+          setPromotions([]);
+          setFollowedStores([]);
+          return;
+        }
+        const data = await res.json();
+        setPromotions(data.promotions || []);
+        setFollowedStores(data.followedStores || []);
+      } catch (e) {
+        console.error('Erro ao carregar feed:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadInitialFeed();
   }, []);
-
-  // 3. Carregamento progressivo (Infinite Scroll)
-  const loadMorePromotions = useCallback(async () => {
-    if (loadingMore || !hasMore || promotions.length === 0) return;
-    setLoadingMore(true);
-
-    try {
-      const lastItem = promotions[promotions.length - 1];
-      const cursor = lastItem.created_at;
-      const res = await fetch(`/api/feed?cursor=${encodeURIComponent(cursor)}&limit=12`);
-      const data = await res.json();
-      const newItems = data.promotions || [];
-
-      if (newItems.length === 0) {
-        setHasMore(false);
-      } else {
-        setPromotions((prev) => [...prev, ...newItems]);
-        if (newItems.length < 12) {
-          setHasMore(false);
-        }
-      }
-    } catch (e) {
-      console.error('Erro ao carregar mais itens do feed:', e);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [loadingMore, hasMore, promotions]);
-
-  // Observer para o elemento sentinela no final da lista
-  useEffect(() => {
-    if (!observerRef.current || !hasMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMorePromotions();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(observerRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, loadMorePromotions]);
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-6">
       <div className="max-w-[940px] mx-auto px-4">
-        {/* Cabeçalho da Seção Feed */}
-        <div className="mb-6 border-b border-gray-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 uppercase">
-              Feed que Sigo
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Todos os produtos e ofertas postados hoje pelas lojas que você segue (reinicia amanhã)
-            </p>
-          </div>
-          <span className="text-xs font-bold px-3 py-1 bg-[#FB6600] text-white self-start sm:self-auto uppercase tracking-wider rounded-[4px] tabular-nums">
-            {promotions.length} {promotions.length === 1 ? 'postagem hoje' : 'postagens hoje'}
-          </span>
+        {/* Botão barra duplo no topo: PRODUTOS (esq) | LOJAS (dir) */}
+        <div
+          role="tablist"
+          aria-label="Alternar entre Produtos e Lojas no Feed que Sigo"
+          className="mb-5 grid grid-cols-2 border border-gray-300 rounded-[6px] overflow-hidden bg-white shadow-2xs"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'produtos'}
+            onClick={() => setActiveTab('produtos')}
+            className={`py-3 px-4 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 ${
+              activeTab === 'produtos'
+                ? 'bg-[#FB6600] text-white'
+                : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
+            }`}
+          >
+            <span>PRODUTOS</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                activeTab === 'produtos'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-neutral-100 text-neutral-600'
+              }`}
+            >
+              {promotions.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'lojas'}
+            onClick={() => setActiveTab('lojas')}
+            className={`py-3 px-4 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border-l border-gray-200 ${
+              activeTab === 'lojas'
+                ? 'bg-[#FB6600] text-white'
+                : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
+            }`}
+          >
+            <span>LOJAS</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                activeTab === 'lojas'
+                  ? 'bg-white/20 text-white'
+                  : 'bg-neutral-100 text-neutral-600'
+              }`}
+            >
+              {followedStores.length}
+            </span>
+          </button>
         </div>
 
-        {/* Estado de Carregamento Inicial */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white border border-gray-200 h-[380px] animate-pulse flex flex-col">
-                <div className="h-14 bg-gray-100 border-b border-gray-100" />
-                <div className="flex-1 bg-gray-200" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2" />
-                  <div className="h-8 bg-gray-200 rounded" />
-                </div>
-              </div>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white border border-gray-200 h-[360px] animate-pulse rounded-[6px]" />
             ))}
           </div>
-        ) : promotions.length === 0 ? (
-          <EmptyFeedState isAuthenticated={!!user} />
-        ) : (
-          <>
-            {/* Grid de Promoções */}
+        ) : activeTab === 'produtos' ? (
+          promotions.length === 0 ? (
+            <EmptyFeedState isAuthenticated={!!user} />
+          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {promotions.map((promo) => (
                 <PromotionCard key={promo.id} promotion={promo} />
               ))}
             </div>
+          )
+        ) : followedStores.length === 0 ? (
+          <EmptyFeedState isAuthenticated={!!user} />
+        ) : (
+          /* ABA LOJAS: Cards empilhados (1 em cima do outro): 1/3 mini banner + 2/3 (linha do meio prêmio + linha de baixo dados e regras em MAIÚSCULAS) */
+          <div className="flex flex-col gap-6">
+            {followedStores.map((store) => {
+              const miniBanner = store.small_banner_url || store.large_banner_url;
+              const startDateText = formatDatePtBr(store.promo_start_date, '01/01/2026');
+              const raffleDateText = formatDatePtBr(store.raffle_date, '02/01/2026');
+              const rulesText = (
+                store.raffle_rules ||
+                'PARTICIPE SEGUINDO A LOJA NA KITTANDA OUTLET E ACOMPANHE AS OFERTAS E REGRAS OFICIAIS DIRETAMENTE COM O LOJISTA.'
+              ).toUpperCase();
 
-            {/* Sentinela de Intersection Observer para Carregamento Contínuo */}
-            <div ref={observerRef} className="py-8 flex justify-center items-center">
-              {loadingMore && (
-                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                  Carregando mais novidades...
-                </div>
-              )}
-              {!hasMore && promotions.length > 0 && (
-                <p className="text-xs text-gray-400 uppercase tracking-widest">
-                  Você viu todas as novidades por enquanto
-                </p>
-              )}
-            </div>
-          </>
+              return (
+                <article
+                  key={store.id}
+                  className="bg-white border border-gray-200 rounded-[6px] overflow-hidden shadow-xs hover:shadow-md transition-shadow flex flex-col"
+                >
+                  {/* 1/3 SUPERIOR DO CARD: MINI BANNER DA LOJA */}
+                  <Link
+                    href={`/loja/${store.slug || store.id}`}
+                    className="block w-full h-36 sm:h-44 bg-neutral-900 relative overflow-hidden group"
+                  >
+                    {miniBanner ? (
+                      <img
+                        src={miniBanner}
+                        alt={`Mini banner ${store.name}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-white px-4 text-center bg-gradient-to-r from-neutral-900 to-neutral-800">
+                        <span className="text-lg sm:text-xl font-black uppercase tracking-wider">
+                          {store.name}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-widest text-neutral-400 mt-1">
+                          Mini Banner da Loja
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+
+                  {/* 2/3 INFERIORES DIVIDIDOS EM 2 LINHAS */}
+                  <div className="flex flex-col divide-y divide-gray-200">
+                    {/* LINHA DO MEIO: IMAGEM DO PRÊMIO */}
+                    <div className="p-3 sm:p-4 bg-neutral-50/70 flex flex-col items-center justify-center">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#FB6600] mb-2">
+                        Prêmio da Promoção / Sorteio
+                      </span>
+                      <div className="w-full h-44 sm:h-52 rounded-[4px] border border-gray-200 bg-white overflow-hidden flex items-center justify-center">
+                        {store.raffle_prize_image_url ? (
+                          <img
+                            src={store.raffle_prize_image_url}
+                            alt={`Prêmio ${store.name}`}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-neutral-400 px-4 text-center">
+                            <svg
+                              aria-hidden="true"
+                              className="w-10 h-10 text-[#FB6600]/60 mb-1.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={1.5}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+                              />
+                            </svg>
+                            <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                              Imagem do Prêmio
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LINHA DE BAIXO: LOGO REDONDA, NOME + PONTO DE REFERÊNCIA, DATAS E CAIXA DE REGRAS EM MAIÚSCULAS */}
+                    <div className="p-4 bg-white space-y-3">
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <Link
+                          href={`/loja/${store.slug || store.id}`}
+                          className="flex items-start gap-3 min-w-0 flex-1 group"
+                        >
+                          <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200 bg-gray-100 shrink-0 flex items-center justify-center">
+                            {store.logo_url ? (
+                              <img
+                                src={store.logo_url}
+                                alt={store.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <DefaultStoreAvatar size="md" />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <h2 className="text-sm sm:text-base font-bold uppercase text-neutral-900 group-hover:text-[#FB6600] transition-colors leading-tight">
+                              {store.name}
+                            </h2>
+                            {store.reference_point && (
+                              <p className="text-xs font-bold uppercase text-[#FB6600] mt-0.5 leading-tight">
+                                • {store.reference_point}
+                              </p>
+                            )}
+                          </div>
+                        </Link>
+
+                        <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-wide shrink-0">
+                          <div className="bg-neutral-50 border border-gray-200 px-2.5 py-1.5 rounded-[4px]">
+                            <span className="text-[9.5px] text-neutral-500 block leading-none">
+                              INÍCIO DA PROMOÇÃO
+                            </span>
+                            <span className="text-neutral-900 tabular-nums">{startDateText}</span>
+                          </div>
+                          <div className="bg-orange-50 border border-orange-200 px-2.5 py-1.5 rounded-[4px]">
+                            <span className="text-[9.5px] text-[#FB6600] block leading-none">
+                              DATA DO SORTEIO
+                            </span>
+                            <span className="text-[#FB6600] tabular-nums">{raffleDateText}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Caixa com caracteres para texto de regras do sorteio (letras maiúsculas forçadas) */}
+                      <div className="border border-gray-200 bg-neutral-50 rounded-[4px] p-3">
+                        <span className="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">
+                          REGRAS DO SORTEIO
+                        </span>
+                        <p className="text-xs font-semibold text-neutral-800 leading-relaxed uppercase">
+                          {rulesText}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
