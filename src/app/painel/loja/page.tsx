@@ -10,6 +10,7 @@ import StorePreviewModal, { StorePreviewData } from '@/components/StorePreviewMo
 import PlansModal, { PlanType } from '@/components/PlansModal'
 import LogoAdjustModal from '@/components/merchant/LogoAdjustModal'
 import BannerAdjustModal from '@/components/merchant/BannerAdjustModal'
+import BannerProEditorModal from '@/components/merchant/BannerProEditorModal'
 import SmallBannerAdjustModal from '@/components/merchant/SmallBannerAdjustModal'
 import { getPlan } from '@/lib/plans'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
@@ -296,6 +297,7 @@ function MerchantStoreAdminContent() {
   const largeBannerInputRef = useRef<HTMLInputElement>(null)
   const [isLargeBannerAdjustModalOpen, setIsLargeBannerAdjustModalOpen] = useState(false)
   const [largeBannerAdjustSource, setLargeBannerAdjustSource] = useState<string | null>(null)
+  const [isLargeBannerProEditorOpen, setIsLargeBannerProEditorOpen] = useState(false)
 
   // Estados dos Campos (Tópico 05 — Dispositivo Banner Pequeno: 16:10 / 400 × 250 px)
   const [currentSmallBannerUrl, setCurrentSmallBannerUrl] = useState<string | null>(null)
@@ -1708,6 +1710,15 @@ function MerchantStoreAdminContent() {
                     {largeBannerFile || currentLargeBannerUrl ? 'Substituir Banner Triplo' : 'Enviar Banner Triplo'}
                   </button>
 
+                  <button
+                    type="button"
+                    onClick={() => setIsLargeBannerProEditorOpen(true)}
+                    className="h-11 px-5 bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer rounded-md flex items-center gap-2"
+                    title="Abrir editor profissional de banner com 3 linhas, sombras, posições e 200 fontes"
+                  >
+                    <span>Editor de Banner Profissional</span>
+                  </button>
+
                   {(largeBannerPreview || currentLargeBannerUrl) && (
                     <button
                       type="button"
@@ -2062,6 +2073,15 @@ function MerchantStoreAdminContent() {
         isOpen={isLargeBannerAdjustModalOpen}
         imageSrc={largeBannerAdjustSource}
         onClose={() => setIsLargeBannerAdjustModalOpen(false)}
+        onApply={handleApplyLargeBannerAdjustment}
+      />
+
+      {/* Editor Profissional de Banner Triplo (940 × 370 px) */}
+      <BannerProEditorModal
+        isOpen={isLargeBannerProEditorOpen}
+        initialImageSrc={largeBannerPreview || currentLargeBannerUrl}
+        storeName={name}
+        onClose={() => setIsLargeBannerProEditorOpen(false)}
         onApply={handleApplyLargeBannerAdjustment}
       />
 

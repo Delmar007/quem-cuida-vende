@@ -84,10 +84,10 @@ export default function FeedClient() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-8 pt-2">
+    <div className="min-h-screen bg-gray-50/50 -mt-6 md:-mt-8 pb-8 pt-[10px]">
       <div className="max-w-[940px] mx-auto px-4">
-        {/* Barra fixa logo abaixo da barra de categorias: botão voltar redondo (mobile) + OFERTAS QUE SIGO | LOJAS E PRÊMIOS */}
-        <div className="sticky top-[56px] md:top-[47px] z-40 bg-gray-50/95 backdrop-blur-xs py-2 -mx-4 px-4 mb-4 flex items-center gap-2">
+        {/* Barra fixa logo abaixo da barra de categorias (10px de distância): botão voltar redondo (mobile) + OFERTAS QUE SIGO | LOJAS E PRÊMIOS */}
+        <div className="sticky top-[56px] md:top-[47px] z-40 bg-gray-50/95 backdrop-blur-xs pb-2 pt-0 -mx-4 px-4 mb-3 flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
