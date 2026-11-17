@@ -564,14 +564,14 @@ export default function Header() {
             />
           </Link>
 
-          {/* CAIXA DE BUSCA RETANGULAR COM ÍCONE DE LUPA PRETA */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white">
+          {/* CAIXA DE BUSCA COM CHANFRADO IGUAL AOS CARDS (6px) */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white">
             <input 
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por produto ou nome da loja..."
-              className="w-full px-3 py-2 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none rounded-none bg-transparent"
+              className="w-full px-3 py-2 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none bg-transparent"
             />
             <button 
               type="submit"
@@ -1016,7 +1016,7 @@ export default function Header() {
 
             <form
               onSubmit={handleSearch}
-              className="flex-1 min-w-0 flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-none bg-white h-8"
+              className="flex-1 min-w-0 flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white h-8"
             >
               <input
                 type="text"
