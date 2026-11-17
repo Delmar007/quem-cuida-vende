@@ -13,19 +13,29 @@ export default function FeedClient() {
   const [user, setUser] = useState<any>(null);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // 1. Verificar autenticação
+  // 1. Verificar autenticação e zerar contador diário ao entrar no Feed
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       setUser(data?.user || null);
     });
+    try {
+      const now = new Date();
+      const local = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+      const todayKey = local.toISOString().slice(0, 10);
+      localStorage.setItem('kittanda_feed_last_seen_date', todayKey);
+      localStorage.setItem('kittanda_feed_last_seen_at', now.toISOString());
+      window.dispatchEvent(new Event('kittanda:feed-seen'));
+    } catch {
+      // ignore
+    }
   }, []);
 
-  // 2. Buscar promoções iniciais
+  // 2. Buscar todos os produtos/promoções postados hoje pelas lojas seguidas
   const loadInitialFeed = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/feed?limit=12');
+      const res = await fetch('/api/feed?limit=100');
       if (res.status === 401) {
         setUser(null);
         setPromotions([]);
@@ -35,9 +45,7 @@ export default function FeedClient() {
       const data = await res.json();
       const items = data.promotions || [];
       setPromotions(items);
-      if (items.length < 12) {
-        setHasMore(false);
-      }
+      setHasMore(false);
     } catch (e) {
       console.error('Erro ao carregar feed:', e);
     } finally {
@@ -94,20 +102,20 @@ export default function FeedClient() {
   }, [hasMore, loadMorePromotions]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-8">
+    <div className="min-h-screen bg-gray-50/50 py-6">
       <div className="max-w-[940px] mx-auto px-4">
         {/* Cabeçalho da Seção Feed */}
-        <div className="mb-8 border-b border-gray-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="mb-6 border-b border-gray-200 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-gray-900 uppercase">
-              Meu Feed de Ofertas
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 uppercase">
+              Feed que Sigo
             </h1>
             <p className="text-xs sm:text-sm text-gray-500">
-              Novidades e promoções exclusivas das lojas que você segue na Kittanda Outlet
+              Todos os produtos e ofertas postados hoje pelas lojas que você segue (reinicia amanhã)
             </p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 bg-black text-white self-start sm:self-auto uppercase tracking-wider">
-            Personalizado
+          <span className="text-xs font-bold px-3 py-1 bg-[#FB6600] text-white self-start sm:self-auto uppercase tracking-wider rounded-[4px] tabular-nums">
+            {promotions.length} {promotions.length === 1 ? 'postagem hoje' : 'postagens hoje'}
           </span>
         </div>
 

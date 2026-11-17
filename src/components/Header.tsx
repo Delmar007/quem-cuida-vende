@@ -316,14 +316,27 @@ export default function Header() {
     }
   }, [currentUf, currentCidade, currentBairro])
 
+  const getTodayFeedKey = () => {
+    const now = new Date()
+    const local = new Date(now.getTime() - 4 * 60 * 60 * 1000)
+    return local.toISOString().slice(0, 10)
+  }
+
   const markFeedAsSeen = () => {
     setUnreadFeedPromosCount(0)
     try {
+      localStorage.setItem('kittanda_feed_last_seen_date', getTodayFeedKey())
       localStorage.setItem('kittanda_feed_last_seen_at', new Date().toISOString())
     } catch {
       // ignore
     }
   }
+
+  useEffect(() => {
+    const onFeedSeen = () => setUnreadFeedPromosCount(0)
+    window.addEventListener('kittanda:feed-seen', onFeedSeen)
+    return () => window.removeEventListener('kittanda:feed-seen', onFeedSeen)
+  }, [])
 
   useEffect(() => {
     const isInsideFeed =
@@ -342,15 +355,20 @@ export default function Header() {
     }
 
     let active = true
-    fetch('/api/feed?limit=50')
+    fetch('/api/feed?limit=100')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!active || !data || !Array.isArray(data.promotions)) return
         setRecentFeedPromos(data.promotions.slice(0, 4))
+        const todayKey = getTodayFeedKey()
         let lastSeenMs = 0
         try {
-          const saved = localStorage.getItem('kittanda_feed_last_seen_at')
-          if (saved) lastSeenMs = new Date(saved).getTime() || 0
+          const savedDate = localStorage.getItem('kittanda_feed_last_seen_date')
+          const savedAt = localStorage.getItem('kittanda_feed_last_seen_at')
+          // Só considera a marcação de visto se for do mesmo dia; no dia seguinte zera e conta tudo de novo
+          if (savedDate === todayKey && savedAt) {
+            lastSeenMs = new Date(savedAt).getTime() || 0
+          }
         } catch {
           // ignore
         }
@@ -682,17 +700,17 @@ export default function Header() {
                 }
                 aria-haspopup="true"
                 aria-expanded={isFeedPreviewOpen}
-                aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
-                title="Feed que sigo — Novidades das lojas que você acompanha"
+                aria-current={pathname === '/feed' ? 'page' : undefined}
+                title="Feed que sigo — Novidades de hoje das lojas que você acompanha"
                 className={`relative inline-flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
-                  pathname === '/perfil' && searchParams.get('aba') === 'feed'
+                  pathname === '/feed'
                     ? 'text-[#FB6600] bg-orange-50'
                     : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
                 }`}
                 onClick={() => {
                   markFeedAsSeen()
                   setIsFeedPreviewOpen(false)
-                  router.push('/perfil?aba=feed')
+                  router.push('/feed')
                 }}
               >
                 <svg
@@ -710,7 +728,7 @@ export default function Header() {
                   />
                 </svg>
                 {unreadFeedPromosCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                  <span className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
                     {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
                   </span>
                 )}
@@ -821,7 +839,7 @@ export default function Header() {
                         onClick={() => {
                           markFeedAsSeen()
                           setIsFeedPreviewOpen(false)
-                          router.push('/perfil?aba=feed')
+                          router.push('/feed')
                         }}
                         className="flex-1 py-2 px-3 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors cursor-pointer text-center"
                       >
@@ -876,14 +894,14 @@ export default function Header() {
                   ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
                   : 'Feed que sigo'
               }
-              aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
+              aria-current={pathname === '/feed' ? 'page' : undefined}
               title="Abrir Feed que sigo"
               onClick={() => {
                 markFeedAsSeen()
-                router.push('/perfil?aba=feed')
+                router.push('/feed')
               }}
               className={`relative inline-flex items-center justify-center w-8 h-8 rounded-full transition-all duration-150 cursor-pointer shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
-                pathname === '/perfil' && searchParams.get('aba') === 'feed'
+                pathname === '/feed'
                   ? 'text-[#FB6600] bg-orange-50'
                   : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
               }`}
@@ -903,7 +921,7 @@ export default function Header() {
                 />
               </svg>
               {unreadFeedPromosCount > 0 && (
-                <span className="absolute top-0 right-0 min-w-[15px] h-[15px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                <span className="absolute bottom-0 right-0 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
                   {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
                 </span>
               )}
