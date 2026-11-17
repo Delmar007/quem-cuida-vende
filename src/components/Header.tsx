@@ -1135,7 +1135,7 @@ export default function Header() {
                 )
               })}
 
-              {/* BOTÃO ARREDONDADO PRETO: LIMPA FILTRO */}
+              {/* LIMPA FILTRO (apenas texto em 2 linhas na cor preta) */}
               <div className="flex items-center shrink-0">
                 <Link
                   href="/"
@@ -1145,7 +1145,7 @@ export default function Header() {
                     setSearchTerm('')
                   }}
                   title="Limpar todos os filtros"
-                  className="inline-flex flex-col items-center justify-center px-[10.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.25px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors shadow-2xs scale-[1.03]"
+                  className="inline-flex flex-col items-center justify-center px-1 py-1 text-black hover:text-[#FB6600] text-[10px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors"
                 >
                   <span>Limpa</span>
                   <span>Filtro</span>
@@ -1517,7 +1517,7 @@ export default function Header() {
                         setSearchTerm('')
                       }}
                       title="Limpar todos os filtros"
-                      className="inline-flex flex-col items-center justify-center px-[12.5px] py-[4.2px] bg-black hover:bg-neutral-800 text-white rounded-full text-[8.75px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 scale-[1.03]"
+                      className="inline-flex flex-col items-center justify-center px-1.5 py-1 text-black hover:text-[#FB6600] text-[10.5px] font-bold uppercase leading-[1.05] tracking-tight shrink-0 transition-colors"
                     >
                       <span>Limpa</span>
                       <span>Filtro</span>
