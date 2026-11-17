@@ -555,17 +555,17 @@ export default function Header() {
       {/* 1. TOPO: Rola junto com a página */}
       <div className="w-full bg-white border-b border-gray-100">
         <div className="mx-auto max-w-[940px] px-4 min-h-[72px] py-1.5 flex items-center justify-between gap-3">
-          {/* Logo */}
+          {/* Logo (-10% apenas no desktop) */}
           <Link href="/" className="flex items-center group shrink-0">
             <img 
               src="/logo-kittanda-laranja.png" 
               alt="Kittanda Outlet" 
-              className="w-[160px] sm:w-[250px] md:w-[300px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="w-[160px] sm:w-[225px] md:w-[270px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
-          {/* CAIXA DE BUSCA COM CHANFRADO IGUAL AOS CARDS (6px) */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-[480px] mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white">
+          {/* CAIXA DE BUSCA COM CHANFRADO IGUAL AOS CARDS (6px) - AMPLIADA NO DESKTOP */}
+          <form onSubmit={handleSearch} className="flex-1 mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white">
             <input 
               type="text"
               value={searchTerm}
