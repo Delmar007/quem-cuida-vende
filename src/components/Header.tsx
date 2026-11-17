@@ -1270,7 +1270,7 @@ export default function Header() {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
-              className={`flex items-center gap-2 py-3.5 text-[15.5px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
+              className={`flex items-center gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
                 currentView === 'produtos'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
@@ -1297,7 +1297,7 @@ export default function Header() {
                 e.stopPropagation()
                 setIsMobileCatOpen((prev) => !prev)
               }}
-              className={`flex items-center justify-center gap-2 py-2.5 px-4 text-[15.5px] font-bold uppercase tracking-wide transition-all border rounded-none cursor-pointer relative z-[60] select-none max-w-[46vw] ${
+              className={`flex items-center justify-center gap-2 py-2.5 px-4 text-[15.5px] font-bold uppercase tracking-wide transition-all border rounded-[6px] cursor-pointer relative z-[60] select-none max-w-[46vw] ${
                 isMobileCatOpen || currentCategory
                   ? 'border-[#FB6600] text-[#FB6600] bg-orange-50/60 shadow-xs'
                   : 'border-gray-300 text-black hover:border-black bg-white'
@@ -1323,7 +1323,7 @@ export default function Header() {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
-              className={`flex items-center gap-2 py-3.5 text-[15.5px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
+              className={`flex items-center gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
                 currentView === 'lojas'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
