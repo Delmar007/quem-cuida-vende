@@ -554,7 +554,7 @@ export default function Header() {
 
       {/* 1. TOPO: Rola junto com a página */}
       <div className="w-full bg-white border-b border-gray-100">
-        <div className="mx-auto max-w-[940px] px-4 min-h-[72px] py-1.5 flex items-center justify-between gap-3">
+        <div className="mx-auto max-w-[940px] px-4 md:px-3 min-h-[72px] py-1.5 flex items-center justify-between gap-[5px]">
           {/* Logo (-10% apenas no desktop) */}
           <Link href="/" className="flex items-center group shrink-0">
             <img 
@@ -564,8 +564,8 @@ export default function Header() {
             />
           </Link>
 
-          {/* CAIXA DE BUSCA COM CHANFRADO IGUAL AOS CARDS (6px) - AMPLIADA NO DESKTOP */}
-          <form onSubmit={handleSearch} className="flex-1 mx-2.5 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white">
+          {/* CAIXA DE BUSCA COM CHANFRADO IGUAL AOS CARDS (6px) - 5px da logo e 5px do avatar */}
+          <form onSubmit={handleSearch} className="flex-1 hidden md:flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white">
             <input 
               type="text"
               value={searchTerm}
@@ -590,8 +590,8 @@ export default function Header() {
             </button>
           </form>
 
-          {/* AÇÕES DO TOPO - DESKTOP */}
-          <div className="hidden md:flex items-center gap-[2px] text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
+          {/* AÇÕES DO TOPO - DESKTOP (5px exatos entre cada elemento) */}
+          <div className="hidden md:flex items-center gap-[5px] text-[13px] font-heading tracking-tight text-gray-500 font-normal shrink-0">
             {/* IMAGEM DO ROSTO / AVATAR DO LOGIN (GOOGLE, FACEBOOK OU PADRÃO) */}
             <div 
               onClick={() => {
@@ -627,18 +627,14 @@ export default function Header() {
                   {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
                 </Link>
                 {Boolean(user.hasStore) && (
-                  <>
-                    <span className="text-gray-300 text-xs font-light">|</span>
-                    <Link
-                      href="/painel/loja"
-                      className="text-[13px] hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
-                      title="Acessar painel da minha loja"
-                    >
-                      MINHA LOJA
-                    </Link>
-                  </>
+                  <Link
+                    href="/painel/loja"
+                    className="text-[13px] hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                    title="Acessar painel da minha loja"
+                  >
+                    MINHA LOJA
+                  </Link>
                 )}
-                <span className="text-gray-300 text-xs font-light">|</span>
                 <button 
                   type="button"
                   onClick={async () => {
@@ -672,7 +668,6 @@ export default function Header() {
                 </button>
               </>
             )}
-            <span className="text-gray-300 text-xs font-light">|</span>
             <div
               className="relative flex items-center"
               onMouseEnter={() => setIsFeedPreviewOpen(true)}
@@ -689,7 +684,7 @@ export default function Header() {
                 aria-expanded={isFeedPreviewOpen}
                 aria-current={pathname === '/perfil' && searchParams.get('aba') === 'feed' ? 'page' : undefined}
                 title="Feed que sigo — Novidades das lojas que você acompanha"
-                className={`relative inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+                className={`relative inline-flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
                   pathname === '/perfil' && searchParams.get('aba') === 'feed'
                     ? 'text-[#FB6600] bg-orange-50'
                     : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
@@ -852,7 +847,7 @@ export default function Header() {
               onClick={() => setIsPromoMenuOpen(false)}
               title="Administração do Site"
               aria-label="Administração do Site"
-              className="inline-flex items-center justify-center w-8 h-8 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
+              className="inline-flex items-center justify-center w-6 h-6 rounded-full text-neutral-600 hover:text-[#FB6600] hover:bg-orange-50 transition-colors shrink-0"
             >
               <svg className="w-[18px] h-[18px] stroke-[1.75]" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
@@ -863,11 +858,10 @@ export default function Header() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </Link>
-            <span className="text-gray-300 text-xs font-light">|</span>
             <button
               type="button"
               onClick={() => setIsPlansOpen(true)}
-              className="text-[13px] font-heading font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
+              className="text-[13px] font-heading font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer inline-flex items-center whitespace-nowrap"
             >
               <span>PLANOS</span>
             </button>
