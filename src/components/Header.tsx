@@ -560,7 +560,7 @@ export default function Header() {
             <img 
               src="/logo-kittanda-laranja.png" 
               alt="Kittanda Outlet" 
-              className="w-[160px] sm:w-[225px] md:w-[270px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+              className="w-[176px] sm:w-[225px] md:w-[270px] max-w-full h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             />
           </Link>
 
@@ -967,7 +967,7 @@ export default function Header() {
                     router.push('/')
                     router.refresh()
                   }}
-                  className="ml-1 text-[13px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                  className="ml-1 text-[15.5px] text-red-600 hover:text-red-700 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
                 >
                   SAIR
                 </button>
