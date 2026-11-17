@@ -1066,21 +1066,21 @@ export default function Header() {
           {/* ========================================================= */}
           <div className="hidden md:flex items-center justify-between gap-2 px-3">
             
-            {/* LADO ESQUERDO: Botão de Seleção "Lojas" + Categorias */}
+            {/* LADO ESQUERDO: Botão de Seleção "Produtos" + Categorias */}
             <div className="flex items-center gap-1.5 lg:gap-2 font-heading text-[13px] font-semibold tracking-tight overflow-x-auto no-scrollbar py-0 flex-1 min-w-0">
               
-              {/* BOTÃO "LOJAS" COM OS QUADRADINHOS */}
+              {/* BOTÃO "PRODUTOS" COM OS QUADRADINHOS */}
               <Link
-                href={buildFilterUrl({ tipo: 'lojas' })}
+                href={buildFilterUrl({ tipo: 'produtos' })}
                 onClick={() => setIsPromoMenuOpen(false)}
                 className={`flex items-center gap-1.5 py-3.5 whitespace-nowrap transition-colors duration-200 relative shrink-0 ${
-                  currentView === 'lojas'
+                  currentView === 'produtos'
                     ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                     : "text-black hover:text-[#FB6600]"
                 }`}
               >
                 <svg 
-                  className={`w-4 h-4 stroke-[1.6] ${currentView === 'lojas' ? 'text-[#FB6600]' : 'text-black'}`}
+                  className={`w-4 h-4 stroke-[1.6] ${currentView === 'produtos' ? 'text-[#FB6600]' : 'text-black'}`}
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -1090,10 +1090,10 @@ export default function Header() {
                   <rect x="14" y="14" width="7" height="7" rx="1" />
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span className="uppercase">LOJAS</span>
+                <span className="uppercase">PRODUTOS</span>
               </Link>
 
-              {/* Linha vertical divisória entre Lojas e Categorias */}
+              {/* Linha vertical divisória entre Produtos e Categorias */}
               <div className="h-4 w-[1px] bg-gray-200 shrink-0" />
 
               {/* LISTA DE CATEGORIAS */}
@@ -1232,18 +1232,19 @@ export default function Header() {
               )}
             </div>
 
-            {/* LADO DIREITO: Botão de Seleção "Produtos" */}
+            {/* LADO DIREITO: Botão de Seleção "Lojas" */}
             <div className="border-l border-gray-200 pl-3 flex items-center h-full shrink-0">
               <Link
-                href={buildFilterUrl({ tipo: 'produtos' })}
+                href={buildFilterUrl({ tipo: 'lojas' })}
+                onClick={() => setIsPromoMenuOpen(false)}
                 className={`flex items-center gap-1.5 py-3.5 font-heading text-[13px] font-semibold tracking-tight transition-colors relative shrink-0 ${
-                  currentView === 'produtos'
+                  currentView === 'lojas'
                     ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                     : "text-black hover:text-[#FB6600]"
                 }`}
               >
                 <svg 
-                  className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'produtos' ? 'text-[#FB6600]' : 'text-black'}`}
+                  className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'lojas' ? 'text-[#FB6600]' : 'text-black'}`}
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -1253,30 +1254,30 @@ export default function Header() {
                   <rect x="14" y="14" width="7" height="7" rx="1" />
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span className="uppercase">PRODUTOS</span>
+                <span className="uppercase">LOJAS</span>
               </Link>
             </div>
           </div>
 
           {/* ========================================================= */}
-          {/* B. VERSÃO MOBILE (md:hidden): Lojas | Categorias ▾ | Produtos */}
+          {/* B. VERSÃO MOBILE (md:hidden): Produtos | Categorias ▾ | Lojas */}
           {/* ========================================================= */}
           <div className="flex md:hidden items-center justify-between gap-2 px-3 h-14 font-heading relative z-[60]">
-            {/* LADO ESQUERDO: Lojas */}
+            {/* LADO ESQUERDO: Produtos */}
             <Link
-              href={buildFilterUrl({ tipo: 'lojas' })}
+              href={buildFilterUrl({ tipo: 'produtos' })}
               onClick={(e) => {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
               className={`flex items-center gap-2 py-3.5 text-[15.5px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
-                currentView === 'lojas'
+                currentView === 'produtos'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
               }`}
             >
               <svg 
-                className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'lojas' ? 'text-[#FB6600]' : 'text-black'}`}
+                className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'produtos' ? 'text-[#FB6600]' : 'text-black'}`}
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
@@ -1286,7 +1287,7 @@ export default function Header() {
                 <rect x="14" y="14" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" />
               </svg>
-              <span className="uppercase">LOJAS</span>
+              <span className="uppercase">PRODUTOS</span>
             </Link>
 
             {/* MEIO: Botão Categorias que abre o Menu Vertical */}
@@ -1315,21 +1316,21 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* LADO DIREITO: Produtos */}
+            {/* LADO DIREITO: Lojas */}
             <Link
-              href={buildFilterUrl({ tipo: 'produtos' })}
+              href={buildFilterUrl({ tipo: 'lojas' })}
               onClick={(e) => {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
               className={`flex items-center gap-2 py-3.5 text-[15.5px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
-                currentView === 'produtos'
+                currentView === 'lojas'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
               }`}
             >
               <svg 
-                className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'produtos' ? 'text-[#FB6600]' : 'text-black'}`}
+                className={`w-[18px] h-[18px] stroke-[1.6] ${currentView === 'lojas' ? 'text-[#FB6600]' : 'text-black'}`}
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
@@ -1339,7 +1340,7 @@ export default function Header() {
                 <rect x="14" y="14" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="7" height="7" rx="1" />
               </svg>
-              <span className="uppercase">PRODUTOS</span>
+              <span className="uppercase">LOJAS</span>
             </Link>
           </div>
         </div>
