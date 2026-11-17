@@ -1290,14 +1290,14 @@ export default function Header() {
               <span className="uppercase">PRODUTOS</span>
             </Link>
 
-            {/* MEIO: Botão Categorias que abre o Menu Vertical */}
+            {/* MEIO: Botão Categorias com largura flex-1 (igual à barra de busca) e espaçamento simétrico */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation()
                 setIsMobileCatOpen((prev) => !prev)
               }}
-              className={`flex items-center justify-center gap-2 py-2.5 px-4 text-[15.5px] font-bold uppercase tracking-wide transition-all border rounded-[6px] cursor-pointer relative z-[60] select-none max-w-[46vw] ${
+              className={`flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 text-[14.5px] font-bold uppercase tracking-wide transition-all border rounded-[6px] cursor-pointer relative z-[60] select-none ${
                 isMobileCatOpen || currentCategory
                   ? 'border-[#FB6600] text-[#FB6600] bg-orange-50/60 shadow-xs'
                   : 'border-gray-300 text-black hover:border-black bg-white'
