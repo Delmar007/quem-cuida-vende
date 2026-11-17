@@ -251,16 +251,22 @@ export default function PromoThermometerBar({
                     : 'text-[#8c939d] hover:text-red-600'
                 }`}
               >
-                <svg
-                  className="w-[38px] h-[38px] md:w-[19px] md:h-[19px]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.25}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
-                </svg>
+                {isFollowingStore ? (
+                  <span className="text-[12px] md:text-[10px] font-bold uppercase tracking-wider text-red-600 leading-none whitespace-nowrap">
+                    SEGUINDO
+                  </span>
+                ) : (
+                  <svg
+                    className="w-[38px] h-[38px] md:w-[19px] md:h-[19px]"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.25}
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+                  </svg>
+                )}
               </button>
             )}
 
