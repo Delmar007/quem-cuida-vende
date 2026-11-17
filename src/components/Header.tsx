@@ -553,7 +553,7 @@ export default function Header() {
       </div>
 
       {/* 1. TOPO: Rola junto com a página */}
-      <div className="w-full bg-white border-b border-gray-100">
+      <div className="w-full bg-white border-b border-gray-100 relative z-[60]">
         <div className="mx-auto max-w-[940px] px-4 md:px-3 min-h-[72px] py-1.5 flex items-center justify-between gap-[5px]">
           {/* Logo (-10% apenas no desktop) */}
           <Link href="/" className="flex items-center group shrink-0">
@@ -720,7 +720,7 @@ export default function Header() {
                 <div
                   role="region"
                   aria-label="Prévia do Feed que sigo"
-                  className="absolute right-0 top-full pt-2 z-50 w-80"
+                  className="absolute right-0 top-full pt-2 z-[70] w-80"
                 >
                   <div className="bg-white border border-neutral-200 rounded-md shadow-xl overflow-hidden normal-case tracking-normal text-left">
                     <div className="px-3.5 py-2.5 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
