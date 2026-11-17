@@ -45,6 +45,7 @@ export default function Header() {
   const [isPlansOpen, setIsPlansOpen] = useState(false)
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
   const [porRuaMode, setPorRuaMode] = useState<'rua' | 'shopping'>('rua')
+  const [isPorRuaExpanded, setIsPorRuaExpanded] = useState(true)
   const [streetsByLetter, setStreetsByLetter] = useState<Record<string, string[]>>(() =>
     mergeAndGroupStreetsByLetter()
   )
@@ -242,8 +243,10 @@ export default function Header() {
   useEffect(() => {
     if (currentCategory !== 'por_rua') {
       setSelectedLetter(null)
+      setIsPorRuaExpanded(true)
       return
     }
+    setIsPorRuaExpanded(!currentRua)
     let active = true
     Promise.all([
       getCommercialStreetsByLetterAction(),
@@ -643,7 +646,7 @@ export default function Header() {
                 {Boolean(user.hasStore) && (
                   <Link
                     href="/painel/loja"
-                    className="text-[13px] hover:text-[#FB6600] text-neutral-800 font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
+                    className="text-[13px] text-[#FB6600] hover:text-[#e05b00] font-semibold uppercase transition-colors cursor-pointer whitespace-nowrap"
                     title="Acessar painel da minha loja"
                   >
                     MINHA LOJA
@@ -1427,89 +1430,113 @@ export default function Header() {
         {/* ========================================================= */}
         {currentCategory === 'por_rua' ? (
           <div className="w-full bg-white border-t border-gray-100 animate-in fade-in duration-200 relative">
-            <div className="mx-auto max-w-[940px] px-4 py-2 flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    aria-pressed={porRuaMode === 'rua'}
-                    onClick={() => {
-                      setPorRuaMode('rua')
-                      setSelectedLetter(null)
-                    }}
-                    className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
-                      porRuaMode === 'rua'
-                        ? 'bg-[#FB6600] text-white border-[#FB6600]'
-                        : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
-                    }`}
-                  >
-                    Escolha a inicial da rua comercial
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={porRuaMode === 'shopping'}
-                    onClick={() => {
-                      setPorRuaMode('shopping')
-                      setSelectedLetter(null)
-                    }}
-                    className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
-                      porRuaMode === 'shopping'
-                        ? 'bg-[#FB6600] text-white border-[#FB6600]'
-                        : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
-                    }`}
-                  >
-                    Escolha a inicial do Shopping e Galeria
-                  </button>
-                </div>
-                {currentRua && (
-                  <div className="flex items-center gap-1.5 text-[11px] bg-orange-50 border border-orange-200 text-[#FB6600] font-bold px-2.5 py-0.5 rounded-[2px]">
-                    <span>Selecionado: {currentRua}</span>
-                    <Link
-                      href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: '' })}
-                      className="text-gray-500 hover:text-black ml-1"
-                      title="Limpar filtro selecionado"
-                    >
-                      ×
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-9 sm:flex sm:items-center sm:justify-between gap-1 sm:flex-wrap pb-0.5">
-                {ALPHABET.map((letter) => {
-                  const activeByLetter = porRuaMode === 'shopping' ? shoppingsByLetter : streetsByLetter
-                  const isLetterOpen = selectedLetter === letter
-                  const isActiveStreetLetter =
-                    Boolean(currentRua) &&
-                    (porRuaMode === 'shopping'
-                      ? getShoppingInitialLetter(currentRua) === letter
-                      : getStreetInitialLetter(currentRua) === letter)
-                  const count = (activeByLetter[letter] || []).length
-
-                  return (
+            {isPorRuaExpanded ? (
+              <div className="mx-auto max-w-[940px] px-4 py-2 flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button
-                      key={letter}
                       type="button"
-                      onClick={() => setSelectedLetter((prev) => (prev === letter ? null : letter))}
-                      title={
-                        count > 0
-                          ? `${count} ${porRuaMode === 'shopping' ? 'shopping(s)/galeria(s)' : 'rua(s)'} com a letra ${letter}`
-                          : `Letra ${letter}`
-                      }
-                      className={`min-w-[28px] h-8 px-1 text-[15.5px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
-                        isLetterOpen
-                          ? 'bg-[#FB6600] text-white shadow-xs'
-                          : isActiveStreetLetter
-                          ? 'bg-orange-100 text-[#FB6600] border border-[#FB6600]'
-                          : 'text-gray-700 hover:bg-orange-50 hover:text-[#FB6600]'
+                      aria-pressed={porRuaMode === 'rua'}
+                      onClick={() => {
+                        setPorRuaMode('rua')
+                        setSelectedLetter(null)
+                      }}
+                      className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
+                        porRuaMode === 'rua'
+                          ? 'bg-[#FB6600] text-white border-[#FB6600]'
+                          : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
                       }`}
                     >
-                      {letter}
+                      Escolha a inicial da rua comercial
                     </button>
-                  )
-                })}
+                    <button
+                      type="button"
+                      aria-pressed={porRuaMode === 'shopping'}
+                      onClick={() => {
+                        setPorRuaMode('shopping')
+                        setSelectedLetter(null)
+                      }}
+                      className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-[2px] border transition-colors cursor-pointer ${
+                        porRuaMode === 'shopping'
+                          ? 'bg-[#FB6600] text-white border-[#FB6600]'
+                          : 'bg-white text-neutral-700 border-gray-300 hover:border-[#FB6600] hover:text-[#FB6600]'
+                      }`}
+                    >
+                      Escolha a inicial do Shopping e Galeria
+                    </button>
+                  </div>
+                  {currentRua && (
+                    <div className="flex items-center gap-1.5 text-[11px] bg-orange-50 border border-orange-200 text-[#FB6600] font-bold px-2.5 py-0.5 rounded-[2px]">
+                      <span>Selecionado: {currentRua}</span>
+                      <Link
+                        href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: '' })}
+                        onClick={() => setIsPorRuaExpanded(true)}
+                        className="text-gray-500 hover:text-black ml-1"
+                        title="Limpar filtro selecionado"
+                      >
+                        ×
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-9 sm:flex sm:items-center sm:justify-between gap-1 sm:flex-wrap pb-0.5">
+                  {ALPHABET.map((letter) => {
+                    const activeByLetter = porRuaMode === 'shopping' ? shoppingsByLetter : streetsByLetter
+                    const isLetterOpen = selectedLetter === letter
+                    const isActiveStreetLetter =
+                      Boolean(currentRua) &&
+                      (porRuaMode === 'shopping'
+                        ? getShoppingInitialLetter(currentRua) === letter
+                        : getStreetInitialLetter(currentRua) === letter)
+                    const count = (activeByLetter[letter] || []).length
+
+                    return (
+                      <button
+                        key={letter}
+                        type="button"
+                        onClick={() => setSelectedLetter((prev) => (prev === letter ? null : letter))}
+                        title={
+                          count > 0
+                            ? `${count} ${porRuaMode === 'shopping' ? 'shopping(s)/galeria(s)' : 'rua(s)'} com a letra ${letter}`
+                            : `Letra ${letter}`
+                        }
+                        className={`min-w-[28px] h-8 px-1 text-[15.5px] font-bold rounded-[2px] transition-colors cursor-pointer select-none flex items-center justify-center ${
+                          isLetterOpen
+                            ? 'bg-[#FB6600] text-white shadow-xs'
+                            : isActiveStreetLetter
+                            ? 'bg-orange-100 text-[#FB6600] border border-[#FB6600]'
+                            : 'text-gray-700 hover:bg-orange-50 hover:text-[#FB6600]'
+                        }`}
+                      >
+                        {letter}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mx-auto max-w-[940px] px-4 py-1.5 flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 text-[11px] bg-orange-50 border border-orange-200 text-[#FB6600] font-bold px-2.5 py-0.5 rounded-[2px]">
+                  <span>Selecionado: {currentRua}</span>
+                  <Link
+                    href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: '' })}
+                    onClick={() => setIsPorRuaExpanded(true)}
+                    className="text-gray-500 hover:text-black ml-1"
+                    title="Limpar filtro selecionado"
+                  >
+                    ×
+                  </Link>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPorRuaExpanded(true)}
+                  className="text-[11px] font-bold uppercase tracking-wider text-neutral-700 hover:text-[#FB6600] transition-colors cursor-pointer"
+                >
+                  Alterar rua / shopping
+                </button>
+              </div>
+            )}
 
             {selectedLetter && (
               <>
@@ -1542,7 +1569,10 @@ export default function Header() {
                             <Link
                               key={street}
                               href={buildFilterUrl({ cat: 'por_rua', subcat: '', rua: street })}
-                              onClick={() => setSelectedLetter(null)}
+                              onClick={() => {
+                                setSelectedLetter(null)
+                                setIsPorRuaExpanded(false)
+                              }}
                               className={`px-2.5 py-2 text-[15px] leading-tight rounded-[2px] transition-colors flex items-center justify-between gap-2 ${
                                 isSelectedStreet
                                   ? 'bg-[#FB6600] text-white font-bold'

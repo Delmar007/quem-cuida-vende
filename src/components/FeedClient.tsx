@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import PromotionCard, { PromotionItem } from '@/components/PromotionCard';
 import EmptyFeedState from '@/components/EmptyFeedState';
 import DefaultStoreAvatar from '@/components/DefaultStoreAvatar';
@@ -33,6 +34,7 @@ function formatDatePtBr(raw?: string | null, fallback = '01/01/2026'): string {
 }
 
 export default function FeedClient() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'produtos' | 'lojas'>('produtos');
   const [promotions, setPromotions] = useState<PromotionItem[]>([]);
   const [followedStores, setFollowedStores] = useState<FollowedStoreFeedCard[]>([]);
@@ -82,59 +84,86 @@ export default function FeedClient() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-6">
+    <div className="min-h-screen bg-gray-50/50 pb-8 pt-2">
       <div className="max-w-[940px] mx-auto px-4">
-        {/* Botão barra duplo no topo: PRODUTOS (esq) | LOJAS (dir) */}
-        <div
-          role="tablist"
-          aria-label="Alternar entre Produtos e Lojas no Feed que Sigo"
-          className="mb-5 grid grid-cols-2 border border-gray-300 rounded-[6px] overflow-hidden bg-white shadow-2xs"
-        >
+        {/* Barra fixa logo abaixo da barra de categorias: botão voltar redondo (mobile) + OFERTAS QUE SIGO | LOJAS E PRÊMIOS */}
+        <div className="sticky top-[56px] md:top-[47px] z-40 bg-gray-50/95 backdrop-blur-xs py-2 -mx-4 px-4 mb-4 flex items-center gap-2">
           <button
             type="button"
-            role="tab"
-            aria-selected={activeTab === 'produtos'}
-            onClick={() => setActiveTab('produtos')}
-            className={`py-3 px-4 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 ${
-              activeTab === 'produtos'
-                ? 'bg-[#FB6600] text-white'
-                : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
-            }`}
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back();
+              } else {
+                router.push('/');
+              }
+            }}
+            aria-label="Voltar"
+            title="Voltar"
+            className="md:hidden w-9 h-9 rounded-full border border-gray-300 bg-white text-neutral-800 hover:border-[#FB6600] hover:text-[#FB6600] flex items-center justify-center shrink-0 shadow-2xs transition-colors cursor-pointer"
           >
-            <span>PRODUTOS</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
-                activeTab === 'produtos'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-neutral-100 text-neutral-600'
-              }`}
+            <svg
+              aria-hidden="true"
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.2}
             >
-              {promotions.length}
-            </span>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
 
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'lojas'}
-            onClick={() => setActiveTab('lojas')}
-            className={`py-3 px-4 text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border-l border-gray-200 ${
-              activeTab === 'lojas'
-                ? 'bg-[#FB6600] text-white'
-                : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
-            }`}
+          <div
+            role="tablist"
+            aria-label="Alternar entre Ofertas que Sigo e Lojas e Prêmios"
+            className="flex-1 grid grid-cols-2 border border-gray-300 rounded-[6px] overflow-hidden bg-white shadow-2xs"
           >
-            <span>LOJAS</span>
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
-                activeTab === 'lojas'
-                  ? 'bg-white/20 text-white'
-                  : 'bg-neutral-100 text-neutral-600'
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'produtos'}
+              onClick={() => setActiveTab('produtos')}
+              className={`py-2.5 px-3 text-[11.5px] sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
+                activeTab === 'produtos'
+                  ? 'bg-[#FB6600] text-white'
+                  : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
               }`}
             >
-              {followedStores.length}
-            </span>
-          </button>
+              <span>OFERTAS QUE SIGO</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                  activeTab === 'produtos'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-neutral-100 text-neutral-600'
+                }`}
+              >
+                {promotions.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'lojas'}
+              onClick={() => setActiveTab('lojas')}
+              className={`py-2.5 px-3 text-[11.5px] sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 border-l border-gray-200 ${
+                activeTab === 'lojas'
+                  ? 'bg-[#FB6600] text-white'
+                  : 'bg-white text-neutral-800 hover:bg-orange-50/60 hover:text-[#FB6600]'
+              }`}
+            >
+              <span>LOJAS E PRÊMIOS</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full tabular-nums ${
+                  activeTab === 'lojas'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-neutral-100 text-neutral-600'
+                }`}
+              >
+                {followedStores.length}
+              </span>
+            </button>
+          </div>
         </div>
 
         {loading ? (
