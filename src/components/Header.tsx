@@ -984,15 +984,15 @@ export default function Header() {
           </div>
         </div>
 
-        {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca ampliada (centro) + PLANOS (dir) */}
+        {/* LINHA EXTRA NO MOBILE: MINHA LOJA (esq) + Caixa de Busca (mesma largura de Categorias) + PLANOS (dir) */}
         <div className="md:hidden w-full border-t border-gray-100 bg-neutral-50/70">
           <div className="mx-auto max-w-[940px] px-3 py-2 flex items-center justify-between gap-2 text-[15.5px] font-heading tracking-tight text-gray-600">
-            <div className="shrink-0 flex items-center">
+            <div className="w-[96px] shrink-0 flex items-center justify-start">
               {user ? (
                 Boolean(user.hasStore) && (
                   <Link
                     href="/painel/loja"
-                    className="text-[15.5px] text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
+                    className="text-[13.2px] text-neutral-900 hover:text-[#FB6600] font-bold uppercase transition-colors whitespace-nowrap"
                   >
                     MINHA LOJA
                   </Link>
@@ -1001,7 +1001,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={openRegister}
-                  className="text-[15.5px] text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
+                  className="text-[13.2px] text-neutral-800 hover:text-[#FB6600] font-semibold transition-colors cursor-pointer whitespace-nowrap"
                 >
                   Crie uma conta
                 </button>
@@ -1041,11 +1041,11 @@ export default function Header() {
               </button>
             </form>
 
-            <div className="shrink-0 flex items-center">
+            <div className="w-[70px] shrink-0 flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setIsPlansOpen(true)}
-                className="text-[15.5px] font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
+                className="text-[13.2px] font-bold uppercase tracking-tight text-black hover:text-[#FB6600] transition-colors cursor-pointer whitespace-nowrap"
               >
                 PLANOS
               </button>
@@ -1263,14 +1263,14 @@ export default function Header() {
           {/* B. VERSÃO MOBILE (md:hidden): Produtos | Categorias ▾ | Lojas */}
           {/* ========================================================= */}
           <div className="flex md:hidden items-center justify-between gap-2 px-3 h-14 font-heading relative z-[60]">
-            {/* LADO ESQUERDO: Produtos */}
+            {/* LADO ESQUERDO: Produtos (mesma largura w-[96px] da coluna acima) */}
             <Link
               href={buildFilterUrl({ tipo: 'produtos' })}
               onClick={(e) => {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
-              className={`flex items-center gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
+              className={`w-[96px] flex items-center justify-start gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
                 currentView === 'produtos'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
@@ -1316,14 +1316,14 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* LADO DIREITO: Lojas */}
+            {/* LADO DIREITO: Lojas (mesma largura w-[70px] da coluna acima) */}
             <Link
               href={buildFilterUrl({ tipo: 'lojas' })}
               onClick={(e) => {
                 e.stopPropagation()
                 setIsMobileCatOpen(false)
               }}
-              className={`flex items-center gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
+              className={`w-[70px] flex items-center justify-end gap-1.5 py-3.5 text-[13.2px] font-semibold whitespace-nowrap transition-colors relative shrink-0 ${
                 currentView === 'lojas'
                   ? "text-[#FB6600] font-bold before:content-[''] before:absolute before:-top-[1px] before:left-0 before:right-0 before:h-[2.5px] before:bg-[#FB6600]"
                   : "text-black hover:text-[#FB6600]"
