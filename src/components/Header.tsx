@@ -38,8 +38,6 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [unreadFeedPromosCount, setUnreadFeedPromosCount] = useState(0)
-  const [recentFeedPromos, setRecentFeedPromos] = useState<any[]>([])
-  const [isFeedPreviewOpen, setIsFeedPreviewOpen] = useState(false)
   const [selectedLocation, setSelectedLocation] = useState<KittandaLocation>(DEFAULT_KITTANDA_LOCATION)
   const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false)
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
@@ -350,7 +348,6 @@ export default function Header() {
 
     if (!user) {
       setUnreadFeedPromosCount(0)
-      setRecentFeedPromos([])
       return
     }
 
@@ -359,7 +356,6 @@ export default function Header() {
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!active || !data || !Array.isArray(data.promotions)) return
-        setRecentFeedPromos(data.promotions.slice(0, 4))
         const todayKey = getTodayFeedKey()
         let lastSeenMs = 0
         try {
@@ -686,180 +682,45 @@ export default function Header() {
                 </button>
               </>
             )}
-            <div
-              className="relative flex items-center"
-              onMouseEnter={() => setIsFeedPreviewOpen(true)}
-              onMouseLeave={() => setIsFeedPreviewOpen(false)}
+            <button
+              type="button"
+              aria-label={
+                unreadFeedPromosCount > 0
+                  ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
+                  : 'Feed que sigo'
+              }
+              aria-current={pathname === '/feed' ? 'page' : undefined}
+              title="Feed que sigo — Novidades de hoje das lojas que você acompanha"
+              className={`relative inline-flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
+                pathname === '/feed'
+                  ? 'text-[#FB6600] bg-orange-50'
+                  : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
+              }`}
+              onClick={() => {
+                markFeedAsSeen()
+                router.push('/feed')
+              }}
             >
-              <button
-                type="button"
-                aria-label={
-                  unreadFeedPromosCount > 0
-                    ? `Feed que sigo (${unreadFeedPromosCount} novidades)`
-                    : 'Feed que sigo'
-                }
-                aria-haspopup="true"
-                aria-expanded={isFeedPreviewOpen}
-                aria-current={pathname === '/feed' ? 'page' : undefined}
-                title="Feed que sigo — Novidades de hoje das lojas que você acompanha"
-                className={`relative inline-flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FB6600] ${
-                  pathname === '/feed'
-                    ? 'text-[#FB6600] bg-orange-50'
-                    : 'text-neutral-700 hover:text-[#FB6600] hover:bg-orange-50/70'
-                }`}
-                onClick={() => {
-                  markFeedAsSeen()
-                  setIsFeedPreviewOpen(false)
-                  router.push('/feed')
-                }}
+              <svg
+                aria-hidden="true"
+                className="w-[19px] h-[19px]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.75}
               >
-                <svg
-                  aria-hidden="true"
-                  className="w-[19px] h-[19px]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.75}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                {unreadFeedPromosCount > 0 && (
-                  <span className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
-                    {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
-                  </span>
-                )}
-              </button>
-
-              {isFeedPreviewOpen && (
-                <div
-                  role="region"
-                  aria-label="Prévia do Feed que sigo"
-                  className="absolute right-0 top-full pt-2 z-[70] w-80"
-                >
-                  <div className="bg-white border border-neutral-200 rounded-md shadow-xl overflow-hidden normal-case tracking-normal text-left">
-                    <div className="px-3.5 py-2.5 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-[#FB6600]" aria-hidden="true" />
-                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-                          Feed que sigo
-                        </span>
-                      </div>
-                      {unreadFeedPromosCount > 0 && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-100 text-[#FB6600] tabular-nums">
-                          {unreadFeedPromosCount} {unreadFeedPromosCount === 1 ? 'nova' : 'novas'}
-                        </span>
-                      )}
-                    </div>
-
-                    {!user ? (
-                      <div className="p-4 text-center space-y-2.5">
-                        <p className="text-xs text-neutral-600 leading-relaxed">
-                          Entre na sua conta para acompanhar em um só lugar as novidades e promoções das lojas que você segue.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsFeedPreviewOpen(false)
-                            openLogin()
-                          }}
-                          className="w-full py-2 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors cursor-pointer"
-                        >
-                          Entrar para ver meu Feed
-                        </button>
-                      </div>
-                    ) : recentFeedPromos.length === 0 ? (
-                      <div className="p-4 text-center space-y-2">
-                        <p className="text-xs font-semibold text-neutral-800">
-                          Seu feed está pronto para você
-                        </p>
-                        <p className="text-[11px] text-neutral-500 leading-relaxed">
-                          Siga suas lojas favoritas para receber aqui as últimas postagens e ofertas.
-                        </p>
-                      </div>
-                    ) : (
-                      <ul className="divide-y divide-neutral-100 max-h-64 overflow-y-auto">
-                        {recentFeedPromos.map((promo: any) => {
-                          const storeName = promo?.stores?.name || 'Loja seguida'
-                          const priceValue =
-                            typeof promo?.price_promotional === 'number' && promo.price_promotional > 0
-                              ? promo.price_promotional
-                              : promo?.price_original
-                          return (
-                            <li key={promo.id}>
-                              <Link
-                                href={`/loja/${promo.store_id}`}
-                                onClick={() => {
-                                  markFeedAsSeen()
-                                  setIsFeedPreviewOpen(false)
-                                }}
-                                className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-orange-50/50 transition-colors"
-                              >
-                                <div className="w-11 h-11 rounded-[3px] bg-neutral-100 border border-neutral-200 overflow-hidden shrink-0">
-                                  {promo.image_url ? (
-                                    <img
-                                      src={promo.image_url}
-                                      alt={promo.title || 'Produto'}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                                      <svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-[10px] font-bold uppercase tracking-wide text-[#FB6600] truncate">
-                                    {storeName}
-                                  </p>
-                                  <p className="text-xs font-semibold text-neutral-900 truncate">
-                                    {promo.title}
-                                  </p>
-                                  {typeof priceValue === 'number' && priceValue > 0 && (
-                                    <p className="text-[11px] font-bold text-neutral-800 tabular-nums">
-                                      R$ {priceValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </p>
-                                  )}
-                                </div>
-                              </Link>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    )}
-
-                    <div className="p-2.5 bg-neutral-50 border-t border-neutral-100 flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          markFeedAsSeen()
-                          setIsFeedPreviewOpen(false)
-                          router.push('/feed')
-                        }}
-                        className="flex-1 py-2 px-3 bg-[#FB6600] hover:bg-[#e05b00] text-white text-[11px] font-bold uppercase tracking-wider rounded-[3px] transition-colors cursor-pointer text-center"
-                      >
-                        Abrir Feed que sigo
-                      </button>
-                      <Link
-                        href="/?filtro=feed_que_sigo"
-                        onClick={() => {
-                          markFeedAsSeen()
-                          setIsFeedPreviewOpen(false)
-                        }}
-                        className="py-2 px-2.5 bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-200 text-[11px] font-semibold rounded-[3px] transition-colors whitespace-nowrap"
-                      >
-                        Catálogo
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
+              </svg>
+              {unreadFeedPromosCount > 0 && (
+                <span className="absolute -bottom-1 -right-1 min-w-[16px] h-[16px] px-1 bg-[#FB6600] text-white text-[9px] font-bold leading-none rounded-full flex items-center justify-center tabular-nums ring-2 ring-white shadow-xs">
+                  {unreadFeedPromosCount > 99 ? '99+' : unreadFeedPromosCount}
+                </span>
               )}
-            </div>
+            </button>
             <Link
               href="/admin"
               onClick={() => setIsPromoMenuOpen(false)}
