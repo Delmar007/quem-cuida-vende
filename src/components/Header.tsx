@@ -1010,7 +1010,7 @@ export default function Header() {
 
             <form
               onSubmit={handleSearch}
-              className="flex-1 min-w-0 flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white h-8"
+              className="flex-1 min-w-0 flex items-center border border-gray-300 focus-within:border-black transition-colors rounded-[6px] overflow-hidden bg-white h-[43px]"
             >
               <input
                 type="text"
@@ -1018,7 +1018,7 @@ export default function Header() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar..."
                 aria-label="Buscar por produto ou nome da loja"
-                className="w-full min-w-0 px-2.5 py-1 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none bg-transparent"
+                className="w-full min-w-0 px-2.5 py-1 text-[16px] leading-tight text-gray-800 placeholder:text-xs placeholder:text-gray-400 focus:outline-none bg-transparent"
               />
               <button
                 type="submit"
@@ -1297,7 +1297,7 @@ export default function Header() {
                 e.stopPropagation()
                 setIsMobileCatOpen((prev) => !prev)
               }}
-              className={`flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-3 text-[14.5px] font-bold uppercase tracking-wide transition-all border rounded-[6px] cursor-pointer relative z-[60] select-none ${
+              className={`flex-1 min-w-0 h-[43px] flex items-center justify-center gap-1.5 px-3 text-[14.5px] font-bold uppercase tracking-wide transition-all border rounded-[6px] cursor-pointer relative z-[60] select-none ${
                 isMobileCatOpen || currentCategory
                   ? 'border-[#FB6600] text-[#FB6600] bg-orange-50/60 shadow-xs'
                   : 'border-gray-300 text-black hover:border-black bg-white'
