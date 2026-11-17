@@ -963,7 +963,7 @@ export default function StoreProductsCatalog({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5 w-full">
+            <div className="grid grid-cols-1 gap-3 w-full">
               {filteredProducts.map((produto) => {
                 const priceFinal =
                   produto.promotional_price && produto.promotional_price < produto.price
