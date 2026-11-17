@@ -115,6 +115,7 @@ export default function PromoThermometerBar({
     computeThermometerMetrics(startDate, endDate)
   )
   const [isLiked, setIsLiked] = useState(false)
+  const [isFollowingStore, setIsFollowingStore] = useState(false)
 
   useEffect(() => {
     setMetrics(computeThermometerMetrics(startDate, endDate))
@@ -126,10 +127,13 @@ export default function PromoThermometerBar({
 
   useEffect(() => {
     const syncLike = () => {
+      const followed = getClientFollowedStores()
+      setIsFollowingStore(storeId ? followed.includes(storeId) : false)
+
       if (productId) {
         setIsLiked(getClientFavoriteProducts().includes(productId))
       } else if (storeId) {
-        setIsLiked(getClientFollowedStores().includes(storeId))
+        setIsLiked(followed.includes(storeId))
       }
     }
     syncLike()
@@ -149,10 +153,19 @@ export default function PromoThermometerBar({
     if (productId) {
       setIsLiked(toggleClientFavoriteProduct(productId))
     } else if (storeId) {
-      setIsLiked(toggleClientFollowStore(storeId))
+      const next = toggleClientFollowStore(storeId)
+      setIsLiked(next)
+      setIsFollowingStore(next)
     } else {
       setIsLiked((prev) => !prev)
     }
+  }
+
+  const handleFollowStoreClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!storeId) return
+    setIsFollowingStore(toggleClientFollowStore(storeId))
   }
 
   const prefixTitle =
@@ -218,37 +231,98 @@ export default function PromoThermometerBar({
           )}
         </div>
 
-        {/* Lado Direito: Coração Outline (Exatamente como nas imagens) */}
+        {/* Lado Direito: + Seguir Loja (no card) e Coração Favoritos/Seguir */}
         {showHeart && (
-          <button
-            type="button"
-            onClick={handleHeartClick}
-            title={
-              productId
-                ? isLiked
-                  ? 'Remover dos Favoritos'
-                  : 'Salvar nos Favoritos'
-                : isLiked
-                ? 'Deixar de seguir loja'
-                : 'Seguir esta loja'
-            }
-            aria-label="Favoritar ou Seguir"
-            className="text-[#8c939d] hover:text-[#FB6600] transition-colors cursor-pointer shrink-0 ml-2 flex items-center justify-center"
-          >
-            <svg
-              className={variant === 'card' ? 'w-[19px] h-[19px]' : 'w-[22px] h-[22px]'}
-              fill={isLiked ? '#FB6600' : 'none'}
-              viewBox="0 0 24 24"
-              stroke={isLiked ? '#FB6600' : 'currentColor'}
-              strokeWidth={1.5}
+          <div className="flex items-center gap-2 shrink-0 ml-2">
+            {variant === 'card' && storeId && (
+              <button
+                type="button"
+                onClick={handleFollowStoreClick}
+                aria-pressed={isFollowingStore}
+                title={
+                  isFollowingStore
+                    ? 'Seguindo esta loja (clique para deixar de seguir)'
+                    : 'Seguir esta loja'
+                }
+                aria-label={isFollowingStore ? 'Deixar de seguir loja' : 'Seguir loja'}
+                className={`transition-colors cursor-pointer flex items-center justify-center ${
+                  isFollowingStore
+                    ? 'text-red-600 hover:text-red-700'
+                    : 'text-[#8c939d] hover:text-red-600'
+                }`}
+              >
+                <svg
+                  className="w-[19px] h-[19px]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.25}
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleHeartClick}
+              aria-pressed={isLiked}
+              title={
+                productId
+                  ? isLiked
+                    ? 'Remover dos Favoritos'
+                    : 'Salvar nos Favoritos'
+                  : isLiked
+                  ? 'Seguindo esta loja (clique para deixar de seguir)'
+                  : 'Seguir esta loja'
+              }
+              aria-label={
+                productId
+                  ? isLiked
+                    ? 'Remover dos Favoritos'
+                    : 'Salvar nos Favoritos'
+                  : isLiked
+                  ? 'Deixar de seguir loja'
+                  : 'Seguir esta loja'
+              }
+              className={`transition-colors cursor-pointer flex items-center justify-center ${
+                variant === 'banner'
+                  ? isLiked
+                    ? 'text-red-600'
+                    : 'text-[#8c939d] hover:text-red-600'
+                  : isLiked
+                  ? 'text-[#FB6600]'
+                  : 'text-[#8c939d] hover:text-[#FB6600]'
+              }`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button>
+              <svg
+                className={variant === 'card' ? 'w-[19px] h-[19px]' : 'w-[22px] h-[22px]'}
+                fill={
+                  isLiked
+                    ? variant === 'banner'
+                      ? '#DC2626'
+                      : '#FB6600'
+                    : 'none'
+                }
+                viewBox="0 0 24 24"
+                stroke={
+                  isLiked
+                    ? variant === 'banner'
+                      ? '#DC2626'
+                      : '#FB6600'
+                    : 'currentColor'
+                }
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            </button>
+          </div>
         )}
       </div>
 
