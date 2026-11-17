@@ -179,7 +179,7 @@ export default function PromoThermometerBar({
     >
       <div
         className={`flex items-center justify-between ${
-          variant === 'card' ? 'px-3 py-2' : 'px-3.5 py-2.5'
+          variant === 'card' ? 'px-3.5 py-3.5 md:px-3 md:py-2' : 'px-3.5 py-2.5'
         }`}
       >
         {/* Lado Esquerdo: Contagem regressiva real OU "Pronta entrega na loja" */}
@@ -188,7 +188,7 @@ export default function PromoThermometerBar({
             <>
               <svg
                 className={`${
-                  variant === 'card' ? 'w-4 h-4' : 'w-[18px] h-[18px]'
+                  variant === 'card' ? 'w-5 h-5 md:w-4 md:h-4' : 'w-[18px] h-[18px]'
                 } text-[#8c939d] shrink-0`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -200,7 +200,7 @@ export default function PromoThermometerBar({
               </svg>
               <span
                 className={`${
-                  variant === 'card' ? 'text-xs' : 'text-[13px]'
+                  variant === 'card' ? 'text-[17px] md:text-xs' : 'text-[13px]'
                 } text-[#7f858d] font-normal truncate`}
               >
                 {prefixTitle}
@@ -211,7 +211,7 @@ export default function PromoThermometerBar({
             <>
               <svg
                 className={`${
-                  variant === 'card' ? 'w-4 h-4' : 'w-[18px] h-[18px]'
+                  variant === 'card' ? 'w-5 h-5 md:w-4 md:h-4' : 'w-[18px] h-[18px]'
                 } text-emerald-600 shrink-0`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -222,7 +222,7 @@ export default function PromoThermometerBar({
               </svg>
               <span
                 className={`${
-                  variant === 'card' ? 'text-xs' : 'text-[13px]'
+                  variant === 'card' ? 'text-[17px] md:text-xs' : 'text-[13px]'
                 } text-emerald-700 font-semibold truncate`}
               >
                 Pronta entrega na loja
@@ -233,7 +233,7 @@ export default function PromoThermometerBar({
 
         {/* Lado Direito: + Seguir Loja (no card) e Coração Favoritos/Seguir */}
         {showHeart && (
-          <div className="flex items-center gap-2 shrink-0 ml-2">
+          <div className={`flex items-center shrink-0 ml-2 ${variant === 'card' ? 'gap-3 md:gap-2' : 'gap-2'}`}>
             {variant === 'card' && storeId && (
               <button
                 type="button"
@@ -252,7 +252,7 @@ export default function PromoThermometerBar({
                 }`}
               >
                 <svg
-                  className="w-[19px] h-[19px]"
+                  className="w-[38px] h-[38px] md:w-[19px] md:h-[19px]"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -297,7 +297,11 @@ export default function PromoThermometerBar({
               }`}
             >
               <svg
-                className={variant === 'card' ? 'w-[19px] h-[19px]' : 'w-[22px] h-[22px]'}
+                className={
+                  variant === 'card'
+                    ? 'w-[38px] h-[38px] md:w-[19px] md:h-[19px]'
+                    : 'w-[22px] h-[22px]'
+                }
                 fill={
                   isLiked
                     ? variant === 'banner'
