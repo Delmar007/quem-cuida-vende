@@ -22,6 +22,7 @@ import { StoredProduct } from '@/lib/products-storage'
 import { getPlan, PlanId } from '@/lib/plans'
 import { formatCurrencyBRL } from '@/components/store/StoreProductsCatalog'
 import ProductCardImageCarousel from '@/components/ProductCardImageCarousel'
+import { getPromoColor } from '@/lib/promoColors'
 import { FIPE_MARCAS } from '@/lib/fipeMarcas'
 import { CURATED_BRANDS, toTitleCase } from '@/lib/textFormat'
 
@@ -1320,9 +1321,18 @@ export default function MerchantProductsTab({
                       ) : (
                         <span className="text-3xl text-neutral-400">🖼️</span>
                       )}
-                      <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 bg-[#FB6600] text-white text-[10px] font-bold uppercase tracking-wide rounded shadow-xs">
-                        {getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)}
-                      </span>
+                      {(() => {
+                        const promoLabel = getPromoLabel(prod.promo_type, prod.is_outlet, prod.is_novidade)
+                        const pColor = getPromoColor(promoLabel)
+                        return (
+                          <span
+                            style={{ backgroundColor: pColor.bgHex }}
+                            className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 text-white text-[10px] font-extrabold uppercase tracking-wide rounded shadow-xs"
+                          >
+                            {promoLabel}
+                          </span>
+                        )
+                      })()}
                       {prod.images && prod.images.length > 1 && (
                         <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                           +{prod.images.length - 1} fotos
@@ -2622,9 +2632,18 @@ export default function MerchantProductsTab({
                       />
                       {idx === 0 ? (
                         <>
-                          <span className="absolute top-2 left-2 bg-gradient-to-r from-[#FB6600] to-[#e05b00] text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow-md">
-                            {getPromoLabel(formPromoType)}
-                          </span>
+                          {(() => {
+                            const lbl = getPromoLabel(formPromoType)
+                            const clr = getPromoColor(lbl)
+                            return (
+                              <span
+                                style={{ backgroundColor: clr.bgHex }}
+                                className="absolute top-2 left-2 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-md shadow-md"
+                              >
+                                {lbl}
+                              </span>
+                            )
+                          })()}
                           {calculatedDiscount && calculatedDiscount > 0 && (
                             <span className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-yellow-400 text-black font-black text-[11px] flex items-center justify-center shadow-md border border-yellow-500/50">
                               -{calculatedDiscount}%

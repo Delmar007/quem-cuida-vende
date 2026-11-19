@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import AuthModal from '@/components/AuthModal'
 import PlansModal from '@/components/PlansModal'
+import PromoMapModal from '@/components/PromoMapModal'
+import { getPromoColor } from '@/lib/promoColors'
 import { createPlanCheckoutAction } from '@/app/actions/mercadopago-checkout'
 import { logoutAction, getSessionUserAction } from '@/app/login/actions'
 import {
@@ -42,6 +44,7 @@ export default function Header() {
   const [isLocationMenuOpen, setIsLocationMenuOpen] = useState(false)
   const [isMobileCatOpen, setIsMobileCatOpen] = useState(false)
   const [isPromoMenuOpen, setIsPromoMenuOpen] = useState(false)
+  const [isPromoMapModalOpen, setIsPromoMapModalOpen] = useState(false)
   const [isPlansOpen, setIsPlansOpen] = useState(false)
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
   const [porRuaMode, setPorRuaMode] = useState<'rua' | 'shopping'>('rua')
@@ -1061,20 +1064,34 @@ export default function Header() {
                     onClick={() => setIsPromoMenuOpen(false)}
                   />
                   {/* Menu Vertical de Promoções */}
-                  <div className="absolute right-0 top-full mt-1.5 w-56 bg-white border border-gray-200 shadow-xl z-50 py-1.5 rounded-[2px] animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute right-0 top-full mt-1.5 w-60 bg-white border border-gray-200 shadow-xl z-50 py-1.5 rounded-[2px] animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="px-3 py-1.5 border-b border-gray-100 flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                         Filtrar Promoção
                       </span>
-                      {activePromoObj && (
-                        <Link
-                          href={buildFilterUrl({ filtro: '' })}
-                          onClick={() => setIsPromoMenuOpen(false)}
-                          className="text-[10px] font-bold text-[#FB6600] hover:underline"
+                      <div className="flex items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPromoMenuOpen(false)
+                            setIsPromoMapModalOpen(true)
+                          }}
+                          className="text-[11px] font-black text-[#FB6600] hover:text-[#e05b00] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Abrir mapa com todos os tipos de promoções alocadas"
                         >
-                          Limpar
-                        </Link>
-                      )}
+                          <span>🗺️</span>
+                          <span>Mapa</span>
+                        </button>
+                        {activePromoObj && (
+                          <Link
+                            href={buildFilterUrl({ filtro: '' })}
+                            onClick={() => setIsPromoMenuOpen(false)}
+                            className="text-[10px] font-bold text-gray-400 hover:text-red-500 hover:underline"
+                          >
+                            Limpar
+                          </Link>
+                        )}
+                      </div>
                     </div>
                     <div className="divide-y divide-gray-50 max-h-[340px] overflow-y-auto">
                       {tiposPromocao.map((promo) => {
@@ -1084,12 +1101,13 @@ export default function Header() {
                           promo.id === 'feed_que_sigo' && nextFiltro
                             ? buildFilterUrl({ tipo: 'produtos', filtro: nextFiltro })
                             : buildFilterUrl({ filtro: nextFiltro })
+                        const pColor = getPromoColor(promo.id)
                         return (
                           <Link
                             key={promo.id}
                             href={targetHref}
                             onClick={() => setIsPromoMenuOpen(false)}
-                            className={`flex items-center justify-between px-3.5 py-2.5 text-xs uppercase transition-colors ${
+                            className={`flex items-center justify-between px-3.5 py-2 text-xs uppercase transition-colors ${
                               isPromoSelected
                                 ? 'bg-orange-50/70 text-[#FB6600] font-bold'
                                 : promo.isOrange
@@ -1097,9 +1115,15 @@ export default function Header() {
                                 : 'text-gray-700 hover:bg-gray-50 hover:text-[#FB6600] font-medium'
                             }`}
                           >
-                            <span className={promo.isOrange ? 'text-[#FB6600] font-bold' : ''}>
-                              {promo.label}
-                            </span>
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span
+                                style={{ backgroundColor: pColor.bgHex }}
+                                className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs border border-white"
+                              />
+                              <span className={`truncate ${promo.isOrange ? 'text-[#FB6600] font-bold' : ''}`}>
+                                {promo.label}
+                              </span>
+                            </div>
                             {isPromoSelected ? (
                               <span className="text-[10px] uppercase font-bold text-[#FB6600]">✓</span>
                             ) : (
@@ -1683,6 +1707,14 @@ export default function Header() {
           // Se não gerou link (ex: loja ainda sendo configurada), abre no painel com o plano selecionado
           router.push(`/painel/loja?plano=${plan}`)
         }}
+      />
+
+      {/* Modal Interativo de Mapa das Promoções com Pontos Coloridos */}
+      <PromoMapModal
+        isOpen={isPromoMapModalOpen}
+        onClose={() => setIsPromoMapModalOpen(false)}
+        currentCity={selectedLocation.city}
+        currentUf={selectedLocation.state}
       />
     </>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { getPromoColor } from '@/lib/promoColors'
 
 interface ProductCardImageCarouselProps {
   images: string[]
@@ -118,20 +119,26 @@ export default function ProductCardImageCarousel({
         </div>
       )}
 
-      {/* Badge do Tipo de Promoção no Canto Superior Esquerdo */}
-      <div
-        className={`absolute ${
-          compact ? 'top-1.5 left-1.5' : 'top-2.5 left-2.5'
-        } z-10 flex flex-col gap-1 items-start`}
-      >
-        <span
-          className={`bg-[#FB6600] text-white ${
-            compact ? 'text-[8.5px] px-1.5 py-0.5' : 'text-[9.5px] px-2 py-0.5'
-          } uppercase tracking-wider font-bold shadow-sm`}
-        >
-          {promoBadgeLabel}
-        </span>
-      </div>
+      {/* Badge do Tipo de Promoção no Canto Superior Esquerdo (Cor Alegre Exclusiva, Outlet em Laranja) */}
+      {(() => {
+        const promoColor = getPromoColor(promoBadgeLabel)
+        return (
+          <div
+            className={`absolute ${
+              compact ? 'top-1.5 left-1.5' : 'top-2.5 left-2.5'
+            } z-10 flex flex-col gap-1 items-start`}
+          >
+            <span
+              style={{ backgroundColor: promoColor.bgHex }}
+              className={`text-white ${
+                compact ? 'text-[8.5px] px-1.5 py-0.5' : 'text-[9.5px] px-2 py-0.5'
+              } uppercase tracking-wider font-extrabold shadow-sm rounded-[2px] transition-colors`}
+            >
+              {promoBadgeLabel}
+            </span>
+          </div>
+        )
+      })()}
 
       {/* Tag da Subcategoria no Canto Inferior Esquerdo */}
       {subcategory && (
