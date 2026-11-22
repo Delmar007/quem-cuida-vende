@@ -244,6 +244,12 @@ export default function Header() {
   }
 
   useEffect(() => {
+    if (searchParams.get('mapa') === '1' || searchParams.get('mapa') === 'true') {
+      setIsPromoMapModalOpen(true)
+    }
+  }, [searchParams])
+
+  useEffect(() => {
     if (currentCategory !== 'por_rua') {
       setSelectedLetter(null)
       setIsPorRuaExpanded(true)
@@ -1064,34 +1070,39 @@ export default function Header() {
                     onClick={() => setIsPromoMenuOpen(false)}
                   />
                   {/* Menu Vertical de Promoções */}
-                  <div className="absolute right-0 top-full mt-1.5 w-60 bg-white border border-gray-200 shadow-xl z-50 py-1.5 rounded-[2px] animate-in fade-in slide-in-from-top-1 duration-150">
-                    <div className="px-3 py-1.5 border-b border-gray-100 flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                        Filtrar Promoção
-                      </span>
-                      <div className="flex items-center gap-2.5">
+                  <div className="absolute right-0 top-full mt-1.5 w-64 bg-white border border-gray-200 shadow-xl z-50 py-1.5 rounded-[2px] animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-500 whitespace-nowrap">
+                          Filtrar Promoção
+                        </span>
+                        <span className="text-gray-300 text-xs font-bold">:</span>
+                        {/* Palavra de acesso para acessar o mapa */}
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
                             setIsPromoMenuOpen(false)
                             setIsPromoMapModalOpen(true)
                           }}
-                          className="text-[11px] font-black text-[#FB6600] hover:text-[#e05b00] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
-                          title="Abrir mapa com todos os tipos de promoções alocadas"
+                          className="text-xs font-black text-[#FB6600] hover:text-[#d95500] underline underline-offset-2 cursor-pointer flex items-center gap-0.5 bg-orange-50 hover:bg-orange-100 px-1.5 py-0.5 rounded transition-all active:scale-95 whitespace-nowrap"
+                          title="Clique em mapa para abrir o mapa de promoções de Campo Grande - MS"
                         >
                           <span>🗺️</span>
-                          <span>Mapa</span>
+                          <span className="font-black">mapa</span>
                         </button>
-                        {activePromoObj && (
-                          <Link
-                            href={buildFilterUrl({ filtro: '' })}
-                            onClick={() => setIsPromoMenuOpen(false)}
-                            className="text-[10px] font-bold text-gray-400 hover:text-red-500 hover:underline"
-                          >
-                            Limpar
-                          </Link>
-                        )}
                       </div>
+
+                      {activePromoObj && (
+                        <Link
+                          href={buildFilterUrl({ filtro: '' })}
+                          onClick={() => setIsPromoMenuOpen(false)}
+                          className="text-[10px] font-bold text-gray-400 hover:text-red-500 hover:underline shrink-0"
+                        >
+                          Limpar
+                        </Link>
+                      )}
                     </div>
                     <div className="divide-y divide-gray-50 max-h-[340px] overflow-y-auto">
                       {tiposPromocao.map((promo) => {
