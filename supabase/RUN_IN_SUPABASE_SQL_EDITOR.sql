@@ -1,7 +1,7 @@
 -- ==============================================================================
 -- KITTANDA OUTLET — SCRIPT MESTRE DE BANCO DE DADOS SUPABASE
 -- Execute este script completo no SQL Editor do painel Supabase:
--- https://supabase.com/dashboard/project/sfqliyespzdjwengpjtg/sql/new
+-- https://supabase.com/dashboard/project/vooczwqifbbwtspzcdpz/sql/new
 -- ==============================================================================
 
 -- 1. EXTENSÕES NECESSÁRIAS
